@@ -20,7 +20,7 @@ import numpy as np
 
 def solver(ti,yi,h,func):
     # 4th order Runge-Kutta solver; func takes args ti (scalar time), 
-    # yi (vector values at time ti); h is time step
+    # yi (output at time ti as a numpy array or scalar); h is time step
     k1 = h*func(ti,yi)
     k2 = h*func(ti+0.5*h, yi+0.5*k1)
     k3 = h*func(ti+0.5*h, yi+0.5*k2)
@@ -29,7 +29,7 @@ def solver(ti,yi,h,func):
 
 def solverp(ti,yi,h,func,**params):
     # 4th order Runge-Kutta solver; func takes args ti (scalar time), 
-    # yi (vector values at time ti), **params (extra args needed for func); h is time step
+    # yi (output at time ti as a numpy array or scalar), **params (extra args needed for func); h is time step
     k1 = h*func(ti,yi,**params)
     k2 = h*func(ti+0.5*h, yi+0.5*k1,**params)
     k3 = h*func(ti+0.5*h, yi+0.5*k2,**params)
