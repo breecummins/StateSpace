@@ -28,4 +28,8 @@ def lorenz(t,xyz,sigma=0.,rho=0.,beta=0.):
 if __name__ == '__main__':
     import StateSpaceReconstructionPlots as SSRPlots
     timeseries = solveLorenz([1.0,0.5,0.5],80.0)
-    SSRPlots.plotManifold(timeseries)
+    # SSRPlots.plotManifold(timeseries,show=0)
+    # SSRPlots.plotShadowManifold(timeseries[:,0],3,8,show=0,hold=1,style='r-')
+    SSRPlots.plotShadowManifold(timeseries[:,0],2,8,show=0,hold=0,style='r-')
+    SSRPlots.plotShadowManifold(timeseries[:,1],2,8,show=0,hold=0,style='g-')
+    SSRPlots.plotShadowManifold(timeseries[:,2],2,8,show=1,hold=0,style='k-')
