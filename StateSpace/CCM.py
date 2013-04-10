@@ -45,9 +45,14 @@ def crossMap(ts1,ts2,numlags,lagsize,wgtfunc):
     est2 = estSeries(M1,M2[:,-1])
     return est1, est2
 
-def corrCoeff():
-    pass
-
+def corrCoeffPearson(ts1,ts2):
+    shift1 = ts1 - np.mean(ts1)
+    shift2 = ts2 - np.mean(ts2)
+    s12 = ( shift1*shift2 ).sum()
+    s11 = ( shift1*shift1 ).sum()
+    s22 = ( shift2*shift2 ).sum()
+    return s12 / np.sqrt(s11*s22)
+    
 def testCausality(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=makeExpWeights):
     '''
     Check for convergence (Sugihara) to infer causality between ts1 and ts2.
@@ -64,8 +69,9 @@ def testCausality(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=makeExpWei
     '''
     listoflens.sort()
     cap = min(len(ts1),len(ts2))
-    lol = [l if l < cap for l in listoflens]
+    lol = [l for l in listoflens if l < cap]
     for l in lol:
+        pass
         # choose numiters starting indices
         # for each starting index, choose the appropriate chunks of ts1 and ts2
             # call crossMap with the chunks
