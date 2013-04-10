@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
 import StateSpaceReconstruction as SSR
 
@@ -59,5 +60,35 @@ def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-'):
     if show:
         plt.show()
 
-
+def plots(x,y,hold=0,stylestr=['b-'],leglabels=None,titlestr=None,xstr=None,ystr=None,fname=None):
+    if not hold:
+        fig = plt.figure()
+    else:
+        plt.hold('on')
+    if len(y.shape) == 2 and len(x.shape)==1:
+        for k in range(y.shape[1]):
+            if leglabels != None:
+                plt.plot(x,y[:,k],stylestr[k],linewidth=2.0,label=leglabels[k])
+            else:
+                plt.plot(x,y[:,k],stylestr[k],linewidth=2.0)
+    elif len(y.shape) == 2 and len(x.shape)==2:
+        for k in range(y.shape[1]):
+            if leglabels != None:
+                plt.plot(x[:,k],y[:,k],stylestr[k],linewidth=2.0,label=leglabels[k])
+            else:
+                plt.plot(x[:,k],y[:,k],stylestr[k],linewidth=2.0)
+    else:
+        plt.plot(x,y,stylestr[0],linewidth=2.0) 
+    if titlestr != None:  
+        plt.title(titlestr)
+    if xstr != None: 
+        plt.xlabel(xstr)
+    if ystr != None:
+        plt.ylabel(ystr)
+    if leglabels != None:
+        plt.legend(loc=4)
+    mpl.rc('font',size=22)
+    if fname != None:
+        plt.savefig(fname,format='pdf', bbox_inches="tight")
+    plt.show()
 

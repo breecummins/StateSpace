@@ -1,5 +1,6 @@
 import StateSpaceReconstruction as SSR
 import numpy as np
+import random
 
 def findClosest(poi,pts,N):
     '''
@@ -8,11 +9,11 @@ def findClosest(poi,pts,N):
     '''
     dists = np.sqrt(((pts - poi)**2).sum(1))
     out = []
-    for _ in range(N):
+    for _ in range(N+1):
         i = dists.argmin()
         out.append((dists[i],i))
         dists[i] = np.Inf
-    return zip(*out)
+    return zip(*out[1:])
 
 def makeExpWeights(dists):
     u = np.exp( -dists/dists[0])
@@ -31,15 +32,15 @@ def crossMap(ts1,ts2,numlags,lagsize,wgtfunc):
     other time series.
 
     '''
-    M1 = SSR.makeShadowManifold(timeseries1,numlags,lagsize)
-    M2 = SSR.makeShadowManifold(timeseries2,numlags,lagsize)
+    M1 = np.array(list(SSR.makeShadowManifold(ts1,numlags,lagsize)))
+    M2 = np.array(list(SSR.makeShadowManifold(ts2,numlags,lagsize)))
     def estSeries(M,ts):
         est=np.zeros(ts.shape)
         for k in range(M.shape[0]):
             poi = M[k,:]
             dists,inds = findClosest(poi,M,numlags+1)
-            w = wgtfunc(dists)
-            est[k] = w*ts[list(inds)]
+            w = wgtfunc(np.array(dists))
+            est[k] = (w*ts[list(inds)]).sum()
         return est
     est1 = estSeries(M2,M1[:,-1])
     est2 = estSeries(M1,M2[:,-1])
@@ -56,28 +57,55 @@ def corrCoeffPearson(ts1,ts2):
 def testCausality(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=makeExpWeights):
     '''
     Check for convergence (Sugihara) to infer causality between ts1 and ts2.
+    ts1 and ts2 must have the same length.
     numlags is the dimension of the embedding space for the reconstruction.
     Use time lags of size lagsize * dt to construct shadow manifolds. lagsize
     is an integer representing the index of the time lag.
     listoflens contains the lengths to use to show convergence 
     Example: range(100,10000,100)
     Each length will be run numiters times from different random starting 
-    locations in the time series.
+    locations in the time series. numiters must be <= len(ts1) - max(listoflens).
     The estimated time series will be constructed using the weighting function 
     handle given by wgtfunc.
 
     '''
+    L = len(ts1)
+    if len(ts2) != L:
+        raise(ValueError,"The lengths of the two time series must be the same.")
     listoflens.sort()
-    cap = min(len(ts1),len(ts2))
-    lol = [l for l in listoflens if l < cap]
+    lol = [l for l in listoflens if l < L]
+    avgcc1=[]
+    stdcc1=[]
+    avgcc2=[]
+    stdcc2=[]
     for l in lol:
-        pass
-        # choose numiters starting indices
-        # for each starting index, choose the appropriate chunks of ts1 and ts2
-            # call crossMap with the chunks
-            # calculate correlation coefficient of estimated time series with real 
-        # record average over correlation coefficients
-        
+        startinds = random.sample(range(L-l),numiters)
+        cc1=[]
+        cc2=[]
+        for s in startinds:
+            est1,est2 = crossMap(ts1[s:s+l],ts2[s:s+l],numlags,lagsize,wgtfunc)
+            #correct for the time points lost in shadow manifold construction
+            s1 = s+(numlags-1)*lagsize 
+            l1 = len(est1)              
+            cc1.append(corrCoeffPearson(est1,ts1[s1:s1+l1]))
+            cc2.append(corrCoeffPearson(est2,ts2[s1:s1+l1]))
+        avgcc1.append(np.mean(np.array(cc1)))
+        avgcc2.append(np.mean(np.array(cc2)))
+        stdcc1.append(np.std(np.array(cc1)))
+        stdcc2.append(np.std(np.array(cc2)))
+    return lol,avgcc1,avgcc2,stdcc1,stdcc2
+    
+if __name__ == '__main__':
+    import StateSpaceReconstructionPlots as SSRPlots
+    from LorenzEqns import solveLorenz
+    timeseries = solveLorenz([1.0,0.5,0.5],80.0)
+    l,avg1,avg2,std1,std2 = testCausality(timeseries[:,0],timeseries[:,1],2,8,range(25,200,15),75) 
+    print(np.array(l))
+    print(np.array([avg1,avg2]))
+    avgarr = np.zeros((len(avg1),2))
+    avgarr[:,0] = avg1
+    avgarr[:,1] = avg2
+    SSRPlots.plots(np.array(l),avgarr,stylestr=['b-','r-'],leglabels=['x from My','y from Mx'],xstr='length of time interval',ystr='mean corr coeff')       
         
 
 
