@@ -1,8 +1,11 @@
+#third party modules
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
+#my modules
 import StateSpaceReconstruction as SSR
+import CCM
 
 def plotManifold(timeseries,show=1,hold=0,style='b-'):
     '''
@@ -59,6 +62,29 @@ def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-'):
         plt.plot(timeseries,style)
     if show:
         plt.show()
+
+def plotEstShadowManifoldSugihara(ts1,ts2,numlags,lagsize,wgtfunc=CCM.makeExpWeights):
+    est1,est2 = CCM.crossMap(ts1,ts2,numlags,lagsize,wgtfunc)
+    plotShadowManifold(ts1,numlags,lagsize,0)
+    plotShadowManifold(est1,numlags,lagsize,0,1,'r-')
+    plotShadowManifold(ts2,numlags,lagsize,0,0,'k-')
+    plotShadowManifold(est2,numlags,lagsize,1,1,'g-')
+
+def plotEstShadowManifoldUs1(ts1,ts2,numlags,lagsize,wgtfunc=CCM.makeExpWeights):
+    M1 = np.array(list(SSR.makeShadowManifold(ts1,numlags,lagsize)))
+    M2 = np.array(list(SSR.makeShadowManifold(ts2,numlags,lagsize)))
+    Mest1,Mest2 = CCM.crossMapModified1(M1,M2,wgtfunc)
+    plotManifold(M1,0)
+    plotManifold(Mest1,0,1,'r-')
+    plotManifold(M2,0,0,'k-')
+    plotManifold(Mest2,1,1,'g-')
+
+def plotEstShadowManifoldUs2(ts1,ts2,numlags,lagsize,wgtfunc=CCM.makeExpWeights):
+    est1,est2 = CCM.crossMapModified2(ts1,ts2,numlags,lagsize,wgtfunc)
+    plotShadowManifold(ts1,numlags,lagsize,0)
+    plotShadowManifold(est1,numlags,lagsize,0,1,'r-')
+    plotShadowManifold(ts2,numlags,lagsize,0,0,'k-')
+    plotShadowManifold(est2,numlags,lagsize,1,1,'g-')
 
 def plots(x,y,hold=0,stylestr=['b-'],leglabels=None,titlestr=None,xstr=None,ystr=None,fname=None):
     if not hold:
