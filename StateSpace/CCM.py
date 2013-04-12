@@ -33,7 +33,7 @@ def crossMap(ts1,ts2,numlags,lagsize,wgtfunc):
         est=np.zeros(ts.shape)
         for k in range(M.shape[0]):
             poi = M[k,:]
-            dists,inds = findClosest(poi,M,numlags+1)
+            dists,inds = Weights.findClosest(poi,M,numlags+1)
             w = wgtfunc(np.array(dists))
             est[k] = (w*ts[list(inds)]).sum()
         return est
@@ -90,7 +90,7 @@ def estManifold(Mx,My,wgtfunc):
     Mest=np.zeros(My.shape)
     for k in range(Mx.shape[0]):
         poi = Mx[k,:]
-        dists,inds = findClosest(poi,Mx,Mx.shape[1]+1)
+        dists,inds = Weights.findClosest(poi,Mx,Mx.shape[1]+1)
         w = wgtfunc(np.array(dists))
         pts = [My[j,:] for j in inds]
         Mest[k,:] = np.array([w[j]*pts[j] for j in range(len(w))]).sum(0)
