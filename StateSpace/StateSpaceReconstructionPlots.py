@@ -78,7 +78,7 @@ def plotEstShadowManifoldUs3(ts1,ts2,numlags,lagsize,proj,wgtfunc=Weights.makeEx
     plotShadowManifold(ts2,numlags,lagsize,0,0,'k-')
     plotShadowManifold(est2,numlags,lagsize,1,1,'g-')
 
-def plots(x,y,hold=0,stylestr=['b-'],leglabels=None,titlestr=None,xstr=None,ystr=None,fname=None):
+def plots(x,y,hold=0,stylestr=['b-'],leglabels=None,legloc=4,titlestr=None,xstr=None,ystr=None,fname=None):
     if not hold:
         fig = plt.figure()
     else:
@@ -104,7 +104,7 @@ def plots(x,y,hold=0,stylestr=['b-'],leglabels=None,titlestr=None,xstr=None,ystr
     if ystr != None:
         plt.ylabel(ystr)
     if leglabels != None:
-        plt.legend(loc=4)
+        plt.legend(loc=legloc)
     mpl.rc('font',size=22)
     if fname != None:
         plt.savefig(fname,format='pdf', bbox_inches="tight")
