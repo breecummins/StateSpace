@@ -8,6 +8,10 @@ def corrCoeffPearson(ts1,ts2):
     s22 = ( shift2*shift2 ).sum()
     return s12 / np.sqrt(s11*s22)
 
-def L2error(M1,M2):
-    return np.sqrt(((M1-M2)**2).sum(1)).sum(0) / M1.shape[0]
+def L2errorPerPt(M1,M2,dt):
+    return np.sqrt(((M1-M2)**2).sum(1)*dt).sum(0) / M1.shape[0]
+
+def L2errorPerVol(M1,M2,dt,volperpt):
+    return L2errorPerPt(M1,M2,dt)/volperpt
+
 

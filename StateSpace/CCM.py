@@ -127,6 +127,7 @@ def testCausalityModified1(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=W
 
     '''
     L = len(ts1)
+    dt = ts1[1] - ts2[0] #assume uniform sampling in time
     if len(ts2) != L:
         raise(ValueError,"The lengths of the two time series must be the same.")
     listoflens.sort()
@@ -142,52 +143,11 @@ def testCausalityModified1(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=W
         for s in startinds:
             M1 = np.array(list(SSR.makeShadowManifold(ts1[s:s+l],numlags,lagsize)))
             M2 = np.array(list(SSR.makeShadowManifold(ts2[s:s+l],numlags,lagsize)))
+            typvol1 = Weights.typicalVolume(M1)
+            typvol2 = Weights.typicalVolume(M2)
             Mest1,Mest2 = crossMapModified1(M1,M2,wgtfunc)
-            cc1.append(Similarity.L2error(Mest1,M1))
-            cc2.append(Similarity.L2error(Mest2,M2))
-        avgcc1.append(np.mean(np.array(cc1)))
-        avgcc2.append(np.mean(np.array(cc2)))
-        stdcc1.append(np.std(np.array(cc1)))
-        stdcc2.append(np.std(np.array(cc2)))
-    return lol,avgcc1,avgcc2,stdcc1,stdcc2
-
-def testCausalityHybrid(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=Weights.makeExpWeights):
-    '''
-    Check for convergence to infer causality between ts1 and ts2. Hybrid method 
-    between Sugihara and us.
-    ts1 and ts2 must have the same length.
-    numlags is the dimension of the embedding space for the reconstruction.
-    Use time lags of size lagsize * dt to construct shadow manifolds. lagsize
-    is an integer representing the index of the time lag.
-    listoflens contains the lengths to use to show convergence 
-    Example: range(100,10000,100)
-    Each length will be run numiters times from different random starting 
-    locations in the time series. numiters must be <= len(ts1) - max(listoflens).
-    The estimated time series will be constructed using the weighting function 
-    handle given by wgtfunc.
-
-    '''
-    #FIXME - is still plain Sugihara method
-    L = len(ts1)
-    if len(ts2) != L:
-        raise(ValueError,"The lengths of the two time series must be the same.")
-    listoflens.sort()
-    lol = [l for l in listoflens if l < L]
-    avgcc1=[]
-    stdcc1=[]
-    avgcc2=[]
-    stdcc2=[]
-    for l in lol:
-        startinds = random.sample(range(L-l),numiters)
-        cc1=[]
-        cc2=[]
-        for s in startinds:
-            est1,est2 = crossMap(ts1[s:s+l],ts2[s:s+l],numlags,lagsize,wgtfunc)
-            #correct for the time points lost in shadow manifold construction
-            s1 = s+(numlags-1)*lagsize 
-            l1 = len(est1)              
-            cc1.append(Similarity.corrCoeffPearson(est1,ts1[s1:s1+l1]))
-            cc2.append(Similarity.corrCoeffPearson(est2,ts2[s1:s1+l1]))
+            cc1.append(Similarity.L2errorPerVol(Mest1,M1,dt,typvol1))
+            cc2.append(Similarity.L2errorPerVol(Mest2,M2,dt,typvol2))
         avgcc1.append(np.mean(np.array(cc1)))
         avgcc2.append(np.mean(np.array(cc2)))
         stdcc1.append(np.std(np.array(cc1)))
