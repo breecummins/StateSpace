@@ -22,13 +22,13 @@ def crossMap(ts1,ts2,numlags,lagsize,wgtfunc):
     projection:
     Mest1 = estManifold(M2,M1)
     Mest2 = estManifold(M1,M2)
-    est1 = Mest1[:,-1]
-    est2 = Mest2[:,-1]
+    est1 = Mest1[:,0]
+    est2 = Mest2[:,0]
 
 
     '''
-    M1 = np.array(list(SSR.makeShadowManifold(ts1,numlags,lagsize)))
-    M2 = np.array(list(SSR.makeShadowManifold(ts2,numlags,lagsize)))
+    M1 = SSR.makeShadowManifold(ts1,numlags,lagsize)
+    M2 = SSR.makeShadowManifold(ts2,numlags,lagsize)
     def estSeries(M,ts):
         est=np.zeros(ts.shape)
         for k in range(M.shape[0]):
@@ -37,8 +37,8 @@ def crossMap(ts1,ts2,numlags,lagsize,wgtfunc):
             w = wgtfunc(np.array(dists))
             est[k] = (w*ts[list(inds)]).sum()
         return est
-    est1 = estSeries(M2,M1[:,-1])
-    est2 = estSeries(M1,M2[:,-1])
+    est1 = estSeries(M2,M1[:,0])
+    est2 = estSeries(M1,M2[:,0])
     return est1, est2
 
 def testCausality(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=Weights.makeExpWeights):
@@ -66,18 +66,15 @@ def testCausality(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=Weights.ma
     avgcc2=[]
     stdcc2=[]
     for l in lol:
-        startinds = random.sample(range(L-l-numlags*lagsize),numiters)
-        print(startinds)
-        print(startinds+l+numlags*lagsize)
+        startinds = random.sample(range(L-l),numiters)
         cc1=[]
         cc2=[]
         for s in startinds:
             est1,est2 = crossMap(ts1[s:s+l],ts2[s:s+l],numlags,lagsize,wgtfunc)
             #correct for the time points lost in shadow manifold construction
-            s1 = s+(numlags-1)*lagsize 
-            l1 = len(est1)              
-            cc1.append(Similarity.corrCoeffPearson(est1,ts1[s1:s1+l1]))
-            cc2.append(Similarity.corrCoeffPearson(est2,ts2[s1:s1+l1]))
+            shift = (numlags-1)*lagsize 
+            cc1.append(Similarity.corrCoeffPearson(est1,ts1[s+shift:s+l]))
+            cc2.append(Similarity.corrCoeffPearson(est2,ts2[s+shift:s+l]))
         avgcc1.append(np.mean(np.array(cc1)))
         avgcc2.append(np.mean(np.array(cc2)))
         stdcc1.append(np.std(np.array(cc1)))
@@ -89,10 +86,18 @@ if __name__ == '__main__':
     import StateSpaceReconstructionPlots as SSRPlots
     # from LorenzEqns import solveLorenz
     # timeseries = solveLorenz([1.0,0.5,0.5],80.0)
-    # l,avg1,avg2,std1,std2 = testCausalityModified1(timeseries[:,0],timeseries[:,1],2,8,range(20,2000,100),25) 
+    # l,avg1,avg2,std1,std2 = testCausality(timeseries[:4001,0],timeseries[:4001,1],2,8,range(20,2000,200),25) 
     # from differenceEqns import solve2Species
     # timeseries = solve2Species([0.4,0.2],8.0)
-    # l,avg1,avg2,std1,std2 = testCausalityModified1(timeseries[:,0],timeseries[:,1],2,8,range(20,320,20),25) 
+    # l,avg1,avg2,std1,std2 = testCausality(timeseries[:,0],timeseries[:,1],2,8,range(20,320,40),25) 
+    # print(np.array(l))
+    # print(np.array([avg1,avg2]))
+    # avgarr = np.zeros((len(avg1),2))
+    # avgarr[:,0] = avg1
+    # avgarr[:,1] = avg2
+    # SSRPlots.plots(np.array(l),avgarr,hold=0,show=1,stylestr=['b-','r-'],leglabels=['x from My','y from Mx'], legloc=0,xstr='length of time interval',ystr='mean corr coeff')   
+
+
     from DoublePendulum import solvePendulum
     timeseries = solvePendulum([1.0,2.0,3.0,2.0],300.0)
     names = ['x','y','z']
@@ -100,16 +105,16 @@ if __name__ == '__main__':
     hold = 0
     show = 0
     for k in range(3):
-        l,avg1,avg2,std1,std2 = testCausality(timeseries[:,k],timeseries[:,-1],7,16,range(100,1700,500),25)
+        l,avg1,avg2,std1,std2 = testCausality(timeseries[:,k],timeseries[:,-1],9,16,range(500,3100,500),25)
         print(np.array(l))
         print(np.array([avg1,avg2]))
         avgarr = np.zeros((len(avg1),2))
         avgarr[:,0] = avg1
         avgarr[:,1] = avg2
-        if k == 1: 
-            xw = avg2
-        elif k==2:
-            yw = avg2
+        if k == 0: 
+            xw = avgarr[:,1]
+        elif k==1:
+            yw = avgarr[:,1]
         legloc=0
         SSRPlots.plots(np.array(l),avgarr[:,0],hold=hold,show=show,stylestr=[styles[k]],leglabels=[names[k] + ' from Mw'], legloc=legloc,xstr='length of time interval',ystr='mean corr coeff')   
         if not hold:

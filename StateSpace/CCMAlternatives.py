@@ -6,6 +6,7 @@ import StateSpaceReconstruction as SSR
 import Weights
 import Similarity
 
+#FIXME - refactor SSR
 
 def estManifold(Mx,My,wgtfunc):
     '''

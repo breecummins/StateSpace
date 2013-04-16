@@ -2,6 +2,9 @@ import numpy as np
 import CCM, Similarity, Weights
 import StateSpaceReconstruction as SSR
 import StateSpaceReconstructionPlots as SSRPlots
+
+#FIXME - refactor SSR
+
 # from LorenzEqns import solveLorenz
 # timeseries = solveLorenz([1.0,0.5,0.5],80.0)
 # from differenceEqns import solve2Species

@@ -45,7 +45,7 @@ def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-'):
     lagsize is the number of time points in each lag.
 
     '''
-    pts = np.array(list(SSR.makeShadowManifold(timeseries,numlags,lagsize)))
+    pts = SSR.makeShadowManifold(timeseries,numlags,lagsize)
     plotManifold(pts,show,hold,style)
 
 def plotEstShadowManifoldSugihara(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeights):
@@ -56,8 +56,8 @@ def plotEstShadowManifoldSugihara(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeEx
     plotShadowManifold(est2,numlags,lagsize,1,1,'g-')
 
 def plotEstShadowManifoldUs1(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeights):
-    M1 = np.array(list(SSR.makeShadowManifold(ts1,numlags,lagsize)))
-    M2 = np.array(list(SSR.makeShadowManifold(ts2,numlags,lagsize)))
+    M1 = SSR.makeShadowManifold(ts1,numlags,lagsize)
+    M2 = SSR.makeShadowManifold(ts2,numlags,lagsize)
     Mest1,Mest2 = CCM.crossMapModified1(M1,M2,wgtfunc)
     plotManifold(M1,0)
     plotManifold(Mest1,0,1,'r-')
@@ -65,8 +65,8 @@ def plotEstShadowManifoldUs1(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeig
     plotManifold(Mest2,1,1,'g-')
 
 def plotEstShadowManifoldUs2(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeights):
-    M1 = np.array(list(SSR.makeShadowManifold(ts1,numlags,lagsize)))
-    M2 = np.array(list(SSR.makeShadowManifold(ts2,numlags,lagsize)))
+    M1 = SSR.makeShadowManifold(ts1,numlags,lagsize)
+    M2 = SSR.makeShadowManifold(ts2,numlags,lagsize)
     est1,est2 = CCM.crossMapModified2(M1,M2,wgtfunc)
     plotShadowManifold(ts1,numlags,lagsize,1)
     plotShadowManifold(est1,numlags,lagsize,0,1,'r-')
@@ -74,8 +74,8 @@ def plotEstShadowManifoldUs2(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeig
     plotShadowManifold(est2,numlags,lagsize,1,1,'g-')
 
 def plotEstShadowManifoldUs3(ts1,ts2,numlags,lagsize,proj,wgtfunc=Weights.makeExpWeights):
-    M1 = np.array(list(SSR.makeShadowManifold(ts1,numlags,lagsize)))
-    M2 = np.array(list(SSR.makeShadowManifold(ts2,numlags,lagsize)))
+    M1 = SSR.makeShadowManifold(ts1,numlags,lagsize)
+    M2 = SSR.makeShadowManifold(ts2,numlags,lagsize)
     est1,est2 = CCM.crossMapModified3(M1,M2,proj,wgtfunc)
     plotShadowManifold(ts1,numlags,lagsize,0)
     plotShadowManifold(est1,numlags,lagsize,0,1,'r-')

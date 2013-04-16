@@ -10,7 +10,7 @@ def makeShadowManifold(timeseries, numlags, lagsize):
     reconstruction. 
 
     '''
-    Mx = np.zeros((len(timeseries)-(numlags-1)*lagsize+1,numlags))
+    Mx = np.zeros((len(timeseries)-(numlags-1)*lagsize,numlags))
     for t in range(0,len(timeseries)-(numlags-1)*lagsize):
         inds = np.arange(t+(numlags-1)*lagsize,t-1,-lagsize)
         Mx[t,:] = timeseries[inds]
