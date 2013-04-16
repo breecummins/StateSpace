@@ -7,7 +7,9 @@ from mpl_toolkits.mplot3d import Axes3D
 import StateSpaceReconstruction as SSR
 import CCM, Weights
 
-def plotManifold(timeseries,show=1,hold=0,style='b-'):
+mpl.rcParams.update({'font.size': 22})
+
+def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None):
     '''
     timeseries is a sequence of observations containing at most three columns
 
@@ -28,6 +30,8 @@ def plotManifold(timeseries,show=1,hold=0,style='b-'):
         ax.plot(timeseries[:,0],timeseries[:,1],timeseries[:,2],style)
     else:
         raise(SystemExit,'A timeseries of dimension ' + str(timeseries.shape) + ' cannot be plotted')
+    if titlestr != None:  
+        plt.title(titlestr)
     if show:
         plt.show()
 
@@ -64,7 +68,7 @@ def plotEstShadowManifoldUs2(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeig
     M1 = np.array(list(SSR.makeShadowManifold(ts1,numlags,lagsize)))
     M2 = np.array(list(SSR.makeShadowManifold(ts2,numlags,lagsize)))
     est1,est2 = CCM.crossMapModified2(M1,M2,wgtfunc)
-    plotShadowManifold(ts1,numlags,lagsize,0)
+    plotShadowManifold(ts1,numlags,lagsize,1)
     plotShadowManifold(est1,numlags,lagsize,0,1,'r-')
     plotShadowManifold(ts2,numlags,lagsize,0,0,'k-')
     plotShadowManifold(est2,numlags,lagsize,1,1,'g-')
@@ -78,7 +82,7 @@ def plotEstShadowManifoldUs3(ts1,ts2,numlags,lagsize,proj,wgtfunc=Weights.makeEx
     plotShadowManifold(ts2,numlags,lagsize,0,0,'k-')
     plotShadowManifold(est2,numlags,lagsize,1,1,'g-')
 
-def plots(x,y,hold=0,stylestr=['b-'],leglabels=None,legloc=4,titlestr=None,xstr=None,ystr=None,fname=None):
+def plots(x,y,show=1,hold=0,stylestr=['b-'],leglabels=None,legloc=4,titlestr=None,xstr=None,ystr=None,fname=None):
     if not hold:
         fig = plt.figure()
     else:
@@ -96,7 +100,10 @@ def plots(x,y,hold=0,stylestr=['b-'],leglabels=None,legloc=4,titlestr=None,xstr=
             else:
                 plt.plot(x[:,k],y[:,k],stylestr[k],linewidth=2.0)
     else:
-        plt.plot(x,y,stylestr[0],linewidth=2.0) 
+        if leglabels != None:
+            plt.plot(x,y,stylestr[0],linewidth=2.0,label=leglabels[0]) 
+        else:
+            plt.plot(x,y,stylestr[0],linewidth=2.0) 
     if titlestr != None:  
         plt.title(titlestr)
     if xstr != None: 
@@ -108,5 +115,6 @@ def plots(x,y,hold=0,stylestr=['b-'],leglabels=None,legloc=4,titlestr=None,xstr=
     mpl.rc('font',size=22)
     if fname != None:
         plt.savefig(fname,format='pdf', bbox_inches="tight")
-    plt.show()
+    if show:
+        plt.show()
 
