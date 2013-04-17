@@ -44,7 +44,7 @@ def crossMapModified2(M1,M2,wgtfunc):
     interest. 
     Use the time indices of these points and the associated weights to 
     make a weighted-sum estimate of the contemporaneous points in M2.
-    Average the columns of the estimated manifold to get an estimated 
+    Average the shifted columns of the estimated manifold to get an estimated 
     time series.
 
     '''
@@ -96,7 +96,7 @@ def testCausalityModified(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=crossMa
     Each length will be run numiters times from different random starting 
     locations in the time series. numiters must be <= len(ts1) - max(listoflens).
     The estimated time series will be constructed using the weighting function 
-    handle given by wgtfunc.
+    handle given by wgtfunc and the cross map function given by CM.
 
     '''
     L = len(ts1)
