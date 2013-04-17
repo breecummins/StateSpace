@@ -84,7 +84,7 @@ def crossMapModified3(M1,M2,proj,wgtfunc):
     est2 = Mest2[:,proj]
     return est1, est2
 
-def testCausalityModified(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=crossMapModified1,wgtfunc=Weights.makeExpWeights):
+def testCausalityModified(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=crossMapModified1,wgtfunc=Weights.makeExpWeights,simMeasure=Similarity.RootMeanSquaredError):
     '''
     Check for convergence in root mean squared error to infer causality between ts1 and ts2.
     ts1 and ts2 must have the same length.
@@ -117,8 +117,8 @@ def testCausalityModified(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=crossMa
             M1 = SSR.makeShadowManifold(ts1[s:s+l],numlags,lagsize)
             M2 = SSR.makeShadowManifold(ts2[s:s+l],numlags,lagsize)
             Mest1,Mest2 = CM(M1,M2,wgtfunc)
-            cc1.append(Similarity.RootMeanSquaredError(Mest1,M1))
-            cc2.append(Similarity.RootMeanSquaredError(Mest2,M2))
+            cc1.append(simMeasure(Mest1,M1))
+            cc2.append(simMeasure(Mest2,M2))
         avgcc1.append(np.mean(np.array(cc1)))
         avgcc2.append(np.mean(np.array(cc2)))
         stdcc1.append(np.std(np.array(cc1)))
