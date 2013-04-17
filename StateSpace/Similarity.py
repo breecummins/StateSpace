@@ -11,4 +11,7 @@ def corrCoeffPearson(ts1,ts2):
 def RootMeanSquaredError(M1,M2):
     return np.sqrt( ((M1-M2)**2).sum() / M1.shape[0]*M1.shape[1])
 
+def HausdorffDistance(M1,M2):
+    pass
+
 
