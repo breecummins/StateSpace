@@ -33,7 +33,7 @@ def crossMap(ts1,ts2,numlags,lagsize,wgtfunc):
         est=np.zeros(ts.shape)
         for k in range(M.shape[0]):
             poi = M[k,:]
-            dists,inds = Weights.findClosest(poi,M,numlags+1)
+            dists,inds = Similarity.findClosestInclusive(poi,M,numlags+1)
             w = wgtfunc(np.array(dists))
             est[k] = (w*ts[list(inds)]).sum()
         return est

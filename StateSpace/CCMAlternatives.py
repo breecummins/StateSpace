@@ -14,7 +14,7 @@ def estManifold(Mx,My,wgtfunc):
     Mest=np.zeros(My.shape)
     for k in range(Mx.shape[0]):
         poi = Mx[k,:]
-        dists,inds = Weights.findClosest(poi,Mx,Mx.shape[1]+1)
+        dists,inds = Similarity.findClosestInclusive(poi,Mx,Mx.shape[1]+1)
         w = wgtfunc(np.array(dists))
         pts = [My[j,:] for j in inds]
         Mest[k,:] = np.array([w[j]*pts[j] for j in range(len(w))]).sum(0)
