@@ -5,7 +5,7 @@ import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
 #my modules
 import StateSpaceReconstruction as SSR
-import CCM, Weights
+import CCM, CCMAlternatives,Weights
 
 mpl.rcParams.update({'font.size': 22})
 
@@ -58,7 +58,7 @@ def plotEstShadowManifoldSugihara(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeEx
 def plotEstShadowManifoldUs1(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeights):
     M1 = SSR.makeShadowManifold(ts1,numlags,lagsize)
     M2 = SSR.makeShadowManifold(ts2,numlags,lagsize)
-    Mest1,Mest2 = CCM.crossMapModified1(M1,M2,wgtfunc)
+    Mest1,Mest2 = CCMAlternatives.crossMapModified1(M1,M2,wgtfunc)
     plotManifold(M1,0)
     plotManifold(Mest1,0,1,'r-')
     plotManifold(M2,0,0,'k-')
@@ -67,8 +67,8 @@ def plotEstShadowManifoldUs1(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeig
 def plotEstShadowManifoldUs2(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeights):
     M1 = SSR.makeShadowManifold(ts1,numlags,lagsize)
     M2 = SSR.makeShadowManifold(ts2,numlags,lagsize)
-    est1,est2 = CCM.crossMapModified2(M1,M2,wgtfunc)
-    plotShadowManifold(ts1,numlags,lagsize,1)
+    est1,est2 = CCMAlternatives.crossMapModified2(M1,M2,wgtfunc)
+    plotShadowManifold(ts1,numlags,lagsize,0)
     plotShadowManifold(est1,numlags,lagsize,0,1,'r-')
     plotShadowManifold(ts2,numlags,lagsize,0,0,'k-')
     plotShadowManifold(est2,numlags,lagsize,1,1,'g-')
@@ -76,7 +76,7 @@ def plotEstShadowManifoldUs2(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeig
 def plotEstShadowManifoldUs3(ts1,ts2,numlags,lagsize,proj,wgtfunc=Weights.makeExpWeights):
     M1 = SSR.makeShadowManifold(ts1,numlags,lagsize)
     M2 = SSR.makeShadowManifold(ts2,numlags,lagsize)
-    est1,est2 = CCM.crossMapModified3(M1,M2,proj,wgtfunc)
+    est1,est2 = CCMAlternatives.crossMapModified3(M1,M2,proj,wgtfunc)
     plotShadowManifold(ts1,numlags,lagsize,0)
     plotShadowManifold(est1,numlags,lagsize,0,1,'r-')
     plotShadowManifold(ts2,numlags,lagsize,0,0,'k-')
