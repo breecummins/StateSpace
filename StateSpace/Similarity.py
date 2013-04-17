@@ -43,6 +43,11 @@ def findClosestExclusive(poi,pts,N):
     return zip(*out)
 
 def HausdorffDistance(M1,M2):
+    '''
+    Find the Hausdorff distance between two sets of points
+    in R^d, where d = M1.shape[1] = M2.shape[1].
+
+    '''
     def calcMaxMin(X,Y):
         mm = 0.0
         for k in range(X.shape[0]):
@@ -54,6 +59,29 @@ def HausdorffDistance(M1,M2):
     mm1 = calcMaxMin(M1,M2)
     mm2 = calcMaxMin(M2,M1)
     return max(mm1,mm2)
+
+def countingMeasure(M1,M2):
+    '''
+    Count the number of nearest neighbors for points in M1 that share a time 
+    index with a nearest neighbor of the contemporaneous point in M2. This
+    is analogous to estimating M1 from M2 using Sugihara's method. 
+
+    '''
+    n = M1.shape[1]+1
+    mycount = []
+    for k in range(M1.shape[0]):
+        poi1 = M1[k,:]
+        junk,inds1 = findClosestInclusive(poi1,M1,n)
+        poi2 = M2[k,:]
+        junk,inds2 = findClosestInclusive(poi2,M2,n)
+        mc = 0
+        for j in range(n):
+            if inds2[j] in inds1:
+                mc += 1
+        mycount.append(mc)
+    return np.mean(np.array(mycount))
+        
+
 
 def typicalVolume(M1):
     '''
