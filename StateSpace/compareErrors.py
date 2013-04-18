@@ -64,17 +64,17 @@ proj = numlags - 1
 est1,est2=CCMAlternatives.crossMapModified3(M1,M2,proj,Weights.makeExpWeights)
 M1us3=SSR.makeShadowManifold(est1,numlags,lagsize)
 M2us3=SSR.makeShadowManifold(est2,numlags,lagsize)
-M1us3RMSE, M2us3RMSE = calcErrs(M1us3,M2us3,Similarity.RootMeanSquaredError,M1[corr-(numlags-proj):-(numlags-proj),:],M2[corr-(numlags-proj):-(numlags-proj),:])
-M1us3HD, M2us3HD = calcErrs(M1us3,M2us3,Similarity.HausdorffDistance,M1[corr-(numlags-proj):-(numlags-proj),:],M2[corr-(numlags-proj):-(numlags-proj),:])
-M1us3CM, M2us3CM = calcErrs(M1us3,M2us3,Similarity.countingMeasure,M1[corr-(numlags-proj):-(numlags-proj),:],M2[corr-(numlags-proj):-(numlags-proj),:])
+M1us3RMSE, M2us3RMSE = calcErrs(M1us3,M2us3,Similarity.RootMeanSquaredError,M1[corr-proj:-proj,:],M2[corr-proj:-proj,:])
+M1us3HD, M2us3HD = calcErrs(M1us3,M2us3,Similarity.HausdorffDistance,M1[corr-proj:-proj,:],M2[corr-proj:-proj,:])
+M1us3CM, M2us3CM = calcErrs(M1us3,M2us3,Similarity.countingMeasure,M1[corr-proj:-proj,:],M2[corr-proj:-proj,:])
 print("Our method 3, take a different projection (index "+ str(proj) +"):")
 printMe("RMSE",M1us3RMSE,M2us3RMSE)
 printMe("Hausdorff dist",M1us3HD,M2us3HD)
 printMe("Counting measure",M1us3CM,M2us3CM)
 
-# plot the shadow manifolds and their estimates
-SSRPlots.plotEstShadowManifoldSugihara(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize)     
-SSRPlots.plotEstShadowManifoldUs1(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize)        
-SSRPlots.plotEstShadowManifoldUs2(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize)        
-SSRPlots.plotEstShadowManifoldUs3(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize,proj)        
+# # plot the shadow manifolds and their estimates
+# SSRPlots.plotEstShadowManifoldSugihara(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize)     
+# SSRPlots.plotEstShadowManifoldUs1(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize)        
+# SSRPlots.plotEstShadowManifoldUs2(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize)        
+# SSRPlots.plotEstShadowManifoldUs3(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize,proj)        
 

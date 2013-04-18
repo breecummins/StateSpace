@@ -67,7 +67,8 @@ def countingMeasure(M1,M2):
     is analogous to estimating M1 from M2 using Sugihara's method. 
 
     '''
-    n = M1.shape[1]+1
+    # n = M1.shape[1]+1
+    n = 2*(M1.shape[1]+1)
     mycount = []
     for k in range(M1.shape[0]):
         poi1 = M1[k,:]
@@ -79,7 +80,7 @@ def countingMeasure(M1,M2):
             if inds2[j] in inds1:
                 mc += 1
         mycount.append(mc)
-    return np.mean(np.array(mycount))
+    return np.mean(np.array(mycount)) / n
         
 
 
