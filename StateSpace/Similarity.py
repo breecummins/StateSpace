@@ -67,8 +67,7 @@ def countingMeasure(M1,M2):
     is analogous to estimating M1 from M2 using Sugihara's method. 
 
     '''
-    # n = M1.shape[1]+1
-    n = 2*(M1.shape[1]+1)
+    n = M1.shape[1]+1
     mycount = []
     for k in range(M1.shape[0]):
         poi1 = M1[k,:]
@@ -81,9 +80,31 @@ def countingMeasure(M1,M2):
                 mc += 1
         mycount.append(mc)
     return np.mean(np.array(mycount)) / n
+
+def compareLocalDiams(M1,M2):
+    def calcDiam(N):
+        diam = 0
+        for k in range(N.shape[0]):
+            for j in range(N.shape[0]):
+                d = np.sqrt(((N[k,:]-N[j,:])**2).sum())
+                if d > diam:
+                    diam=d
+        return diam
+    n = M1.shape[1]+2
+    diamratioprod = []
+    for k in range(M1.shape[0]):
+        poi1 = M1[k,:]
+        _,inds1 = findClosestExclusive(poi1,M1,n)
+        diamN1 = calcDiam(M1[inds1,:])
+        diamIm1 = calcDiam(M2[inds1,:])
+        poi2 = M2[k,:]
+        _,inds2 = findClosestExclusive(poi2,M2,n)
+        diamN2 = calcDiam(M2[inds2,:])
+        diamIm2 = calcDiam(M1[inds2,:])
+        diamratioprod.append((diamIm1*diamIm2)/(diamN1*diamN2))
+    return np.mean(np.array(diamratioprod))
+
         
-
-
 def typicalVolume(M1):
     '''
     Find the "typical volume" of points in M1.
@@ -103,4 +124,13 @@ def typicalVolume(M1):
         dx[k,:] = np.mean(np.abs(M1[inds,:] - poi),0)
     return np.mean(dx.prod(1))
 
-
+if __name__=='__main__':
+    import StateSpaceReconstruction as SSR
+    from LorenzEqns import solveLorenz
+    ts = solveLorenz([1.0,0.5,0.5],80.0)
+    numlags = 3
+    lagsize = 8
+    M1 = SSR.makeShadowManifold(ts[:,0],numlags,lagsize)
+    M2 = SSR.makeShadowManifold(ts[:,1],numlags,lagsize)
+    meanprodratiodiams = compareLocalDiams(M1,M2)
+    print(meanprodratiodiams)
