@@ -148,18 +148,25 @@ def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=Si
     lol = [l for l in listoflens if l < L]
     avgcc1=[]
     stdcc1=[]
+    avgcc2=[]
+    stdcc2=[]
     for l in lol:
         startinds = random.sample(range(L-l),numiters)
         cc1=[]
+        cc2=[]
         for s in startinds:
             M1 = SSR.makeShadowManifold(ts1[s:s+l],numlags,lagsize)
             M2 = SSR.makeShadowManifold(ts2[s:s+l],numlags,lagsize)
             cc1.append(simMeasure(M1,M2))
+            cc2.append(simMeasure(M2,M1))
         avgcc1.append(np.mean(np.array(cc1)))
         stdcc1.append(np.std(np.array(cc1)))
-    return lol,avgcc1,stdcc1
+        avgcc2.append(np.mean(np.array(cc2)))
+        stdcc2.append(np.std(np.array(cc2)))
+    return lol,avgcc1,stdcc1,avgcc2,stdcc2
 
 if __name__ == '__main__':
+    import os
     import StateSpaceReconstructionPlots as SSRPlots
     from LorenzEqns import solveLorenz
     timeseries = solveLorenz([1.0,0.5,0.5],80.0)
@@ -168,15 +175,26 @@ if __name__ == '__main__':
     # timeseries = solve2Species([0.4,0.2],8.0)
     # l,avg1,avg2,std1,std2 = testCausalityModified(timeseries[:,0],timeseries[:,1],2,8,range(20,320,40),25) 
     # ystr = "RMSE"
-    # print(np.array(l))
-    # print(np.array([avg1,avg2]))
-    # avgarr = np.zeros((len(avg1),2))
-    # avgarr[:,0] = avg1
-    # avgarr[:,1] = avg2
-    # SSRPlots.plots(np.array(l),avgarr,hold=0,show=1,stylestr=['b-','r-'],leglabels=['Mx from My','My from Mx'], legloc=0,xstr='length of time interval',ystr=ystr)   
-
-    l,avg1,std1 = testDiffeomorphism(timeseries[:,0],timeseries[:,1],3,8,range(20,1001,200),25,Similarity.compareLocalDiams) 
-    ystr='mean prod of diam ratios'
+    l,avg1,std1, avg2, std2 = testDiffeomorphism(timeseries[:,0],timeseries[:,2],3,8,range(200,6001,200),25,simMeasure=Similarity.neighborDistance) 
+    ystr='mean neighbor dist'
+    leglabels=['Mx -> Mz','Mz -> Mx']
+    fname= os.path.expanduser('~/temp/Lorenzxz.pdf')
+    
     print(np.array(l))
-    print(np.array(avg1))
-    SSRPlots.plots(np.array(l),np.array(avg1),hold=0,show=1,stylestr=['b-','r-'],leglabels=['Mx from My','My from Mx'], legloc=0,xstr='length of time interval',ystr=ystr)   
+    print(np.array([avg1,avg2]))
+    avgarr = np.zeros((len(avg1),2))
+    avgarr[:,0] = avg1
+    avgarr[:,1] = avg2
+    SSRPlots.plots(np.array(l),avgarr,hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname)   
+    l,avg1,std1, avg2, std2 = testDiffeomorphism(timeseries[:,0],timeseries[:,1],3,8,range(200,6001,200),25,simMeasure=Similarity.neighborDistance) 
+    ystr='mean neighbor dist'
+    leglabels=['Mx -> My','My -> Mx']
+    fname= os.path.expanduser('~/temp/Lorenzxy.pdf')
+    
+    print(np.array(l))
+    print(np.array([avg1,avg2]))
+    avgarr = np.zeros((len(avg1),2))
+    avgarr[:,0] = avg1
+    avgarr[:,1] = avg2
+    SSRPlots.plots(np.array(l),avgarr,hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname)   
+

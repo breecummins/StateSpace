@@ -62,24 +62,51 @@ def HausdorffDistance(M1,M2):
 
 def countingMeasure(M1,M2):
     '''
-    Count the number of nearest neighbors for points in M1 that share a time 
-    index with a nearest neighbor of the contemporaneous point in M2. This
-    is analogous to estimating M1 from M2 using Sugihara's method. 
+    For each point y in M2, find the contemporaneous point x in M1 and the 
+    2n nearest neighbors of x. Count the neighbors of x that share a time index 
+    with any of the n nearest neighbors of y. Normalize by n and average over
+    the number of points in the manifold (M1.shape[1] = M2.shape[2]).
+    This is analogous to estimating M1 from M2 using Sugihara's method. In 
+    Sugihara's method, the n nearest neighbors of y are assumed to be "close to"
+    x. So I check for these points in a larger radius around x.
 
     '''
     n = M1.shape[1]+1
-    mycount = []
+    mycount = np.zeros(M1.shape[0])
     for k in range(M1.shape[0]):
         poi1 = M1[k,:]
-        junk,inds1 = findClosestInclusive(poi1,M1,n)
+        junk,inds1 = findClosestInclusive(poi1,M1,2*n)
         poi2 = M2[k,:]
         junk,inds2 = findClosestInclusive(poi2,M2,n)
-        mc = 0
+        mc = 0.0
         for j in range(n):
             if inds2[j] in inds1:
                 mc += 1
-        mycount.append(mc)
-    return np.mean(np.array(mycount)) / n
+        mycount[k] = mc
+    return np.mean(mycount) / n
+
+def neighborDistance(M1,M2):
+    '''
+    For each point y in M2, find the contemporaneous point x in M1 and the 
+    n nearest neighbors of x. Map the neighbors of x into M2 and sum the
+    Euclidean distances to y. Normalize by the sum of the distances between y 
+    and its n nearest neighbors. Then average over y in M2. 
+    A small distance (close to 1) is evidence for a diffeomorphism (or maybe just
+    a smooth one-to-one function) in the M2 -> M1 direction, which implies 
+    Sugihara causality of M1 -> M2. 
+
+    '''
+    if M1.shape != M2.shape:
+        raise(SystemExit,"The manifolds must have the same shape.")
+    n = M1.shape[1]+1
+    ndists = np.zeros(M1.shape[0])
+    for k in range(M1.shape[0]):
+        x = M1[k,:]
+        junk,indsx = findClosestInclusive(x,M1,n)
+        y = M2[k,:]
+        distsy,junk = findClosestInclusive(y,M2,n)
+        ndists[k] = np.sqrt(((M2[indsx,:] - y)**2).sum(1)).sum(0) / np.array(distsy).sum()
+    return np.mean(ndists)
 
 def compareLocalDiams(M1,M2):
     def calcDiam(N):
