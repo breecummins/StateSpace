@@ -87,26 +87,32 @@ def countingMeasure(M1,M2):
 
 def neighborDistance(M1,M2):
     '''
-    For each point y in M2, find the contemporaneous point x in M1 and the 
-    n nearest neighbors of x. Map the neighbors of x into M2 and sum the
-    Euclidean distances to y. Normalize by the sum of the distances between y 
-    and its n nearest neighbors. Then average over y in M2. 
-    A small distance (close to 1) is evidence for a diffeomorphism (or maybe just
-    a smooth one-to-one function) in the M2 -> M1 direction, which implies 
-    Sugihara causality of M1 -> M2. 
+    For each pair of contemporaneous points x and y in M1 and M2 respectively, 
+    find the  n+1 nearest neighbors of each, where n is the dimension of the manifolds. 
+    Map the neighbors of x (y) into M2 (M1) and sum the Euclidean distances to y (x). 
+    Normalize by the sum of the distances between y (x) and its n+1 nearest 
+    neighbors. Subtract one which is the smallest possible value to shift the range onto
+    the positive reals. Then average over the number of points in the manifolds. 
+    A small distance (close to 0) is evidence for a topology preserving map 
+    in the M1 -> M2 (M2 -> M1) direction, which implies that M2 (M1) can be 
+    reconstructed from M1 (M2), which implies that 2 is a driver of 1 (Sugihara's assertion). 
+
+    Output returned so that M1 -> M2 (sum in M2) is first, M2 -> M1 (sum in M1) second.
 
     '''
     if M1.shape != M2.shape:
         raise(SystemExit,"The manifolds must have the same shape.")
     n = M1.shape[1]+1
-    ndists = np.zeros(M1.shape[0])
+    ndistsx = np.zeros(M1.shape[0])
+    ndistsy = np.zeros(M1.shape[0])
     for k in range(M1.shape[0]):
         x = M1[k,:]
-        junk,indsx = findClosestInclusive(x,M1,n)
+        distsx,indsx = findClosestInclusive(x,M1,n)
         y = M2[k,:]
-        distsy,junk = findClosestInclusive(y,M2,n)
-        ndists[k] = (np.sqrt(((M2[indsx,:] - y)**2).sum(1)).sum(0) / np.array(distsy).sum()) - 1.0
-    return np.mean(ndists)
+        distsy,indsy = findClosestInclusive(y,M2,n)
+        ndistsx[k] = (np.sqrt(((M1[indsy,:] - x)**2).sum(1)).sum(0) / np.array(distsx).sum()) - 1.0
+        ndistsy[k] = (np.sqrt(((M2[indsx,:] - y)**2).sum(1)).sum(0) / np.array(distsy).sum()) - 1.0
+    return np.mean(ndistsy),np.mean(ndistsx)
 
 def compareLocalDiams(M1,M2):
     def calcDiam(N):

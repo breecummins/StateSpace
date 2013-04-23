@@ -165,6 +165,47 @@ def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=Si
         stdcc2.append(np.std(np.array(cc2)))
     return lol,avgcc1,stdcc1,avgcc2,stdcc2
 
+def testDiffeomorphism2(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=Similarity.neighborDistance):
+    '''
+    Check for diffeomorphism between shadow manifolds constructed from ts1 and ts2.
+    ts1 and ts2 must have the same length.
+    numlags is the dimension of the embedding space for the reconstruction.
+    Use time lags of size lagsize * dt to construct shadow manifolds. lagsize
+    is an integer representing the index of the time lag.
+    listoflens contains the lengths to use to show convergence 
+    Example: range(100,10000,100)
+    Each length will be run numiters times from different random starting 
+    locations in the time series. numiters must be <= len(ts1) - max(listoflens).
+    Neighborhoods of contemporaneous points will be assessed for similarity using
+    simMeasure.
+
+    '''
+    L = len(ts1)
+    dt = ts1[1] - ts2[0] #assume uniform sampling in time
+    if len(ts2) != L:
+        raise(ValueError,"The lengths of the two time series must be the same.")
+    listoflens.sort()
+    lol = [l for l in listoflens if l < L]
+    avgcc1=[]
+    stdcc1=[]
+    avgcc2=[]
+    stdcc2=[]
+    for l in lol:
+        startinds = random.sample(range(L-l),numiters)
+        cc1=[]
+        cc2=[]
+        for s in startinds:
+            M1 = SSR.makeShadowManifold(ts1[s:s+l],numlags,lagsize)
+            M2 = SSR.makeShadowManifold(ts2[s:s+l],numlags,lagsize)
+            c12,c21 = simMeasure(M1,M2)
+            cc1.append(c12)
+            cc2.append(c21)
+        avgcc1.append(np.mean(np.array(cc1)))
+        stdcc1.append(np.std(np.array(cc1)))
+        avgcc2.append(np.mean(np.array(cc2)))
+        stdcc2.append(np.std(np.array(cc2)))
+    return lol,avgcc1,stdcc1,avgcc2,stdcc2
+
 if __name__ == '__main__':
     import os
     import cPickle
@@ -178,11 +219,11 @@ if __name__ == '__main__':
     # timeseries = solve2Species([0.4,0.2],8.0)
     # l,avg1,avg2,std1,std2 = testCausalityModified(timeseries[:,0],timeseries[:,1],numlags,lagsize,range(20,320,40),25) 
     # ystr = "RMSE"
-    l,avg1,std1, avg2, std2 = testDiffeomorphism(timeseries[:,0],timeseries[:,2],numlags,lagsize,range(200,7001,200),25,simMeasure=Similarity.neighborDistance) 
+    l,avg1,std1, avg2, std2 = testDiffeomorphism2(timeseries[:,0],timeseries[:,2],numlags,lagsize,range(200,7001,200),25,simMeasure=Similarity.neighborDistance) 
     ystr='mean neighbor dist'
-    leglabels=['Mx -> Mz','Mz -> Mx']
+    leglabels=['\phi: M_x \to M_z','\phi: M_z \to M_x']
     fname= os.path.expanduser('~/temp/Lorenzxz')
-    note = "Make Mx from Mz in avg1 (x -> z?), make Mz from Mx in avg2 (z->x?), Lorenz eqns"
+    note = "Make Mz from Mx in avg1 (z -> x?), make Mx from Mz in avg2 (x->z?), Lorenz eqns"
     cPickle.dump({'listoflens':l,'avg1':avg1,'avg2':avg2,'std1':std1,'std2':std2,'note':note,'numlags':numlags,'lagsize':lagsize,'timeseries':timeseries},open(fname+'.pickle','w'))
     
     print(np.array(l))
@@ -191,11 +232,11 @@ if __name__ == '__main__':
     avgarr[:,0] = avg1
     avgarr[:,1] = avg2
     SSRPlots.plots(np.array(l),avgarr,hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname+'.pdf')   
-    l,avg1,std1, avg2, std2 = testDiffeomorphism(timeseries[:,0],timeseries[:,1],3,8,range(200,7001,200),25,simMeasure=Similarity.neighborDistance) 
+    l,avg1,std1, avg2, std2 = testDiffeomorphism2(timeseries[:,0],timeseries[:,1],3,8,range(200,7001,200),25,simMeasure=Similarity.neighborDistance) 
     ystr='mean neighbor dist'
-    leglabels=['Mx -> My','My -> Mx']
+    leglabels=['\phi: M_x \to M_y','\phi: M_y \to M_x']
     fname= os.path.expanduser('~/temp/Lorenzxy')
-    note = "Make Mx from My in avg1 (x -> y?), make My from Mx in avg2 (y->x?), Lorenz eqns"
+    note = "Make My from Mx in avg1 (y -> x?), make Mx from My in avg2 (x->y?), Lorenz eqns"
     cPickle.dump({'listoflens':l,'avg1':avg1,'avg2':avg2,'std1':std1,'std2':std2,'note':note,'numlags':numlags,'lagsize':lagsize,'timeseries':timeseries},open(fname+'.pickle','w'))
     
     print(np.array(l))
