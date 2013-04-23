@@ -167,34 +167,41 @@ def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=Si
 
 if __name__ == '__main__':
     import os
+    import cPickle
     import StateSpaceReconstructionPlots as SSRPlots
     from LorenzEqns import solveLorenz
     timeseries = solveLorenz([1.0,0.5,0.5],80.0)
-    # l,avg1,avg2,std1,std2 = testCausalityModified(timeseries[:,0],timeseries[:,1],2,8,range(20,3001,200),25,simMeasure=Similarity.HausdorffDistance) 
+    numlags = 3
+    lagsize = 8
+    # l,avg1,avg2,std1,std2 = testCausalityModified(timeseries[:,0],timeseries[:,1],numlags,lagsize,range(20,3001,200),25,simMeasure=Similarity.HausdorffDistance) 
     # from differenceEqns import solve2Species
     # timeseries = solve2Species([0.4,0.2],8.0)
-    # l,avg1,avg2,std1,std2 = testCausalityModified(timeseries[:,0],timeseries[:,1],2,8,range(20,320,40),25) 
+    # l,avg1,avg2,std1,std2 = testCausalityModified(timeseries[:,0],timeseries[:,1],numlags,lagsize,range(20,320,40),25) 
     # ystr = "RMSE"
-    l,avg1,std1, avg2, std2 = testDiffeomorphism(timeseries[:,0],timeseries[:,2],3,8,range(200,6001,200),25,simMeasure=Similarity.neighborDistance) 
+    l,avg1,std1, avg2, std2 = testDiffeomorphism(timeseries[:,0],timeseries[:,2],numlags,lagsize,range(200,7001,200),25,simMeasure=Similarity.neighborDistance) 
     ystr='mean neighbor dist'
     leglabels=['Mx -> Mz','Mz -> Mx']
-    fname= os.path.expanduser('~/temp/Lorenzxz.pdf')
+    fname= os.path.expanduser('~/temp/Lorenzxz')
+    note = "Make Mx from Mz in avg1 (x -> z?), make Mz from Mx in avg2 (z->x?), Lorenz eqns"
+    cPickle.dump({'listoflens':l,'avg1':avg1,'avg2':avg2,'std1':std1,'std2':std2,'note':note,'numlags':numlags,'lagsize':lagsize,'timeseries':timeseries},open(fname+'.pickle','w'))
     
     print(np.array(l))
     print(np.array([avg1,avg2]))
     avgarr = np.zeros((len(avg1),2))
     avgarr[:,0] = avg1
     avgarr[:,1] = avg2
-    SSRPlots.plots(np.array(l),avgarr,hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname)   
-    l,avg1,std1, avg2, std2 = testDiffeomorphism(timeseries[:,0],timeseries[:,1],3,8,range(200,6001,200),25,simMeasure=Similarity.neighborDistance) 
+    SSRPlots.plots(np.array(l),avgarr,hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname+'.pdf')   
+    l,avg1,std1, avg2, std2 = testDiffeomorphism(timeseries[:,0],timeseries[:,1],3,8,range(200,7001,200),25,simMeasure=Similarity.neighborDistance) 
     ystr='mean neighbor dist'
     leglabels=['Mx -> My','My -> Mx']
-    fname= os.path.expanduser('~/temp/Lorenzxy.pdf')
+    fname= os.path.expanduser('~/temp/Lorenzxy')
+    note = "Make Mx from My in avg1 (x -> y?), make My from Mx in avg2 (y->x?), Lorenz eqns"
+    cPickle.dump({'listoflens':l,'avg1':avg1,'avg2':avg2,'std1':std1,'std2':std2,'note':note,'numlags':numlags,'lagsize':lagsize,'timeseries':timeseries},open(fname+'.pickle','w'))
     
     print(np.array(l))
     print(np.array([avg1,avg2]))
     avgarr = np.zeros((len(avg1),2))
     avgarr[:,0] = avg1
     avgarr[:,1] = avg2
-    SSRPlots.plots(np.array(l),avgarr,hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname)   
+    SSRPlots.plots(np.array(l),avgarr,hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname+'.pdf')   
 

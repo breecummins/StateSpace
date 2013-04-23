@@ -105,7 +105,7 @@ def neighborDistance(M1,M2):
         junk,indsx = findClosestInclusive(x,M1,n)
         y = M2[k,:]
         distsy,junk = findClosestInclusive(y,M2,n)
-        ndists[k] = np.sqrt(((M2[indsx,:] - y)**2).sum(1)).sum(0) / np.array(distsy).sum()
+        ndists[k] = (np.sqrt(((M2[indsx,:] - y)**2).sum(1)).sum(0) / np.array(distsy).sum()) - 1.0
     return np.mean(ndists)
 
 def compareLocalDiams(M1,M2):
