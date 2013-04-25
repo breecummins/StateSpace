@@ -165,7 +165,7 @@ def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=Si
         stdcc2.append(np.std(np.array(cc2)))
     return lol,avgcc1,stdcc1,avgcc2,stdcc2
 
-def testDiffeomorphism2(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=Similarity.neighborDistance):
+def testDiffeomorphism2(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=Similarity.neighborDistance,N=None):
     '''
     Check for diffeomorphism between shadow manifolds constructed from ts1 and ts2.
     ts1 and ts2 must have the same length.
@@ -178,6 +178,7 @@ def testDiffeomorphism2(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=S
     locations in the time series. numiters must be <= len(ts1) - max(listoflens).
     Neighborhoods of contemporaneous points will be assessed for similarity using
     simMeasure.
+    N is an extra argument required by simMeasure and may vary between functions.
 
     '''
     L = len(ts1)
@@ -197,7 +198,7 @@ def testDiffeomorphism2(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=S
         for s in startinds:
             M1 = SSR.makeShadowManifold(ts1[s:s+l],numlags,lagsize)
             M2 = SSR.makeShadowManifold(ts2[s:s+l],numlags,lagsize)
-            c12,c21 = simMeasure(M1,M2)
+            c12,c21 = simMeasure(M1,M2,N)
             cc1.append(c12)
             cc2.append(c21)
         avgcc1.append(np.mean(np.array(cc1)))
@@ -205,6 +206,17 @@ def testDiffeomorphism2(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=S
         avgcc2.append(np.mean(np.array(cc2)))
         stdcc2.append(np.std(np.array(cc2)))
     return lol,avgcc1,stdcc1,avgcc2,stdcc2
+
+def callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr,leglabels,fname,note):
+        l,avg1,std1, avg2, std2 = testDiffeomorphism2(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N) 
+        cPickle.dump({'listoflens':l,'avg1':avg1,'avg2':avg2,'std1':std1,'std2':std2,'note':note,'numlags':numlags,'lagsize':lagsize,'timeseries':timeseries,'numneighbors':N},open(fname+'.pickle','w'))        
+        print(np.array(l))
+        print(np.array([avg1,avg2]))
+        avgarr = np.zeros((len(avg1),2))
+        avgarr[:,0] = avg1
+        avgarr[:,1] = avg2
+        SSRPlots.plots(np.array(l),avgarr,hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname+'.pdf')   
+
 
 if __name__ == '__main__':
     import os
@@ -214,35 +226,24 @@ if __name__ == '__main__':
     timeseries = solveLorenz([1.0,0.5,0.5],80.0)
     numlags = 3
     lagsize = 8
-    # l,avg1,avg2,std1,std2 = testCausalityModified(timeseries[:,0],timeseries[:,1],numlags,lagsize,range(20,3001,200),25,simMeasure=Similarity.HausdorffDistance) 
-    # from differenceEqns import solve2Species
-    # timeseries = solve2Species([0.4,0.2],8.0)
-    # l,avg1,avg2,std1,std2 = testCausalityModified(timeseries[:,0],timeseries[:,1],numlags,lagsize,range(20,320,40),25) 
-    # ystr = "RMSE"
-    l,avg1,std1, avg2, std2 = testDiffeomorphism2(timeseries[:,0],timeseries[:,2],numlags,lagsize,range(200,7001,200),25,simMeasure=Similarity.neighborDistance) 
-    ystr='mean neighbor dist'
-    leglabels=['\phi: M_x \to M_z','\phi: M_z \to M_x']
-    fname= os.path.expanduser('~/temp/Lorenzxz')
-    note = "Make Mz from Mx in avg1 (z -> x?), make Mx from Mz in avg2 (x->z?), Lorenz eqns"
-    cPickle.dump({'listoflens':l,'avg1':avg1,'avg2':avg2,'std1':std1,'std2':std2,'note':note,'numlags':numlags,'lagsize':lagsize,'timeseries':timeseries},open(fname+'.pickle','w'))
-    
-    print(np.array(l))
-    print(np.array([avg1,avg2]))
-    avgarr = np.zeros((len(avg1),2))
-    avgarr[:,0] = avg1
-    avgarr[:,1] = avg2
-    SSRPlots.plots(np.array(l),avgarr,hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname+'.pdf')   
-    l,avg1,std1, avg2, std2 = testDiffeomorphism2(timeseries[:,0],timeseries[:,1],3,8,range(200,7001,200),25,simMeasure=Similarity.neighborDistance) 
-    ystr='mean neighbor dist'
-    leglabels=['\phi: M_x \to M_y','\phi: M_y \to M_x']
-    fname= os.path.expanduser('~/temp/Lorenzxy')
-    note = "Make My from Mx in avg1 (y -> x?), make Mx from My in avg2 (x->y?), Lorenz eqns"
-    cPickle.dump({'listoflens':l,'avg1':avg1,'avg2':avg2,'std1':std1,'std2':std2,'note':note,'numlags':numlags,'lagsize':lagsize,'timeseries':timeseries},open(fname+'.pickle','w'))
-    
-    print(np.array(l))
-    print(np.array([avg1,avg2]))
-    avgarr = np.zeros((len(avg1),2))
-    avgarr[:,0] = avg1
-    avgarr[:,1] = avg2
-    SSRPlots.plots(np.array(l),avgarr,hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname+'.pdf')   
-
+    numiters = 25
+    listoflens = range(200,2001,200)
+    simMeasure=Similarity.neighborDistance
+    leglabels1=['\phi: M_x \to M_z','\phi: M_z \to M_x']
+    leglabels2=['\phi: M_x \to M_y','\phi: M_y \to M_x']
+    note1 = "Make Mz from Mx in avg1 (z -> x?), make Mx from Mz in avg2 (x->z?), Lorenz eqns"
+    note2 = "Make My from Mx in avg1 (y -> x?), make Mx from My in avg2 (x->y?), Lorenz eqns"
+ 
+    for N in range(numlags+1,2*numlags):
+        ystr='mean ' + str(N) ' neighbor dist'
+        #xz
+        ts1=timeseries[:,0]
+        ts2=timeseries[:,2]
+        fname= os.path.expanduser('~/temp/Lorenzxz'+str(N))
+        callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr,leglabels1,fname,note1)
+        #xy
+        ts1=timeseries[:,0]
+        ts2=timeseries[:,1]
+        fname= os.path.expanduser('~/temp/Lorenzxy'+str(N))
+        callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr,leglabels2,fname,note2)
+ 

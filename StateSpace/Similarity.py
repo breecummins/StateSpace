@@ -85,10 +85,10 @@ def countingMeasure(M1,M2):
         mycount[k] = mc
     return np.mean(mycount) / n
 
-def neighborDistance(M1,M2):
+def neighborDistance(M1,M2,N):
     '''
     For each pair of contemporaneous points x and y in M1 and M2 respectively, 
-    find the  n+1 nearest neighbors of each, where n is the dimension of the manifolds. 
+    find the  N nearest neighbors of each. 
     Map the neighbors of x (y) into M2 (M1) and sum the Euclidean distances to y (x). 
     Normalize by the sum of the distances between y (x) and its n+1 nearest 
     neighbors. Subtract one which is the smallest possible value to shift the range onto
@@ -102,14 +102,13 @@ def neighborDistance(M1,M2):
     '''
     if M1.shape != M2.shape:
         raise(SystemExit,"The manifolds must have the same shape.")
-    n = M1.shape[1]+1
     ndistsx = np.zeros(M1.shape[0])
     ndistsy = np.zeros(M1.shape[0])
     for k in range(M1.shape[0]):
         x = M1[k,:]
-        distsx,indsx = findClosestInclusive(x,M1,n)
+        distsx,indsx = findClosestInclusive(x,M1,N)
         y = M2[k,:]
-        distsy,indsy = findClosestInclusive(y,M2,n)
+        distsy,indsy = findClosestInclusive(y,M2,N)
         ndistsx[k] = (np.sqrt(((M1[indsy,:] - x)**2).sum(1)).sum(0) / np.array(distsx).sum()) - 1.0
         ndistsy[k] = (np.sqrt(((M2[indsx,:] - y)**2).sum(1)).sum(0) / np.array(distsy).sum()) - 1.0
     return np.mean(ndistsy),np.mean(ndistsx)
