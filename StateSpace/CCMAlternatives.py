@@ -227,7 +227,7 @@ if __name__ == '__main__':
     numlags = 3
     lagsize = 8
     numiters = 25
-    listoflens = range(200,2001,200)
+    listoflens = range(200,401,200)
     simMeasure=Similarity.neighborDistance
     # simMeasure=Similarity.countingMeasure
     ystr = 'mean neighbor dist'
