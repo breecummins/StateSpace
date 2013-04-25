@@ -227,11 +227,11 @@ if __name__ == '__main__':
     numlags = 3
     lagsize = 8
     numiters = 25
-    listoflens = range(200,4001,200)
+    listoflens = range(200,401,200)
 
     def LorenzCall(simMeasure,ystr,fname):
-        leglabels1=[r'$f: M_x -> M_z$','$f: M_z -> M_x$']
-        leglabels2=[r'$f: M_x -> M_y$','$f: M_y -> M_x$']
+        leglabels1=[r'$f$: $M_x$ -> $M_z$',r'$f$: $M_z$ -> $M_x$']
+        leglabels2=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
         note1 = "Make Mz from Mx in avg1 (does z -> x?), make Mx from Mz in avg2 (does x->z?), Lorenz eqns"
         note2 = "Make My from Mx in avg1 (does y -> x?), make Mx from My in avg2 (does x->y?), Lorenz eqns"
         fname1 = fname + 'xz'
