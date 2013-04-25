@@ -235,7 +235,7 @@ if __name__ == '__main__':
     note2 = "Make My from Mx in avg1 (y -> x?), make Mx from My in avg2 (x->y?), Lorenz eqns"
  
     for N in range(numlags+1,2*numlags):
-        ystr='mean ' + str(N) ' neighbor dist'
+        ystr='mean ' + str(N) + ' neighbor dist'
         #xz
         ts1=timeseries[:,0]
         ts2=timeseries[:,2]
