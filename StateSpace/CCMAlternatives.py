@@ -229,8 +229,8 @@ if __name__ == '__main__':
     numiters = 25
     listoflens = range(200,2001,200)
     simMeasure=Similarity.neighborDistance
-    leglabels1=['\phi: M_x \to M_z','\phi: M_z \to M_x']
-    leglabels2=['\phi: M_x \to M_y','\phi: M_y \to M_x']
+    leglabels1=['$\phi: M_x \to M_z$','$\phi: M_z \to M_x$']
+    leglabels2=['$\phi: M_x \to M_y$','$\phi: M_y \to M_x$']
     note1 = "Make Mz from Mx in avg1 (z -> x?), make Mx from Mz in avg2 (x->z?), Lorenz eqns"
     note2 = "Make My from Mx in avg1 (y -> x?), make Mx from My in avg2 (x->y?), Lorenz eqns"
  
