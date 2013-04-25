@@ -42,10 +42,12 @@ def findClosestExclusive(poi,pts,N):
         dists[i] = np.Inf
     return zip(*out)
 
-def HausdorffDistance(M1,M2):
+def HausdorffDistance(M1,M2,N=None):
     '''
     Find the Hausdorff distance between two sets of points
     in R^d, where d = M1.shape[1] = M2.shape[1].
+    N is an argument only to conserve API with other 
+    functions. Same with the second output.
 
     '''
     def calcMaxMin(X,Y):
@@ -58,32 +60,51 @@ def HausdorffDistance(M1,M2):
         return mm
     mm1 = calcMaxMin(M1,M2)
     mm2 = calcMaxMin(M2,M1)
-    return max(mm1,mm2)
+    return max(mm1,mm2), None
 
-def countingMeasure(M1,M2):
+def countingMeasure(M1,M2,N):
     '''
-    For each point y in M2, find the contemporaneous point x in M1 and the 
-    2n nearest neighbors of x. Count the neighbors of x that share a time index 
-    with any of the n nearest neighbors of y. Normalize by n and average over
+    For each point y in M2, find the contemporaneous point x in M1 and the set
+    of points containing the N nearest neighbors of the N nearest neighbors of x. 
+    Count the points in this neighborhood that share a time index 
+    with any of the N nearest neighbors of y. Normalize by N and average over
     the number of points in the manifold (M1.shape[1] = M2.shape[2]).
-    This is analogous to estimating M1 from M2 using Sugihara's method. In 
-    Sugihara's method, the n nearest neighbors of y are assumed to be "close to"
-    x. So I check for these points in a larger radius around x.
+    This is analogous to estimating M1 from M2 using Sugihara's method and 
+    testing for causality in the 1 -> 2 direction. In Sugihara's method, the N 
+    nearest neighbors of y are assumed to be "close to" x. So I check for these 
+    points in a larger radius around x. In terms of maps, this tests for a 1-1 map 
+    in the M2 -> M1 direction.
+    Also do the same calculation starting at x in M1.
+    Outputs are returned in the M1 -> M2, M2 -> M1 order for consistency 
+    with neighborDistance.
 
     '''
-    n = M1.shape[1]+1
-    mycount = np.zeros(M1.shape[0])
+    def friendsoffriends(inds,M):
+        indsbig = []
+        for i in inds:
+            junk,indsb = findClosestInclusive(M[i,:],M,N)
+            indsbig.extend(indsb)
+        return list(set(indsbig))
+
+    def countme(inds,indsbig):
+        mc = 0.0
+        for j in range(N):
+            if inds[j] in indsbig:
+                mc += 1
+        return mc
+
+    mycount1 = np.zeros(M1.shape[0])
+    mycount2 = np.zeros(M1.shape[0])
     for k in range(M1.shape[0]):
         poi1 = M1[k,:]
-        junk,inds1 = findClosestInclusive(poi1,M1,2*n)
+        junk,inds1 = findClosestInclusive(poi1,M1,N)
+        inds1big = friendsoffriends(inds1,M1)
         poi2 = M2[k,:]
-        junk,inds2 = findClosestInclusive(poi2,M2,n)
-        mc = 0.0
-        for j in range(n):
-            if inds2[j] in inds1:
-                mc += 1
-        mycount[k] = mc
-    return np.mean(mycount) / n
+        junk,inds2 = findClosestInclusive(poi2,M2,N)
+        inds2big = friendsoffriends(inds2,M2)
+        mycount1[k] = countme(inds2,inds1big)
+        mycount2[k] = countme(inds1,inds2big)
+    return np.mean(mycount2) / N, np.mean(mycount1) / N
 
 def neighborDistance(M1,M2,N):
     '''

@@ -228,22 +228,24 @@ if __name__ == '__main__':
     lagsize = 8
     numiters = 25
     listoflens = range(200,2001,200)
-    simMeasure=Similarity.neighborDistance
+    # simMeasure=Similarity.neighborDistance
+    simMeasure=Similarity.countingMeasure
     leglabels1=['$\phi: M_x \to M_z$','$\phi: M_z \to M_x$']
     leglabels2=['$\phi: M_x \to M_y$','$\phi: M_y \to M_x$']
     note1 = "Make Mz from Mx in avg1 (z -> x?), make Mx from Mz in avg2 (x->z?), Lorenz eqns"
     note2 = "Make My from Mx in avg1 (y -> x?), make Mx from My in avg2 (x->y?), Lorenz eqns"
  
     for N in range(numlags+1,5*(numlags+1),numlags+1):
-        ystr='mean ' + str(N) + ' neighbor dist'
+        # ystr='mean ' + str(N) + ' neighbor dist'
+        ystr='mean ' + str(N) + ' counting measure'
         #xz
         ts1=timeseries[:,0]
         ts2=timeseries[:,2]
-        fname= os.path.expanduser('~/temp/Lorenzxz'+str(N))
+        fname= os.path.expanduser('~/temp/Lorenzxz'+str(N)+'countingmeasure')
         callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr,leglabels1,fname,note1)
         #xy
         ts1=timeseries[:,0]
         ts2=timeseries[:,1]
-        fname= os.path.expanduser('~/temp/Lorenzxy'+str(N))
+        fname= os.path.expanduser('~/temp/Lorenzxy'+str(N)+'countingmeasure')
         callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr,leglabels2,fname,note2)
- 
+
