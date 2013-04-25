@@ -42,26 +42,6 @@ def findClosestExclusive(poi,pts,N):
         dists[i] = np.Inf
     return zip(*out)
 
-def HausdorffDistance(M1,M2,N=None):
-    '''
-    Find the Hausdorff distance between two sets of points
-    in R^d, where d = M1.shape[1] = M2.shape[1].
-    N is an argument only to conserve API with other 
-    functions. Same with the second output.
-
-    '''
-    def calcMaxMin(X,Y):
-        mm = 0.0
-        for k in range(X.shape[0]):
-            poi = X[k,:]
-            d,junk = findClosestExclusive(poi,Y,1)
-            if d[0] > mm:
-                mm = d[0]
-        return mm
-    mm1 = calcMaxMin(M1,M2)
-    mm2 = calcMaxMin(M2,M1)
-    return max(mm1,mm2), None
-
 def countingMeasure(M1,M2,N):
     '''
     For each point y in M2, find the contemporaneous point x in M1 and the set
@@ -134,7 +114,37 @@ def neighborDistance(M1,M2,N):
         ndistsy[k] = (np.sqrt(((M2[indsx,:] - y)**2).sum(1)).sum(0) / np.array(distsy).sum()) - 1.0
     return np.mean(ndistsy),np.mean(ndistsx)
 
+#Below here are failed experiments
+
+def HausdorffDistance(M1,M2):
+    '''
+    Find the Hausdorff distance between two sets of points
+    in R^d, where d = M1.shape[1] = M2.shape[1].
+
+    Note: Is a symmetric measure and will not detect 1-1 functions.
+
+    '''
+    def calcMaxMin(X,Y):
+        mm = 0.0
+        for k in range(X.shape[0]):
+            poi = X[k,:]
+            d,junk = findClosestExclusive(poi,Y,1)
+            if d[0] > mm:
+                mm = d[0]
+        return mm
+    mm1 = calcMaxMin(M1,M2)
+    mm2 = calcMaxMin(M2,M1)
+    return max(mm1,mm2)
+
 def compareLocalDiams(M1,M2):
+    '''
+    Method to calculate the local diameter change in both directions.
+
+    Note: Unfortunately, the forward and backward diameters are not 
+    related. I would need the smallest dimension in the backwards map, 
+    not the largest, and I don't know how to reliably get that.
+
+    ''' 
     def calcDiam(N):
         diam = 0
         for k in range(N.shape[0]):
@@ -167,6 +177,8 @@ def typicalVolume(M1):
     The product of these distances is the estimated
     volume of each point. Then take the average
     to get a typical volume over all of the points.
+
+    Note: Never used this for anything.
 
     '''
     d = M1.shape[1]

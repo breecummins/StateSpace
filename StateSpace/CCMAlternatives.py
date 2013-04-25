@@ -125,47 +125,7 @@ def testCausalityModified(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=crossMa
         stdcc2.append(np.std(np.array(cc2)))
     return lol,avgcc1,avgcc2,stdcc1,stdcc2
 
-def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=Similarity.countingMeasure):
-    '''
-    Check for diffeomorphism between shadow manifolds constructed from ts1 and ts2.
-    ts1 and ts2 must have the same length.
-    numlags is the dimension of the embedding space for the reconstruction.
-    Use time lags of size lagsize * dt to construct shadow manifolds. lagsize
-    is an integer representing the index of the time lag.
-    listoflens contains the lengths to use to show convergence 
-    Example: range(100,10000,100)
-    Each length will be run numiters times from different random starting 
-    locations in the time series. numiters must be <= len(ts1) - max(listoflens).
-    Neighborhoods of contemporaneous points will be assessed for similarity using
-    simMeasure.
-
-    '''
-    L = len(ts1)
-    dt = ts1[1] - ts2[0] #assume uniform sampling in time
-    if len(ts2) != L:
-        raise(ValueError,"The lengths of the two time series must be the same.")
-    listoflens.sort()
-    lol = [l for l in listoflens if l < L]
-    avgcc1=[]
-    stdcc1=[]
-    avgcc2=[]
-    stdcc2=[]
-    for l in lol:
-        startinds = random.sample(range(L-l),numiters)
-        cc1=[]
-        cc2=[]
-        for s in startinds:
-            M1 = SSR.makeShadowManifold(ts1[s:s+l],numlags,lagsize)
-            M2 = SSR.makeShadowManifold(ts2[s:s+l],numlags,lagsize)
-            cc1.append(simMeasure(M1,M2))
-            cc2.append(simMeasure(M2,M1))
-        avgcc1.append(np.mean(np.array(cc1)))
-        stdcc1.append(np.std(np.array(cc1)))
-        avgcc2.append(np.mean(np.array(cc2)))
-        stdcc2.append(np.std(np.array(cc2)))
-    return lol,avgcc1,stdcc1,avgcc2,stdcc2
-
-def testDiffeomorphism2(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=Similarity.neighborDistance,N=None):
+def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=Similarity.neighborDistance,N=None):
     '''
     Check for diffeomorphism between shadow manifolds constructed from ts1 and ts2.
     ts1 and ts2 must have the same length.
@@ -208,7 +168,7 @@ def testDiffeomorphism2(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=S
     return lol,avgcc1,stdcc1,avgcc2,stdcc2
 
 def callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr,leglabels,fname,note):
-        l,avg1,std1, avg2, std2 = testDiffeomorphism2(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N) 
+        l,avg1,std1, avg2, std2 = testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N) 
         cPickle.dump({'listoflens':l,'avg1':avg1,'avg2':avg2,'std1':std1,'std2':std2,'note':note,'numlags':numlags,'lagsize':lagsize,'timeseries':timeseries,'numneighbors':N},open(fname+'.pickle','w'))        
         print(np.array(l))
         print(np.array([avg1,avg2]))
@@ -227,7 +187,7 @@ if __name__ == '__main__':
     numlags = 3
     lagsize = 8
     numiters = 25
-    listoflens = range(200,401,200)
+    listoflens = range(200,6001,200)
 
     def LorenzCall(simMeasure,ystr,fname):
         leglabels1=[r'$f$: $M_x$ -> $M_z$',r'$f$: $M_z$ -> $M_x$']
