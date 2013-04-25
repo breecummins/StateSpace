@@ -227,27 +227,26 @@ if __name__ == '__main__':
     numlags = 3
     lagsize = 8
     numiters = 25
-    listoflens = range(200,401,200)
-    simMeasure=Similarity.neighborDistance
-    # simMeasure=Similarity.countingMeasure
-    ystr = 'mean neighbor dist'
-    # ystr = 'mean counting measure'
-    fname = os.path.expanduser('~/temp/Lorenzneighbordist')
-    # fname = os.path.expanduser('~/temp/Lorenzcountingmeasure')
-    leglabels1=[r'$\phi: M_x \to M_z$','$\phi: M_z \to M_x$']
-    leglabels2=[r'$\phi: M_x \to M_y$','$\phi: M_y \to M_x$']
-    note1 = "Make Mz from Mx in avg1 (z -> x?), make Mx from Mz in avg2 (x->z?), Lorenz eqns"
-    note2 = "Make My from Mx in avg1 (y -> x?), make Mx from My in avg2 (x->y?), Lorenz eqns"
-    fname1 = fname + 'xz'
-    fname2 = fname + 'xy'
+    listoflens = range(200,4001,200)
 
-    for N in range(numlags+1,5*(numlags+1),numlags+1):
-        #xz
-        ts1=timeseries[:,0]
-        ts2=timeseries[:,2]
-        callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr+' '+str(N),leglabels1,fname1+str(N),note1)
-        #xy
-        ts1=timeseries[:,0]
-        ts2=timeseries[:,1]
-        callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr+' '+str(N),leglabels2,fname2+str(N),note2)
+    def LorenzCall(simMeasure,ystr,fname):
+        leglabels1=[r'$f: M_x -> M_z$','$f: M_z -> M_x$']
+        leglabels2=[r'$f: M_x -> M_y$','$f: M_y -> M_x$']
+        note1 = "Make Mz from Mx in avg1 (does z -> x?), make Mx from Mz in avg2 (does x->z?), Lorenz eqns"
+        note2 = "Make My from Mx in avg1 (does y -> x?), make Mx from My in avg2 (does x->y?), Lorenz eqns"
+        fname1 = fname + 'xz'
+        fname2 = fname + 'xy'
+
+        for N in range(numlags+1,5*(numlags+1),numlags+1):
+            #xz
+            ts1=timeseries[:,0]
+            ts2=timeseries[:,2]
+            callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr+' '+str(N),leglabels1,fname1+str(N),note1)
+            #xy
+            ts1=timeseries[:,0]
+            ts2=timeseries[:,1]
+            callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr+' '+str(N),leglabels2,fname2+str(N),note2)
+
+    LorenzCall(Similarity.neighborDistance,'mean neighbor dist',os.path.expanduser('~/temp/Lorenzneighbordist'))
+    LorenzCall(Similarity.countingMeasure,'mean counting measure',os.path.expanduser('~/temp/Lorenzcountingmeasure'))
 
