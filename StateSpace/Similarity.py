@@ -2,6 +2,10 @@ import numpy as np
 import Weights
 
 def corrCoeffPearson(ts1,ts2):
+    '''
+    Compare a times series and its estimate.
+
+    '''
     shift1 = ts1 - np.mean(ts1)
     shift2 = ts2 - np.mean(ts2)
     s12 = ( shift1*shift2 ).sum()
@@ -9,8 +13,40 @@ def corrCoeffPearson(ts1,ts2):
     s22 = ( shift2*shift2 ).sum()
     return s12 / np.sqrt(s11*s22)
 
-def RootMeanSquaredError(M1,M2):
+def RootMeanSquaredErrorTS(ts1,ts2):
+    '''
+    Compare a sampled manifold and its estimate at contemporaneous
+    points using root mean squared error.
+
+    '''
+    return np.sqrt( ((ts1-ts2)**2).sum() / len(ts1))
+
+def RootMeanSquaredErrorManifold(M1,M2):
+    '''
+    Compare a sampled manifold and its estimate at contemporaneous
+    points using root mean squared error.
+
+    '''
     return np.sqrt( ((M1-M2)**2).sum() / M1.shape[0]*M1.shape[1])
+
+def HausdorffDistance(M1,M2):
+    '''
+    Compare a sampled manifold and its estimate using the Hausdorff
+    distance. This ignores relationships between contemporary
+    times. 
+    
+    '''
+    def calcMaxMin(X,Y):
+        mm = 0.0
+        for k in range(X.shape[0]):
+            poi = X[k,:]
+            d,junk = findClosestExclusive(poi,Y,1)
+            if d[0] > mm:
+                mm = d[0]
+        return mm
+    mm1 = calcMaxMin(M1,M2)
+    mm2 = calcMaxMin(M2,M1)
+    return max(mm1,mm2)
 
 def findClosestInclusive(poi,pts,N):
     '''
@@ -115,26 +151,6 @@ def neighborDistance(M1,M2,N):
     return np.mean(ndistsy),np.mean(ndistsx)
 
 #Below here are failed experiments
-
-def HausdorffDistance(M1,M2):
-    '''
-    Find the Hausdorff distance between two sets of points
-    in R^d, where d = M1.shape[1] = M2.shape[1].
-
-    Note: Is a symmetric measure and will not detect 1-1 functions.
-
-    '''
-    def calcMaxMin(X,Y):
-        mm = 0.0
-        for k in range(X.shape[0]):
-            poi = X[k,:]
-            d,junk = findClosestExclusive(poi,Y,1)
-            if d[0] > mm:
-                mm = d[0]
-        return mm
-    mm1 = calcMaxMin(M1,M2)
-    mm2 = calcMaxMin(M2,M1)
-    return max(mm1,mm2)
 
 def compareLocalDiams(M1,M2):
     '''

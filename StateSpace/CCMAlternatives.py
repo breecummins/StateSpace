@@ -22,13 +22,13 @@ def estManifold(Mx,My,wgtfunc):
 
 def crossMapModified1(M1,M2,wgtfunc):
     '''
-    Estimate manifold 1 (M1) from manifold 2 and vice versa using a 
+    Estimate manifold 1 (M1) from manifold 2 (and vice versa) using a 
     cross-mapping technique.
-    Find the nearest points to each point in M1.
+    Find the nearest points to each point in M2.
     Construct weights based on their distances to the point of
     interest. 
     Use the time indices of these points and the associated weights to 
-    make a weighted-sum estimate of the contemporaneous points in M2.
+    make a weighted-sum estimate of the contemporaneous points in M1.
 
     '''
     Mest1 = estManifold(M2,M1,wgtfunc)
@@ -37,13 +37,14 @@ def crossMapModified1(M1,M2,wgtfunc):
 
 def crossMapModified2(M1,M2,wgtfunc):
     '''
-    Estimate manifold 1 (M1) from manifold 2 and vice versa using a 
-    cross-mapping technique.
-    Find the nearest points to each point in M1.
+    Estimate time series 1 (M1[:,0]) from manifold 2 (and vice versa) by
+    estimating the manifolds from each other and averaging the different
+    time series.
+    Find the nearest points to each point in M2.
     Construct weights based on their distances to the point of
     interest. 
     Use the time indices of these points and the associated weights to 
-    make a weighted-sum estimate of the contemporaneous points in M2.
+    make a weighted-sum estimate of the contemporaneous points in M1.
     Average the shifted columns of the estimated manifold to get an estimated 
     time series.
 
@@ -68,13 +69,13 @@ def crossMapModified2(M1,M2,wgtfunc):
 
 def crossMapModified3(M1,M2,proj,wgtfunc):
     '''
-    Estimate manifold 1 (M1) from manifold 2 and vice versa using a 
+    Estimate a projection of M1 from manifold 2 and vice versa using a 
     cross-mapping technique.
-    Find the nearest points to each point in M1.
+    Find the nearest points to each point in M2.
     Construct weights based on their distances to the point of
     interest. 
     Use the time indices of these points and the associated weights to 
-    make a weighted-sum estimate of the contemporaneous points in M2.
+    make a weighted-sum estimate of the contemporaneous points in M1.
     Take a projection of the estimated manifold on dimension proj.
 
     '''
@@ -84,9 +85,9 @@ def crossMapModified3(M1,M2,proj,wgtfunc):
     est2 = Mest2[:,proj]
     return est1, est2
 
-def testCausalityModified(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=crossMapModified1,wgtfunc=Weights.makeExpWeights,simMeasure=Similarity.RootMeanSquaredError):
+def testCausalityReconstruction(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=crossMapModified1,wgtfunc=Weights.makeExpWeights,simMeasure=Similarity.RootMeanSquaredErrorManifold):
     '''
-    Check for convergence in root mean squared error to infer causality between ts1 and ts2.
+    Check for convergence to infer causality between ts1 and ts2.
     ts1 and ts2 must have the same length.
     numlags is the dimension of the embedding space for the reconstruction.
     Use time lags of size lagsize * dt to construct shadow manifolds. lagsize
@@ -95,12 +96,18 @@ def testCausalityModified(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=crossMa
     Example: range(100,10000,100)
     Each length will be run numiters times from different random starting 
     locations in the time series. numiters must be <= len(ts1) - max(listoflens).
-    The estimated time series will be constructed using the weighting function 
+    The estimated time series (or manifold) will be constructed using the weighting function 
     handle given by wgtfunc and the cross map function given by CM.
+    CM = crossMapModified1 will estimate manifolds.
+    CM = crossMapModified2 or 3 will estimate time series.
+    The similarity between a time series (or a manifold) and its estimate will be given by
+    simMeasure.
+    For manifolds, simMeasure = Similarity.RootMeanSquaredErrorManifold or 
+    Similarity.HausdorffDistance.
+    For time series, simMeasure = Similarity.RootMeanSquaredErrorTS or Similarity.corrCoeffPearson.
 
     '''
     L = len(ts1)
-    dt = ts1[1] - ts2[0] #assume uniform sampling in time
     if len(ts2) != L:
         raise(ValueError,"The lengths of the two time series must be the same.")
     listoflens.sort()
@@ -137,12 +144,15 @@ def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=Si
     Each length will be run numiters times from different random starting 
     locations in the time series. numiters must be <= len(ts1) - max(listoflens).
     Neighborhoods of contemporaneous points will be assessed for similarity using
-    simMeasure.
-    N is an extra argument required by simMeasure and may vary between functions.
+    simMeasure, which can be Similarity.neighborDistance or Similarity.countingMeasure.
+    N is an argument required by simMeasure that indicates the number of points
+    in a neighborhood. The default depends on the dimension of the embedding space
+    (numlags), so is constructed in the body of the function.
 
     '''
+    if N == None:
+        N = numlags+1
     L = len(ts1)
-    dt = ts1[1] - ts2[0] #assume uniform sampling in time
     if len(ts2) != L:
         raise(ValueError,"The lengths of the two time series must be the same.")
     listoflens.sort()
