@@ -144,7 +144,8 @@ def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure=Si
     Each length will be run numiters times from different random starting 
     locations in the time series. numiters must be <= len(ts1) - max(listoflens).
     Neighborhoods of contemporaneous points will be assessed for similarity using
-    simMeasure, which can be Similarity.neighborDistance or Similarity.countingMeasure.
+    simMeasure, which can be Similarity.neighborDistance, Similarity.maxNeighborDist, 
+    or Similarity.countingMeasure.
     N is an argument required by simMeasure that indicates the number of points
     in a neighborhood. The default depends on the dimension of the embedding space
     (numlags), so is constructed in the body of the function.
@@ -185,7 +186,7 @@ def callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr,leglabe
         avgarr = np.zeros((len(avg1),2))
         avgarr[:,0] = avg1
         avgarr[:,1] = avg2
-        SSRPlots.plots(np.array(l),avgarr,hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname+'.pdf')   
+        SSRPlots.plots(np.array(l),avgarr,hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname+'.pdf')  
 
 
 if __name__ == '__main__':
@@ -197,7 +198,7 @@ if __name__ == '__main__':
     numlags = 3
     lagsize = 8
     numiters = 25
-    listoflens = range(200,6001,200)
+    listoflens = range(1000,6001,1000)
 
     def LorenzCall(simMeasure,ystr,fname):
         leglabels1=[r'$f$: $M_x$ -> $M_z$',r'$f$: $M_z$ -> $M_x$']
@@ -217,6 +218,8 @@ if __name__ == '__main__':
             ts2=timeseries[:,1]
             callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr+' '+str(N),leglabels2,fname2+str(N),note2)
 
-    LorenzCall(Similarity.neighborDistance,'mean neighbor dist',os.path.expanduser('~/temp/Lorenzneighbordist'))
-    LorenzCall(Similarity.countingMeasure,'mean counting measure',os.path.expanduser('~/temp/Lorenzcountingmeasure'))
+    # LorenzCall(Similarity.neighborDistance,'mean neighbor dist',os.path.expanduser('~/temp/Lorenzneighbordist'))
+    # LorenzCall(Similarity.countingMeasure,'mean counting measure',os.path.expanduser('~/temp/Lorenzcountingmeasure'))
+    LorenzCall(Similarity.maxNeighborDist,'mean max neighbor dist',os.path.expanduser('~/temp/LorenzMaxNeighborDist'))
+
 

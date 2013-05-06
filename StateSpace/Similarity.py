@@ -137,8 +137,6 @@ def neighborDistance(M1,M2,N):
     Output returned so that M1 -> M2 (sum in M2) is first, M2 -> M1 (sum in M1) second.
 
     '''
-    if M1.shape != M2.shape:
-        raise(SystemExit,"The manifolds must have the same shape.")
     ndistsx = np.zeros(M1.shape[0])
     ndistsy = np.zeros(M1.shape[0])
     for k in range(M1.shape[0]):
@@ -149,6 +147,19 @@ def neighborDistance(M1,M2,N):
         ndistsx[k] = (np.sqrt(((M1[indsy,:] - x)**2).sum(1)).sum(0) / np.array(distsx).sum()) - 1.0
         ndistsy[k] = (np.sqrt(((M2[indsx,:] - y)**2).sum(1)).sum(0) / np.array(distsy).sum()) - 1.0
     return np.mean(ndistsy),np.mean(ndistsx)
+
+def maxNeighborDist(M1,M2,N):
+    ndistsx = np.zeros(M1.shape[0])
+    ndistsy = np.zeros(M1.shape[0])
+    for k in range(M1.shape[0]):
+        x = M1[k,:]
+        distsx,indsx = findClosestInclusive(x,M1,N)
+        y = M2[k,:]
+        distsy,indsy = findClosestInclusive(y,M2,N)
+        ndistsx[k] = (np.sqrt(((M1[indsy,:] - x)**2).sum(1))).max()
+        ndistsy[k] = (np.sqrt(((M2[indsx,:] - y)**2).sum(1))).max()
+        return np.mean(ndistsy), np.mean(ndistsx)
+
 
 #Below here are failed experiments
 
