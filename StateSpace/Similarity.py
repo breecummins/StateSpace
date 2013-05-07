@@ -148,17 +148,33 @@ def neighborDistance(M1,M2,N):
         ndistsy[k] = (np.sqrt(((M2[indsx,:] - y)**2).sum(1)).sum(0) / np.array(distsy).sum()) - 1.0
     return np.mean(ndistsy),np.mean(ndistsx)
 
-def maxNeighborDist(M1,M2,N):
-    ndistsx = np.zeros(M1.shape[0])
-    ndistsy = np.zeros(M1.shape[0])
-    for k in range(M1.shape[0]):
-        x = M1[k,:]
+def maxNeighborDistArray(M1,M2,N,poi=None):
+    if not poi:
+        poi = range(M1.shape[0])
+    ndistsx = np.zeros(len(poi))
+    ndistsy = np.zeros(len(poi))
+    for k,ind in enumerate(poi):
+        x = M1[ind,:]
         distsx,indsx = findClosestInclusive(x,M1,N)
-        y = M2[k,:]
+        y = M2[ind,:]
         distsy,indsy = findClosestInclusive(y,M2,N)
         ndistsx[k] = (np.sqrt(((M1[indsy,:] - x)**2).sum(1))).max()
         ndistsy[k] = (np.sqrt(((M2[indsx,:] - y)**2).sum(1))).max()
-        return np.mean(ndistsy), np.mean(ndistsx)
+    return ndistsy, ndistsx
+
+def maxNeighborDistMean(M1,M2,N,poi=None):
+    if not poi:
+        poi = range(M1.shape[0])
+    ndistsx = np.zeros(len(poi))
+    ndistsy = np.zeros(len(poi))
+    for k,ind in enumerate(poi):
+        x = M1[ind,:]
+        distsx,indsx = findClosestInclusive(x,M1,N)
+        y = M2[ind,:]
+        distsy,indsy = findClosestInclusive(y,M2,N)
+        ndistsx[k] = (np.sqrt(((M1[indsy,:] - x)**2).sum(1))).max()
+        ndistsy[k] = (np.sqrt(((M2[indsx,:] - y)**2).sum(1))).max()
+    return np.mean(ndistsy), np.mean(ndistsx)
 
 
 #Below here are failed experiments
