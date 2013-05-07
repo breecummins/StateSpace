@@ -291,7 +291,7 @@ if __name__ == '__main__':
     # np.random.seed(43)
     # poi = sorted(list(set([int(r) for r in (min(listoflens)-2*numlags-1)*np.random.rand(25)])))#[0,27,100,157,226,250,321,366]#,512,601]
     # print(poi)
-    poi = range(0,min(listoflens)-1 - (numlags-1)*lagsize,7)
+    poi = range(0,min(listoflens)-1 - (numlags-1)*lagsize,21)
     def LorenzCallSamePts(simMeasure,ystr,fname,whichcall=callmesamepts):
         leglabels1=[r'$f$: $M_x$ -> $M_z$',r'$f$: $M_z$ -> $M_x$']
         leglabels2=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
@@ -312,4 +312,4 @@ if __name__ == '__main__':
 
 
     # LorenzCallSamePts(Similarity.maxNeighborDist,'max neighbor dist',os.path.expanduser('~/temp/LorenzMaxNeighborDist'))
-    LorenzCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/LorenzMaxNeighborDistMeanEvery7_'),callmesameptsscalar)
+    LorenzCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/LorenzMaxNeighborDistMeanEvery21_'),callmesameptsscalar)
