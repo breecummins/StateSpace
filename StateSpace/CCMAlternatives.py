@@ -295,8 +295,8 @@ if __name__ == '__main__':
     def LorenzCallSamePts(simMeasure,ystr,fname,whichcall=callmesamepts):
         leglabels1=[r'$f$: $M_x$ -> $M_z$',r'$f$: $M_z$ -> $M_x$']
         leglabels2=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
-        note1 = "Make Mz from Mx in avg1 (does z -> x?), make Mx from Mz in avg2 (does x->z?), Lorenz eqns"
-        note2 = "Make My from Mx in avg1 (does y -> x?), make Mx from My in avg2 (does x->y?), Lorenz eqns"
+        note1 = "Make Mz from Mx in sm12 (does z -> x?), make Mx from Mz in sm21 (does x->z?), Lorenz eqns"
+        note2 = "Make My from Mx in sm12 (does y -> x?), make Mx from My in sm21 (does x->y?), Lorenz eqns"
         fname1 = fname + 'xz'
         fname2 = fname + 'xy'
 
@@ -312,4 +312,34 @@ if __name__ == '__main__':
 
 
     # LorenzCallSamePts(Similarity.maxNeighborDist,'max neighbor dist',os.path.expanduser('~/temp/LorenzMaxNeighborDist'))
-    LorenzCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/LorenzMaxNeighborDistMeanEvery21_'),callmesameptsscalar)
+    # LorenzCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/LorenzMaxNeighborDistMeanEvery21_'),callmesameptsscalar)
+
+    #######################################
+    from DoublePendulum import solvePendulum
+    timeseries = solvePendulum([1.0,2.0,3.0,2.0],1151.0)
+    numlags = 4
+    lagsize = 16
+
+    listoflens = range(500,2201,100)
+    startind=100
+    poi = range(0,min(listoflens)-1 - (numlags-1)*lagsize,21)
+
+    def DPCallSamePts(simMeasure,ystr,fname,whichcall=callmesameptsscalar):
+        leglabels1=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
+        leglabels2=[r'$f$: $M_x$ -> $M_w$',r'$f$: $M_w$ -> $M_x$']
+        note1 = "Make My from Mx in sm12 (does y -> x?), make Mx from My in sm21 (does x->y?), double pendulum eqns"
+        note2 = "Make Mw from Mx in sm12 (does w -> x?), make Mx from Mw in sm21 (does x->w?), double pendulum eqns"
+        fname1 = fname + 'xy'
+        fname2 = fname + 'xw'
+
+        for N in range(numlags+1,5*(numlags+1),numlags+1):
+            print('xy, '+str(N)+ ' neighbors')
+            ts1=timeseries[:,0]
+            ts2=timeseries[:,1]
+            whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels1,fname1+str(N),note1)
+            print('xw, '+str(N)+ ' neighbors')
+            ts1=timeseries[:,0]
+            ts2=timeseries[:,3]
+            whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels2,fname2+str(N),note2)
+
+    DPCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMeanEvery21_'))

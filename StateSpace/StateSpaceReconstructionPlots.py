@@ -1,7 +1,7 @@
 #third party modules
 import numpy as np
 import matplotlib as mpl
-mpl.use('Pdf') #comment out if you want to see figures at run time
+# mpl.use('Pdf') #comment out if you want to see figures at run time
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 #my modules

@@ -22,13 +22,13 @@ if __name__ == '__main__':
     x = solvePendulum([1.0,2.0,3.0,2.0],300.0)
     numlags = 2
     lagsize = 16
-    SSRPlots.plotManifold(x[:,:3],show=0,titlestr='x, y, z')
-    SSRPlots.plotManifold(x[:,(0,1,3)],show=1,titlestr='x, y, w')
+    # SSRPlots.plotManifold(x[:,:3],show=0,titlestr='x, y, z')
+    # SSRPlots.plotManifold(x[:,(0,1,3)],show=1,titlestr='x, y, w')
     # SSRPlots.plotManifold(x[:,(0,3)],show=0,titlestr='x and w')
     # SSRPlots.plotManifold(x[:,(1,2)],show=0,titlestr='y and z')
     # SSRPlots.plotManifold(x[:,(1,3)],show=0,titlestr='y and w')
-    # SSRPlots.plotShadowManifold(x[:,0],numlags,lagsize,show=0,hold=0,style='r-')
-    # SSRPlots.plotShadowManifold(x[:,-1],numlags,lagsize,show=1,hold=0,style='g-')
+    SSRPlots.plotShadowManifold(x[:,0],numlags,lagsize,show=0,hold=0,style='r-')
+    SSRPlots.plotShadowManifold(x[:,-1],numlags,lagsize,show=1,hold=0,style='g-')
     # SSRPlots.plotManifold(x[:,2:],show=1,titlestr='z and w')
     # SSRPlots.plotManifold(x[:,:-1],show=0,titlestr='x, y, and z')
     # SSRPlots.plotManifold(x[:,(0,2,3)],show=0,titlestr='x, z, and w')
