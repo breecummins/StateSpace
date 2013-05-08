@@ -38,7 +38,7 @@ def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None):
 
 
 
-def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-'):
+def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-',titlestr=None):
     '''
     timeseries is a sequence of observations.
     numlags is a integer indicating the dimension of the shadow manifold
@@ -47,7 +47,7 @@ def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-'):
 
     '''
     pts = SSR.makeShadowManifold(timeseries,numlags,lagsize)
-    plotManifold(pts,show,hold,style)
+    plotManifold(pts,show,hold,style,titlestr)
 
 def plotEstShadowManifoldSugihara(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeights):
     est1,est2 = CCM.crossMap(ts1,ts2,numlags,lagsize,wgtfunc)

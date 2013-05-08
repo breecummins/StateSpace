@@ -315,31 +315,103 @@ if __name__ == '__main__':
     # LorenzCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/LorenzMaxNeighborDistMeanEvery21_'),callmesameptsscalar)
 
     #######################################
-    from DoublePendulum import solvePendulum
-    timeseries = solvePendulum([1.0,2.0,3.0,2.0],1151.0)
-    numlags = 4
+    import DoublePendulum 
+    timeseries = DoublePendulum.solvePendulum([1.0,2.0,3.0,2.0],1151.0)
+    numlags = 9
     lagsize = 16
 
-    listoflens = range(500,2201,100)
-    startind=100
+    listoflens = range(1000,22001,500)
+    startind=750
     poi = range(0,min(listoflens)-1 - (numlags-1)*lagsize,21)
 
     def DPCallSamePts(simMeasure,ystr,fname,whichcall=callmesameptsscalar):
         leglabels1=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
         leglabels2=[r'$f$: $M_x$ -> $M_w$',r'$f$: $M_w$ -> $M_x$']
+        leglabels3=[r'$f$: $M_z$ -> $M_w$',r'$f$: $M_w$ -> $M_z$']
         note1 = "Make My from Mx in sm12 (does y -> x?), make Mx from My in sm21 (does x->y?), double pendulum eqns"
         note2 = "Make Mw from Mx in sm12 (does w -> x?), make Mx from Mw in sm21 (does x->w?), double pendulum eqns"
+        note3 = "Make Mw from Mz in sm12 (does w -> z?), make Mz from Mw in sm21 (does z->w?), double pendulum eqns"
         fname1 = fname + 'xy'
         fname2 = fname + 'xw'
+        fname3 = fname + 'zw'
 
-        for N in range(numlags+1,5*(numlags+1),numlags+1):
-            print('xy, '+str(N)+ ' neighbors')
-            ts1=timeseries[:,0]
-            ts2=timeseries[:,1]
-            whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels1,fname1+str(N),note1)
-            print('xw, '+str(N)+ ' neighbors')
-            ts1=timeseries[:,0]
-            ts2=timeseries[:,3]
-            whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels2,fname2+str(N),note2)
+        # for N in range(numlags+1,5*(numlags+1),numlags+1):
+        #     print('xy, '+str(N)+ ' neighbors')
+        #     ts1=timeseries[:,0]
+        #     ts2=timeseries[:,1]
+        #     whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels1,fname1+str(N),note1)
+        #     print('xw, '+str(N)+ ' neighbors')
+        #     ts1=timeseries[:,0]
+        #     ts2=timeseries[:,3]
+        #     whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels2,fname2+str(N),note2)
 
-    DPCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMeanEvery21_'))
+        def doruns(msg,ind1,ind2,ll,fn,note):
+            print(msg)
+            ts1=timeseries[:,ind1]
+            ts2=timeseries[:,ind2]
+            whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),ll,fn+str(N),note)
+
+        N = numlags +1 
+
+        doruns('xy,'+str(N)+ ' neighbors',0,1,leglabels1,fname1,note1)
+        doruns('xw,'+str(N)+ ' neighbors',0,3,leglabels2,fname2,note2)
+        doruns('zw,'+str(N)+ ' neighbors',2,3,leglabels3,fname3,note3)
+
+
+    DPCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMeanEvery21__Embed09_LongTS_Lag16_StartLater_TrackMorePts_'))
+
+    # #######################################
+    # import TriplePendulum 
+    # timeseries = TriplePendulum.solvePendulum([1.0,2.0,3.0,2.0,1.0,1.5,2.5,2.0],1151.0)
+    # numlags = 17
+    # lagsize = 16
+
+    # listoflens = range(500,22001,500)
+    # startind=750
+    # poi = range(0,min(listoflens)-1 - (numlags-1)*lagsize,21)
+
+    # def TPCallSamePts(simMeasure,ystr,fname,whichcall=callmesameptsscalar):
+    #     leglabels1=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
+    #     leglabels2=[r'$f$: $M_x$ -> $M_w$',r'$f$: $M_w$ -> $M_x$']
+    #     leglabels3=[r'$f$: $M_x$ -> $M_u$',r'$f$: $M_u$ -> $M_x$']
+    #     leglabels4=[r'$f$: $M_v$ -> $M_u$',r'$f$: $M_u$ -> $M_v$']
+    #     leglabels5=[r'$f$: $M_z$ -> $M_r$',r'$f$: $M_r$ -> $M_z$']
+    #     leglabels6=[r'$f$: $M_v$ -> $M_r$',r'$f$: $M_r$ -> $M_v$']
+    #     leglabels7=[r'$f$: $M_z$ -> $M_w$',r'$f$: $M_w$ -> $M_z$']
+    #     leglabels8=[r'$f$: $M_s$ -> $M_r$',r'$f$: $M_r$ -> $M_s$']
+    #     note1 = "Make My from Mx in sm12 (does y -> x?), make Mx from My in sm21 (does x->y?), triple pendulum eqns"
+    #     note2 = "Make Mw from Mx in sm12 (does w -> x?), make Mx from Mw in sm21 (does x->w?), triple pendulum eqns"
+    #     note3 = "Make Mu from Mx in sm12 (does u -> x?), make Mx from Mu in sm21 (does x->u?), triple pendulum eqns"
+    #     note4 = "Make Mu from Mv in sm12 (does u -> v?), make Mv from Mu in sm21 (does v->u?), triple pendulum eqns"
+    #     note5 = "Make Mr from Mz in sm12 (does r -> z?), make Mz from Mr in sm21 (does z->r?), triple pendulum eqns"
+    #     note6 = "Make Mr from Mv in sm12 (does r -> v?), make Mv from Mr in sm21 (does v->r?), triple pendulum eqns"
+    #     note7 = "Make Mw from Mz in sm12 (does w -> z?), make Mz from Mw in sm21 (does z->w?), triple pendulum eqns"
+    #     note8 = "Make Mr from Ms in sm12 (does r -> s?), make Ms from Mr in sm21 (does s->r?), triple pendulum eqns"
+    #     fname1 = fname + 'xy'
+    #     fname2 = fname + 'xw'
+    #     fname3 = fname + 'xu'
+    #     fname4 = fname + 'vu'
+    #     fname5 = fname + 'zr'
+    #     fname6 = fname + 'vr'
+    #     fname7 = fname + 'zw'
+    #     fname8 = fname + 'sr'
+
+    #     N = 1*(numlags+1)
+
+    #     def doruns(msg,ind1,ind2,ll,fn,note):
+    #         print(msg)
+    #         ts1=timeseries[:,ind1]
+    #         ts2=timeseries[:,ind2]
+    #         whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),ll,fn+str(N),note)
+
+    #     doruns('xy,'+str(N)+ ' neighbors',0,1,leglabels1,fname1,note1)
+    #     doruns('xw,'+str(N)+ ' neighbors',0,3,leglabels2,fname2,note2)
+    #     doruns('xu,'+str(N)+ ' neighbors',0,5,leglabels3,fname3,note3)
+    #     doruns('vu,'+str(N)+ ' neighbors',4,5,leglabels4,fname4,note4)
+    #     doruns('zr,'+str(N)+ ' neighbors',2,7,leglabels5,fname5,note5)
+    #     doruns('vr,'+str(N)+ ' neighbors',4,7,leglabels6,fname6,note6)
+    #     doruns('zw,'+str(N)+ ' neighbors',2,3,leglabels7,fname7,note7)
+    #     doruns('sr,'+str(N)+ ' neighbors',6,7,leglabels8,fname8,note8)
+
+
+    # TPCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/TPMaxNeighborDistMeanEvery21_Embed17_LongTS_Lag16_StartLater_'))
