@@ -105,7 +105,7 @@ if __name__ == '__main__':
     hold = 0
     show = 0
     for k in range(3):
-        l,avg1,avg2,std1,std2 = testCausality(timeseries[:,k],timeseries[:,-1],4,16,range(500,5000,500),25)
+        l,avg1,avg2,std1,std2 = testCausality(timeseries[2000:,k],timeseries[2000:,-1],4,80,range(500,3000,500),25)
         print(np.array(l))
         print(np.array([avg1,avg2]))
         avgarr = np.zeros((len(avg1),2))
@@ -118,9 +118,9 @@ if __name__ == '__main__':
         legloc=0
         SSRPlots.plots(np.array(l),avgarr[:,0],hold=hold,show=show,stylestr=[styles[k]],leglabels=[names[k] + ' from Mw'], legloc=legloc,xstr='length of time interval',ystr='mean corr coeff')   
         if not hold:
-            hold += 1
+            hold = 1
         if k == 2:
-            show += 1
+            show = 1
             SSRPlots.plots(np.array(l),avgarr[:,1],hold=hold,show=show,stylestr=[styles[-1]],leglabels=['w from M'+names[k]], legloc=legloc,xstr='length of time interval',ystr='mean corr coeff')   
     SSRPlots.plots(np.array(l),xw,hold=0,show=0,stylestr=['b-'],leglabels=['w from Mx'], legloc=legloc,xstr='length of time interval',ystr='mean corr coeff')   
     SSRPlots.plots(np.array(l),yw,hold=1,show=1,stylestr=['r-'],leglabels=['w from My'], legloc=legloc,xstr='length of time interval',ystr='mean corr coeff')   
