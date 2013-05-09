@@ -258,107 +258,114 @@ if __name__ == '__main__':
     import os
     import cPickle
     import StateSpaceReconstructionPlots as SSRPlots
-    from LorenzEqns import solveLorenz
-    timeseries = solveLorenz([1.0,0.5,0.5],161.0)
-    numlags = 3
-    lagsize = 8
-    numiters = 25
-    listoflens = range(1000,8001,1000)
 
-    def LorenzCall(simMeasure,ystr,fname):
-        leglabels1=[r'$f$: $M_x$ -> $M_z$',r'$f$: $M_z$ -> $M_x$']
-        leglabels2=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
-        note1 = "Make Mz from Mx in avg1 (does z -> x?), make Mx from Mz in avg2 (does x->z?), Lorenz eqns"
-        note2 = "Make My from Mx in avg1 (does y -> x?), make Mx from My in avg2 (does x->y?), Lorenz eqns"
-        fname1 = fname + 'xz'
-        fname2 = fname + 'xy'
+    # ############################################################
+    # from LorenzEqns import solveLorenz
+    # timeseries = solveLorenz([1.0,0.5,0.5],161.0)
+    # numlags = 3
+    # lagsize = 8
+    # numiters = 25
+    # listoflens = range(1000,8001,1000)
 
-        for N in range(numlags+1,5*(numlags+1),numlags+1):
-            print('xz, '+str(N)+ ' neighbors')
-            ts1=timeseries[:,0]
-            ts2=timeseries[:,2]
-            callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr+' '+str(N),leglabels1,fname1+str(N),note1)
-            print('xy, '+str(N)+ ' neighbors')
-            ts1=timeseries[:,0]
-            ts2=timeseries[:,1]
-            callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr+' '+str(N),leglabels2,fname2+str(N),note2)
+    # def LorenzCall(simMeasure,ystr,fname):
+    #     leglabels1=[r'$f$: $M_x$ -> $M_z$',r'$f$: $M_z$ -> $M_x$']
+    #     leglabels2=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
+    #     note1 = "Make Mz from Mx in avg1 (does z -> x?), make Mx from Mz in avg2 (does x->z?), Lorenz eqns"
+    #     note2 = "Make My from Mx in avg1 (does y -> x?), make Mx from My in avg2 (does x->y?), Lorenz eqns"
+    #     fname1 = fname + 'xz'
+    #     fname2 = fname + 'xy'
 
-    # LorenzCall(Similarity.neighborDistance,'mean neighbor dist',os.path.expanduser('~/temp/Lorenzneighbordist'))
-    # LorenzCall(Similarity.countingMeasure,'mean counting measure',os.path.expanduser('~/temp/Lorenzcountingmeasure'))
+    #     for N in range(numlags+1,5*(numlags+1),numlags+1):
+    #         print('xz, '+str(N)+ ' neighbors')
+    #         ts1=timeseries[:,0]
+    #         ts2=timeseries[:,2]
+    #         callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr+' '+str(N),leglabels1,fname1+str(N),note1)
+    #         print('xy, '+str(N)+ ' neighbors')
+    #         ts1=timeseries[:,0]
+    #         ts2=timeseries[:,1]
+    #         callme(ts1,ts2,numlags,lagsize,listoflens,numiters,simMeasure,N,ystr+' '+str(N),leglabels2,fname2+str(N),note2)
 
-    listoflens = range(500,16001,500)
-    startind=2000
-    # np.random.seed(43)
-    # poi = sorted(list(set([int(r) for r in (min(listoflens)-2*numlags-1)*np.random.rand(25)])))#[0,27,100,157,226,250,321,366]#,512,601]
-    # print(poi)
-    poi = range(0,min(listoflens)-1 - (numlags-1)*lagsize,21)
-    def LorenzCallSamePts(simMeasure,ystr,fname,whichcall=callmesamepts):
-        leglabels1=[r'$f$: $M_x$ -> $M_z$',r'$f$: $M_z$ -> $M_x$']
-        leglabels2=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
-        note1 = "Make Mz from Mx in sm12 (does z -> x?), make Mx from Mz in sm21 (does x->z?), Lorenz eqns"
-        note2 = "Make My from Mx in sm12 (does y -> x?), make Mx from My in sm21 (does x->y?), Lorenz eqns"
-        fname1 = fname + 'xz'
-        fname2 = fname + 'xy'
+    # # LorenzCall(Similarity.neighborDistance,'mean neighbor dist',os.path.expanduser('~/temp/Lorenzneighbordist'))
+    # # LorenzCall(Similarity.countingMeasure,'mean counting measure',os.path.expanduser('~/temp/Lorenzcountingmeasure'))
 
-        for N in range(numlags+1,5*(numlags+1),numlags+1):
-            print('xz, '+str(N)+ ' neighbors')
-            ts1=timeseries[:,0]
-            ts2=timeseries[:,2]
-            whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels1,fname1+str(N),note1)
-            print('xy, '+str(N)+ ' neighbors')
-            ts1=timeseries[:,0]
-            ts2=timeseries[:,1]
-            whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels2,fname2+str(N),note2)
+    # listoflens = range(500,16001,500)
+    # startind=2000
+    # # np.random.seed(43)
+    # # poi = sorted(list(set([int(r) for r in (min(listoflens)-2*numlags-1)*np.random.rand(25)])))#[0,27,100,157,226,250,321,366]#,512,601]
+    # # print(poi)
+    # poi = range(0,min(listoflens)-1 - (numlags-1)*lagsize,21)
+    # def LorenzCallSamePts(simMeasure,ystr,fname,whichcall=callmesamepts):
+    #     leglabels1=[r'$f$: $M_x$ -> $M_z$',r'$f$: $M_z$ -> $M_x$']
+    #     leglabels2=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
+    #     note1 = "Make Mz from Mx in sm12 (does z -> x?), make Mx from Mz in sm21 (does x->z?), Lorenz eqns"
+    #     note2 = "Make My from Mx in sm12 (does y -> x?), make Mx from My in sm21 (does x->y?), Lorenz eqns"
+    #     fname1 = fname + 'xz'
+    #     fname2 = fname + 'xy'
 
-
-    # LorenzCallSamePts(Similarity.maxNeighborDist,'max neighbor dist',os.path.expanduser('~/temp/LorenzMaxNeighborDist'))
-    # LorenzCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/LorenzMaxNeighborDistMeanEvery21_'),callmesameptsscalar)
-
-    #######################################
-    import DoublePendulum 
-    timeseries = DoublePendulum.solvePendulum([1.0,2.0,3.0,2.0],1151.0)
-    numlags = 9
-    lagsize = 16
-
-    listoflens = range(1000,22001,500)
-    startind=750
-    poi = range(0,min(listoflens)-1 - (numlags-1)*lagsize,21)
-
-    def DPCallSamePts(simMeasure,ystr,fname,whichcall=callmesameptsscalar):
-        leglabels1=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
-        leglabels2=[r'$f$: $M_x$ -> $M_w$',r'$f$: $M_w$ -> $M_x$']
-        leglabels3=[r'$f$: $M_z$ -> $M_w$',r'$f$: $M_w$ -> $M_z$']
-        note1 = "Make My from Mx in sm12 (does y -> x?), make Mx from My in sm21 (does x->y?), double pendulum eqns"
-        note2 = "Make Mw from Mx in sm12 (does w -> x?), make Mx from Mw in sm21 (does x->w?), double pendulum eqns"
-        note3 = "Make Mw from Mz in sm12 (does w -> z?), make Mz from Mw in sm21 (does z->w?), double pendulum eqns"
-        fname1 = fname + 'xy'
-        fname2 = fname + 'xw'
-        fname3 = fname + 'zw'
-
-        # for N in range(numlags+1,5*(numlags+1),numlags+1):
-        #     print('xy, '+str(N)+ ' neighbors')
-        #     ts1=timeseries[:,0]
-        #     ts2=timeseries[:,1]
-        #     whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels1,fname1+str(N),note1)
-        #     print('xw, '+str(N)+ ' neighbors')
-        #     ts1=timeseries[:,0]
-        #     ts2=timeseries[:,3]
-        #     whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels2,fname2+str(N),note2)
-
-        def doruns(msg,ind1,ind2,ll,fn,note):
-            print(msg)
-            ts1=timeseries[:,ind1]
-            ts2=timeseries[:,ind2]
-            whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),ll,fn+str(N),note)
-
-        N = numlags +1 
-
-        doruns('xy,'+str(N)+ ' neighbors',0,1,leglabels1,fname1,note1)
-        doruns('xw,'+str(N)+ ' neighbors',0,3,leglabels2,fname2,note2)
-        doruns('zw,'+str(N)+ ' neighbors',2,3,leglabels3,fname3,note3)
+    #     for N in range(numlags+1,5*(numlags+1),numlags+1):
+    #         print('xz, '+str(N)+ ' neighbors')
+    #         ts1=timeseries[:,0]
+    #         ts2=timeseries[:,2]
+    #         whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels1,fname1+str(N),note1)
+    #         print('xy, '+str(N)+ ' neighbors')
+    #         ts1=timeseries[:,0]
+    #         ts2=timeseries[:,1]
+    #         whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels2,fname2+str(N),note2)
 
 
-    DPCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMeanEvery21__Embed09_LongTS_Lag16_StartLater_TrackMorePts_'))
+    # # LorenzCallSamePts(Similarity.maxNeighborDist,'max neighbor dist',os.path.expanduser('~/temp/LorenzMaxNeighborDist'))
+    # # LorenzCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/LorenzMaxNeighborDistMeanEvery21_'),callmesameptsscalar)
+
+    # #######################################
+    # import DoublePendulum 
+    # timeseries = DoublePendulum.solvePendulum([1.0,2.0,3.0,2.0],1151.0)
+    # numlags = 9
+    # lagsize = 16
+
+    # listoflens = range(1000,22001,500)
+    # startind=750
+    # poi = range(0,min(listoflens)-1 - (numlags-1)*lagsize,21)
+
+    # def DPCallSamePts(simMeasure,ystr,fname,whichcall=callmesameptsscalar):
+    #     # leglabels1=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
+    #     # leglabels2=[r'$f$: $M_x$ -> $M_w$',r'$f$: $M_w$ -> $M_x$']
+    #     # leglabels3=[r'$f$: $M_z$ -> $M_w$',r'$f$: $M_w$ -> $M_z$']
+    #     # leglabels4=[r'$f$: $M_z$ + 0.1$M_x$ -> $M_w$',r'$f$: $M_w$ -> $M_z$+ 0.1$M_x$']
+    #     leglabels5=[r'$f$: $M_z$ + $M_y$ -> $M_w$',r'$f$: $M_w$ -> $M_z$+ $M_y$']
+    #     # note1 = "Make My from Mx in sm12 (does y -> x?), make Mx from My in sm21 (does x->y?), double pendulum eqns"
+    #     # note2 = "Make Mw from Mx in sm12 (does w -> x?), make Mx from Mw in sm21 (does x->w?), double pendulum eqns"
+    #     # note3 = "Make Mw from Mz in sm12 (does w -> z?), make Mz from Mw in sm21 (does z->w?), double pendulum eqns"
+    #     # note4 = "Make Mw from Mz + 0.1Mx in sm12 (does w -> z + a little x?), make Mz + 0.1Mx from Mw in sm21 (does z + a little x ->w?), double pendulum eqns"
+    #     note5 = "Make Mw from Mz + My in sm12 (does w -> z + y?), make Mz + My from Mw in sm21 (does z + y ->w?), double pendulum eqns"
+    #     # fname1 = fname + 'xy'
+    #     # fname2 = fname + 'xw'
+    #     # fname3 = fname + 'zw'
+    #     # fname4 = fname + 'zxw'
+    #     fname5 = fname + 'zyw'
+
+    #     # for N in range(numlags+1,5*(numlags+1),numlags+1):
+    #     #     print('xy, '+str(N)+ ' neighbors')
+    #     #     ts1=timeseries[:,0]
+    #     #     ts2=timeseries[:,1]
+    #     #     whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels1,fname1+str(N),note1)
+    #     #     print('xw, '+str(N)+ ' neighbors')
+    #     #     ts1=timeseries[:,0]
+    #     #     ts2=timeseries[:,3]
+    #     #     whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels2,fname2+str(N),note2)
+
+    #     def doruns(msg,ts1,ts2,ll,fn,note):
+    #         print(msg)
+    #         whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),ll,fn+str(N),note)
+
+    #     N = numlags +1 
+
+    #     # doruns('xy,'+str(N)+ ' neighbors',timeseries[:,0],timeseries[:,1],leglabels1,fname1,note1)
+    #     # doruns('xw,'+str(N)+ ' neighbors',timeseries[:,0],timeseries[:,3],leglabels2,fname2,note2)
+    #     # doruns('zw,'+str(N)+ ' neighbors',timeseries[:,2],timeseries[:,3],leglabels3,fname3,note3)
+    #     # doruns('z + 0.1x and w, '+str(N)+' neighbors',timeseries[:,2]+ 0.1*timeseries[:,0],timeseries[:,3],leglabels4,fname4,note4)
+    #     doruns('z + y and w, '+str(N)+' neighbors',timeseries[:,2]+ timeseries[:,1],timeseries[:,3],leglabels5,fname5,note5)
+
+    # DPCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMeanEvery21__Embed09_LongTS_Lag16_StartLater_TrackMorePts_'))
 
     # #######################################
     # import TriplePendulum 
@@ -415,3 +422,44 @@ if __name__ == '__main__':
 
 
     # TPCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/TPMaxNeighborDistMeanEvery21_Embed17_LongTS_Lag16_StartLater_'))
+
+    ############################################################
+    import LorenzPlusIntegration 
+    timeseries = LorenzPlusIntegration.solveLorenz([1.0,0.5,0.5,1.0],161.0)
+    numlags = 3
+    lagsize = 8
+    listoflens = range(500,16001,500)
+    startind=2000
+    poi = range(0,min(listoflens)-1 - (numlags-1)*lagsize,21)
+    def LorenzCallSamePts(simMeasure,ystr,fname,whichcall=callmesameptsscalar):
+        leglabels1=[r'$f$: $M_x$ -> $M_z$',r'$f$: $M_z$ -> $M_x$']
+        leglabels2=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
+        leglabels3=[r'$f$: $M_x$ -> $M_w$',r'$f$: $M_w$ -> $M_x$']
+        note1 = "Make Mz from Mx in sm12 (does z -> x?), make Mx from Mz in sm21 (does x->z?), Lorenz eqns + dw/dt = x"
+        note2 = "Make My from Mx in sm12 (does y -> x?), make Mx from My in sm21 (does x->y?), Lorenz eqns + dw/dt = x"
+        note3 = "Make Mw from Mx in sm12 (does w -> x?), make Mx from Mw in sm21 (does x->w?), Lorenz eqns + dw/dt = x"
+        fname1 = fname + 'xz'
+        fname2 = fname + 'xy'
+        fname3 = fname + 'xw'
+
+        # for N in range(numlags+1,5*(numlags+1),numlags+1):
+        #     print('xz, '+str(N)+ ' neighbors')
+        #     ts1=timeseries[:,0]
+        #     ts2=timeseries[:,2]
+        #     whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels1,fname1+str(N),note1)
+        #     print('xy, '+str(N)+ ' neighbors')
+        #     ts1=timeseries[:,0]
+        #     ts2=timeseries[:,1]
+        #     whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),leglabels2,fname2+str(N),note2)
+        def doruns(msg,ts1,ts2,ll,fn,note):
+            print(msg)
+            whichcall(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi,ystr+' '+str(N),ll,fn+str(N),note)
+
+        N = numlags +1 
+
+        doruns('xz,'+str(N)+ ' neighbors',timeseries[:,0],timeseries[:,2],leglabels1,fname1,note1)
+        doruns('xy,'+str(N)+ ' neighbors',timeseries[:,0],timeseries[:,1],leglabels2,fname2,note2)
+        doruns('xw,'+str(N)+ ' neighbors',timeseries[:,0],timeseries[:,3],leglabels3,fname3,note3)
+
+    LorenzCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/LorenzWithIntegrationMaxNeighborDistMeanEvery21_'))
+
