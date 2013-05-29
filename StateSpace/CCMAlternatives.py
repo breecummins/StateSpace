@@ -17,7 +17,7 @@ def estManifold(Mx,My,wgtfunc):
         dists,inds = Similarity.findClosestInclusive(poi,Mx,Mx.shape[1]+1)
         w = wgtfunc(np.array(dists))
         pts = [My[j,:] for j in inds]
-        Mest[k,:] = np.array([w[j]*pts[j] for j in range(len(w))]).sum(0)
+        Mest[k,:] = sum([w[j]*pts[j] for j in range(len(w))])
     return Mest
 
 def crossMapModified1(M1,M2,wgtfunc):

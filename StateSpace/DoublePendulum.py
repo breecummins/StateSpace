@@ -1,7 +1,7 @@
 import numpy as np
 import rk4
 
-def solvePendulum(init,T,dt=0.01,mu=4.0,beta=2.0,A=2.0):
+def solvePendulum(init,T,dt=0.1,mu=4.0,beta=2.0,A=2.0):
     times = np.arange(0,T,dt)
     x = np.zeros((len(times),len(init)))
     x[0,:] = init
@@ -19,9 +19,9 @@ def doublePendulum(t,x,mu=0.0,beta=0.0,A=0.0):
 
 if __name__ == '__main__':
     import StateSpaceReconstructionPlots as SSRPlots
-    x = solvePendulum([1.0,2.0,3.0,2.0],300.0,dt=0.01)
+    x = solvePendulum([1.0,2.0,3.0,2.0],300.0,dt=0.1)
     numlags = 2
-    lagsize = 80
+    lagsize = 8
     times = np.arange(0,300.0,0.01)
     # SSRPlots.plotManifold(x[:,:3],show=0,titlestr='x, y, z')
     # SSRPlots.plotManifold(x[:,(0,1,3)],show=1,titlestr='x, y, w')
@@ -29,8 +29,8 @@ if __name__ == '__main__':
     # SSRPlots.plotManifold(x[:,(1,2)],show=0,titlestr='y and z')
     # SSRPlots.plotManifold(x[:,(1,3)],show=0,titlestr='y and w')
     # SSRPlots.plotShadowManifold(x[:,2]+x[:,3],numlags,lagsize,show=0,hold=0,style='r-')
-    # SSRPlots.plotShadowManifold(x[:,3],numlags,lagsize,show=1,hold=0,style='g-')
-    SSRPlots.plots(times,x[:,2:],show=1,hold=0,stylestr=['r-','g-'])
+    SSRPlots.plotShadowManifold(x[:,3],numlags,lagsize,show=1,hold=0,style='g-')
+    # SSRPlots.plots(times,x[:,2:],show=1,hold=0,stylestr=['r-','g-'])
     # SSRPlots.plots(times,x[:,3],show=1,hold=0)
     # SSRPlots.plotManifold(x[:,2:],show=1,titlestr='z and w')
     # SSRPlots.plotManifold(x[:,:-1],show=0,titlestr='x, y, and z')

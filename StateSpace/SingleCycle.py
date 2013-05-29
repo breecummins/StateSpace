@@ -1,6 +1,8 @@
 import rk4
 import numpy as np
 
+#FIXME: need something with chaotic behavior
+
 def solveCycle(init,finaltime,dt=0.1,a=2.0,b=2.0,c=2.0):
     '''
     init = [x[0],y[0],z[0]] are the initial conditions

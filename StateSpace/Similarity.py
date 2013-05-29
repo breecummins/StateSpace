@@ -15,7 +15,7 @@ def corrCoeffPearson(ts1,ts2):
 
 def RootMeanSquaredErrorTS(ts1,ts2):
     '''
-    Compare a sampled manifold and its estimate at contemporaneous
+    Compare a time series and its estimate at contemporaneous
     points using root mean squared error.
 
     '''
@@ -27,7 +27,14 @@ def RootMeanSquaredErrorManifold(M1,M2):
     points using root mean squared error.
 
     '''
-    return np.sqrt( ((M1-M2)**2).sum() / M1.shape[0]*M1.shape[1])
+    return np.sqrt( ((M1-M2)**2).sum() / (M1.shape[0]*M1.shape[1]) )
+
+def MeanErrorManifold(M1,M2):
+    '''
+    Find the mean distance between each point and its reconstruction.
+
+    '''
+    return np.mean( np.sqrt( ((M1-M2)**2).sum(1) ) )
 
 def HausdorffDistance(M1,M2):
     '''
@@ -78,13 +85,13 @@ def findClosestExclusive(poi,pts,N):
         dists[i] = np.Inf
     return zip(*out)
 
-def countingMeasure(M1,M2,N):
+def countingMeasure(M1,M2,N=None):
     '''
     For each point y in M2, find the contemporaneous point x in M1 and the set
     of points containing the N nearest neighbors of the N nearest neighbors of x. 
     Count the points in this neighborhood that share a time index 
     with any of the N nearest neighbors of y. Normalize by N and average over
-    the number of points in the manifold (M1.shape[1] = M2.shape[2]).
+    the number of points in the manifold (M1.shape = M2.shape).
     This is analogous to estimating M1 from M2 using Sugihara's method and 
     testing for causality in the 1 -> 2 direction. In Sugihara's method, the N 
     nearest neighbors of y are assumed to be "close to" x. So I check for these 
@@ -95,6 +102,8 @@ def countingMeasure(M1,M2,N):
     with neighborDistance.
 
     '''
+    if N == None:
+        N = M1.shape[1]+1
     def friendsoffriends(inds,M):
         indsbig = []
         for i in inds:
