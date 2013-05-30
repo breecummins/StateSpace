@@ -105,7 +105,7 @@ if __name__ == '__main__':
     hold = 0
     show = 0
     for k in range(3):
-        l,avg1,avg2,std1,std2 = testCausality(timeseries[2000:,k],timeseries[2000:,-1],4,80,range(500,3000,500),25)
+        l,avg1,avg2,std1,std2 = testCausality(timeseries[200:,k],timeseries[200:,-1],4,8,range(500,3000,500),25)
         print(np.array(l))
         print(np.array([avg1,avg2]))
         avgarr = np.zeros((len(avg1),2))

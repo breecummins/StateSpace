@@ -144,11 +144,19 @@ def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,startind=0,si
     Each length will be run numiters times from different random starting 
     locations in the time series. numiters must be <= len(ts1) - max(listoflens).
     Neighborhoods of contemporaneous points will be assessed for similarity using
-    simMeasure, which can be Similarity.neighborDistance, Similarity.maxNeighborDistMean, 
-    or Similarity.countingMeasure.
+    simMeasure, which can be Similarity.neighborDistance or Similarity.countingMeasure,
+    or even Similarity.maxNeighborDistMean and other similar scalar measures, although 
+    it's not a good idea to use these in conjunction with random starting locations and 
+    numiters. It's better to use testDiffeomorphismSamePoints or 
+    testDiffeomorphismSamePointsFillIn.
     N is an argument required by simMeasure that indicates the number of points
     in a neighborhood. The default depends on the dimension of the embedding space
     (numlags), so is constructed in the body of the function.
+    poi is an optional argument of simMeasure that indicates the indices of points
+    to track as the length of the tested time series increases. The default is set in 
+    simMeasure and is all the points in the time series. Note that the poi indices reference  
+    the truncated time series: ts[startind:startind+l] for l in listoflens. 
+    So max(poi) is required to be < min(listoflens).
 
     '''
     if N == None:
@@ -190,10 +198,10 @@ def testDiffeomorphismSamePoints(ts1,ts2,numlags,lagsize,listoflens,startind=0,s
     is an integer representing the index of the time lag.
     listoflens contains the lengths to use to show convergence 
     Example: range(100,10000,100)
-    Each length will be run numiters times from different random starting 
-    locations in the time series. numiters must be <= len(ts1) - max(listoflens).
+    startind is an optional argument that allows a different starting index for the 
+    time series (default = 0). Can be used to remove a transient.
     Neighborhoods of contemporaneous points will be assessed for similarity using
-    simMeasure, which can be Similarity.maxNeighborDistArray only at the moment.
+    simMeasure, which can be any of Similarity.*NeighborDist*.
     N is an argument required by simMeasure that indicates the number of points
     in a neighborhood. The default depends on the dimension of the embedding space
     (numlags), so is constructed in the body of the function.
@@ -220,6 +228,44 @@ def testDiffeomorphismSamePoints(ts1,ts2,numlags,lagsize,listoflens,startind=0,s
         sm12.append(s12)
         sm21.append(s21)
     return lol,sm12,sm21
+
+def testDiffeomorphismSamePointsFillIn(ts1,ts2,numlags,lagsize,listofskips,startind=0,simMeasure=Similarity.meanNeighborDistWithSkip,N=None,poi=None):
+    '''
+    Check for diffeomorphism between shadow manifolds constructed from ts1 and ts2.
+    ts1 and ts2 must have the same length.
+    numlags is the dimension of the embedding space for the reconstruction.
+    Use time lags of size lagsize * dt to construct shadow manifolds. lagsize
+    is an integer representing the index of the time lag.
+    listofskips contains the successive index skips in the full time series to use 
+    to show convergence.
+    Example: [2**n for n in range(5,-1,-1)]
+    startind is an optional argument that allows a different starting index for the 
+    time series (default = 0). Can be used to remove a transient.
+    Neighborhoods of contemporaneous points will be assessed for similarity using
+    simMeasure, which can be any of the Similarity.*WithSkip functions.
+    N is an argument required by simMeasure that indicates the number of points
+    in a neighborhood. The default depends on the dimension of the embedding space
+    (numlags), so is constructed in the body of the function.
+    poi is an optional argument of simMeasure that indicates the indices of points
+    to track as the time series is filled in. The default is set in simMeasure and 
+    is all the points in the time series. Note that the poi indices reference  
+    the truncated time series: ts[startind:].
+
+    '''
+    if N == None:
+        N = numlags+1
+    L = len(ts1)
+    if len(ts2) != L:
+        raise(ValueError,"The lengths of the two time series must be the same.")
+    M1 = SSR.makeShadowManifold(ts1[startind:],numlags,lagsize)
+    M2 = SSR.makeShadowManifold(ts2[startind:],numlags,lagsize)
+    sm12=[]
+    sm21=[]
+    for s in listofskips:
+        s12,s21 = simMeasure(M1,M2,N,poi,s)
+        sm12.append(s12)
+        sm21.append(s21)
+    return [1.0/s for s in listofskips],sm12,sm21
 
 def callme(ts1,ts2,numlags,lagsize,listoflens,N,ystr,leglabels,fname,note,simMeasure,startind=1000,numiters=25,poi=None):
         l,avg1,std1, avg2, std2 = testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,startind,simMeasure,N,poi) 
@@ -253,6 +299,15 @@ def callmesameptsscalar(ts1,ts2,numlags,lagsize,listoflens,N,ystr,leglabels,fnam
         print(lol)
         print(arr)
         SSRPlots.plots(lol,arr.transpose(),hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname+'.pdf')  
+
+def callmesameptsscalarfillin(ts1,ts2,numlags,lagsize,listofskips,N,ystr,leglabels,fname,note,simMeasure=Similarity.meanNeighborDistWithSkip,startind=1000,numiters=0,poi=None):
+        tsprop,sm12,sm21 = testDiffeomorphismSamePointsFillIn(ts1,ts2,numlags,lagsize,listofskips,startind,simMeasure,N,poi) 
+        arr = np.array([sm12,sm21])
+        tsprop = np.array(tsprop)
+        cPickle.dump({'tsprop':tsprop,'sm12':sm12,'sm21':sm21,'note':note,'numlags':numlags,'lagsize':lagsize,'timeseries':timeseries,'numneighbors':N,'startind':startind,'poi':poi},open(fname+'.pickle','w'))
+        print(tsprop)
+        print(arr)
+        SSRPlots.plots(tsprop,arr.transpose(),hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname+'.pdf')  
 
 if __name__ == '__main__':
     import os
@@ -318,15 +373,17 @@ if __name__ == '__main__':
 
     #######################################
     import DoublePendulum 
-    timeseries = DoublePendulum.solvePendulum([1.0,2.0,3.0,2.0],1151.0)
-    numlags = 9
-    lagsize = 24
+    timeseries = DoublePendulum.solvePendulum([1.0,2.0,3.0,2.0],300.0)
+    numlags = 4
+    lagsize = 8
 
-    listoflens = range(1000,22001,500)
-    startind=750
-    poi = range(0,min(listoflens)-1 - (numlags-1)*lagsize,21)
+    # listoflens = range(500,3000,500)
+    listofskips = [2**n for n in range(5,-1,-1)]
+    listoflens = listofskips
+    startind=200
+    poi = range(0,len(timeseries)- startind - (numlags-1)*lagsize,23)
+    # print(len(poi))
     numiters = 0
-    # poi = None
     # inds = tuple([p+startind for p in poi])
     # SSRPlots.plotManifold(timeseries[startind:,(0,1,3)],show=0,hold=0,style='r-')
     # poiarr = np.vstack([np.vstack([timeseries[inds,0],timeseries[inds,1]]),timeseries[inds,3]]).transpose()
@@ -334,17 +391,17 @@ if __name__ == '__main__':
 
     def DPCallSamePts(simMeasure,ystr,fname,whichcall=callmesameptsscalar):
         # leglabels1=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
-        # leglabels2=[r'$f$: $M_x$ -> $M_w$',r'$f$: $M_w$ -> $M_x$']
+        leglabels2=[r'$f$: $M_x$ -> $M_w$',r'$f$: $M_w$ -> $M_x$']
         leglabels3=[r'$f$: $M_z$ -> $M_w$',r'$f$: $M_w$ -> $M_z$']
         # leglabels4=[r'$f$: $M_z$ + 0.1$M_x$ -> $M_w$',r'$f$: $M_w$ -> $M_z$+ 0.1$M_x$']
         # leglabels5=[r'$f$: $M_z$ + $M_y$ -> $M_w$',r'$f$: $M_w$ -> $M_z$+ $M_y$']
         # note1 = "Make My from Mx in sm12 (does y -> x?), make Mx from My in sm21 (does x->y?), double pendulum eqns"
-        # note2 = "Make Mw from Mx in sm12 (does w -> x?), make Mx from Mw in sm21 (does x->w?), double pendulum eqns"
+        note2 = "Make Mw from Mx in sm12 (does w -> x?), make Mx from Mw in sm21 (does x->w?), double pendulum eqns"
         note3 = "Make Mw from Mz in sm12 (does w -> z?), make Mz from Mw in sm21 (does z->w?), double pendulum eqns"
         # note4 = "Make Mw from Mz + 0.1Mx in sm12 (does w -> z + a little x?), make Mz + 0.1Mx from Mw in sm21 (does z + a little x ->w?), double pendulum eqns"
         # note5 = "Make Mw from Mz + My in sm12 (does w -> z + y?), make Mz + My from Mw in sm21 (does z + y ->w?), double pendulum eqns"
         # fname1 = fname + 'xy'
-        # fname2 = fname + 'xw'
+        fname2 = fname + 'xw'
         fname3 = fname + 'zw'
         # fname4 = fname + 'zxw'
         # fname5 = fname + 'zyw'
@@ -356,15 +413,17 @@ if __name__ == '__main__':
         N = numlags +1 
 
         # doruns('xy,'+str(N)+ ' neighbors',timeseries[:,0],timeseries[:,1],leglabels1,fname1,note1)
-        # doruns('xw,'+str(N)+ ' neighbors',timeseries[:,0],timeseries[:,3],leglabels2,fname2,note2)
+        doruns('xw,'+str(N)+ ' neighbors',timeseries[:,0],timeseries[:,3],leglabels2,fname2,note2)
         doruns('zw,'+str(N)+ ' neighbors',timeseries[:,2],timeseries[:,3],leglabels3,fname3,note3)
         # doruns('z + 0.1x and w, '+str(N)+' neighbors',timeseries[:,2]+ 0.1*timeseries[:,0],timeseries[:,3],leglabels4,fname4,note4)
         # doruns('z + y and w, '+str(N)+' neighbors',timeseries[:,2]+ timeseries[:,1],timeseries[:,3],leglabels5,fname5,note5)
 
-    # DPCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMeanEvery01_Embed09_LongTS_Lag16_StartLater_TonsPts_'))
+    # DPCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMean_Every11_Embed04_Lag8_Start200_'))
     # DPCallSamePts(Similarity.maxNeighborDistMin,'min max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMinEvery21_Embed09_LongTS_Lag24_StartLater_'))
     # DPCallSamePts(Similarity.maxNeighborDistMax,'max max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMaxEvery21_Embed09_LongTS_Lag24_StartLater_'))
-    DPCallSamePts(Similarity.meanNeighborDist,'mean mean neighbor dist',os.path.expanduser('~/temp/DPMeanNeighborDistEvery21_Embed09_LongTS_Lag24_StartLater_'))
+    # DPCallSamePts(Similarity.meanNeighborDist,'mean mean neighbor dist',os.path.expanduser('~/temp/DPMeanNeighborDistEvery21_Embed09_LongTS_Lag24_StartLater_'))
+    # DPCallSamePts(Similarity.meanNeighborDistWithSkip,'mean mean neighbor dist',os.path.expanduser('~/temp/DPMeanNeighborDistWithSkip_Every23_WholeSeries_Embed04_Lag16_Start400_'),callmesameptsscalarfillin)
+    DPCallSamePts(Similarity.maxNeighborDistMeanWithSkip,'mean max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMeanWithSkip_Every23_WholeSeries_Embed04_Lag8_Start200_'),callmesameptsscalarfillin)
 
 
     # #######################################

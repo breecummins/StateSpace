@@ -227,6 +227,45 @@ def meanNeighborDist(M1,M2,N,poi=None):
         ndistsy[k] = np.mean(np.sqrt(((M2[indsx,:] - y)**2).sum(1)))
     return np.mean(ndistsy), np.mean(ndistsx)
 
+def meanNeighborDistWithSkip(M1,M2,N,poi=None,skip=1):
+    if not poi:
+        poi = range(M1.shape[0])
+    ndistsx = []
+    ndistsy = []
+    keepinds = range(0,M1.shape[0],skip)
+    print(len(set(poi).intersection(set(keepinds))))    
+    for ind in poi:
+        x = M1[ind,:]
+        y = M2[ind,:]
+        if ind in keepinds:
+            distsx,indsx = findClosestInclusive(x,M1[keepinds,:],N)
+            distsy,indsy = findClosestInclusive(y,M2[keepinds,:],N)
+        else:
+            distsx,indsx = findClosestExclusive(x,M1[keepinds,:],N)
+            distsy,indsy = findClosestExclusive(y,M2[keepinds,:],N)
+        ndistsx.append(np.mean(np.sqrt(((M1[indsy,:] - x)**2).sum(1))))
+        ndistsy.append(np.mean(np.sqrt(((M2[indsx,:] - y)**2).sum(1))))
+    return np.mean(ndistsy), np.mean(ndistsx)
+
+def maxNeighborDistMeanWithSkip(M1,M2,N,poi=None,skip=1):
+    if not poi:
+        poi = range(M1.shape[0])
+    ndistsx = []
+    ndistsy = []
+    keepinds = range(0,M1.shape[0],skip)
+    for ind in poi:
+        x = M1[ind,:]
+        y = M2[ind,:]
+        if ind in keepinds:
+            distsx,indsx = findClosestInclusive(x,M1[keepinds,:],N)
+            distsy,indsy = findClosestInclusive(y,M2[keepinds,:],N)
+        else:
+            distsx,indsx = findClosestExclusive(x,M1[keepinds,:],N)
+            distsy,indsy = findClosestExclusive(y,M2[keepinds,:],N)
+        ndistsx.append(np.max(np.sqrt(((M1[indsy,:] - x)**2).sum(1))))
+        ndistsy.append(np.max(np.sqrt(((M2[indsx,:] - y)**2).sum(1))))
+    return np.mean(ndistsy), np.mean(ndistsx)
+
 #Below here are failed experiments
 
 def compareLocalDiams(M1,M2):

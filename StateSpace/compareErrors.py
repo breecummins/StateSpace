@@ -12,9 +12,9 @@ import StateSpaceReconstructionPlots as SSRPlots
 from DoublePendulum import solvePendulum
 timeseries = solvePendulum([1.0,2.0,3.0,2.0],300.0)
 # quantities needed for the different methods
-numlags=4
+numlags=9
 lagsize=8 
-compind1 = 0
+compind1 = 2
 compind2 = 3
 startind = 0
 endind=len(timeseries)
