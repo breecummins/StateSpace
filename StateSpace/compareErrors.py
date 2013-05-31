@@ -17,10 +17,10 @@ timeseries = solvePendulum([1.0,2.0,3.0,2.0],300.0,dt=dt)
 eqns = 'Double pendulum'
 numlags=4
 lagsize=8 
-compind1 = 0
-name1 = 'x'
-compind2 = 1
-name2 = 'y'
+compind1 = 2
+name1 = 'z'
+compind2 = 3
+name2 = 'W'
 startind = 0
 endind=len(timeseries)
 corr = (numlags-1)*lagsize
@@ -84,19 +84,19 @@ numiters = 25
 
 def makeSeries(wgtfunc,simMeasure,note,short,ts1=timeseries[startind:endind,compind1],ts2=timeseries[startind:endind,compind2]):
     lol,avg1,avg2,std1,std2 = CCMAlternatives.testCausalityReconstruction(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=wgtfunc,simMeasure=simMeasure)
-    print(note + " between " + name1 + " and " + name1 +"': " + ''.join(["{0:0.6f}".format(i) for i in avg1]))
-    print("Standard deviations for " + short + name1 + " and " + name1 +"': " + ''.join(["{0:0.6f}".format(i) for i in std1]))
-    print(note + " between " + name2 + " and " + name2 +"': " + ''.join(["{0:0.6f}".format(i) for i in avg2]))
-    print("Standard deviations for " + short + name2 + " and " + name2 +"': " + ''.join(["{0:0.6f}".format(i) for i in std2]))
+    print(note + " between " + name1 + " and " + name1 +"': " + ' '.join(["{0:0.6f}".format(i) for i in avg1]))
+    print("Standard deviations for " + short + ' ' + name1 + " and " + name1 +"': " + ' '.join(["{0:0.6f}".format(i) for i in std1]))
+    print(note + " between " + name2 + " and " + name2 +"': " + ' '.join(["{0:0.6f}".format(i) for i in avg2]))
+    print("Standard deviations for " + short + ' ' + name2 + " and " + name2 +"': " + ' '.join(["{0:0.6f}".format(i) for i in std2]))
 
 # Sugihara method, full
 lol,avg1,avg2,std1,std2 = CCM.testCausality(timeseries[startind:endind,compind1],timeseries[startind:endind,compind2],numlags,lagsize,listoflens,numiters,Weights.makeExpWeights)
 print("Sugihara method with correlation coefficient:")
 print("Lengths: " + str(lol))
-print("Mean correlation coefficients between " + name1 + " and " + name1 +"': " + str(["{0:0.6f}".format(i) for i in avg1]))
-print("Standard deviations for " + name1 + " and " + name1 +"': " + str(["{0:0.6f}".format(i) for i in std1]))
-print("Mean correlation coefficients between " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in avg2]))
-print("Standard deviations for " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in std2]))
+print("Mean correlation coefficients between " + name1 + " and " + name1 +"': " + ' '.join(["{0:0.6f}".format(i) for i in avg1]))
+print("Standard deviations for " + name1 + " and " + name1 +"': " + ' '.join(["{0:0.6f}".format(i) for i in std1]))
+print("Mean correlation coefficients between " + name2 + " and " + name2 +"': " + ' '.join(["{0:0.6f}".format(i) for i in avg2]))
+print("Standard deviations for " + name2 + " and " + name2 +"': " + ' '.join(["{0:0.6f}".format(i) for i in std2]))
 # Sugihara with intermediate reconstruction
 avgs1 = []
 stds1 = []
@@ -141,18 +141,18 @@ for l in listoflens:
     stds2.append(np.std(a2[2::3]))
 print("Sugihara method with intermediate reconstruction:")
 print("Lengths: " + str(listoflens))
-print("Mean RMSE between " + name1 + " and " + name1 +"': " + str(["{0:0.6f}".format(i) for i in avgs1[0::3]]))
-print("Standard deviations for RMSE " + name1 + " and " + name1 +"': " + str(["{0:0.6f}".format(i) for i in stds1[0::3]]))
-print("Mean RMSE between " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in avgs2[0::3]]))
-print("Standard deviations for RMSE " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in stds2[0::3]]))
-print("Mean error per point between " + name1 + " and " + name1 +"': " + str(["{0:0.6f}".format(i) for i in avgs1[2::3]]))
-print("Standard deviations for ME " + name1 + " and " + name1 +"': " + str(["{0:0.6f}".format(i) for i in stds1[2::3]]))
-print("Mean error per point between " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in avgs2[2::3]]))
-print("Standard deviations for ME " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in stds2[2::3]]))
-print("Mean Hausdorff distance between " + name1 + " and " + name1 +"': " + str(["{0:0.6f}".format(i) for i in avgs1[1::3]]))
-print("Standard deviations for HD " + name1 + " and " + name1 +"': " + str(["{0:0.6f}".format(i) for i in stds1[1::3]]))
-print("Mean Hausdorff distance between " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in avgs2[1::3]]))
-print("Standard deviations for HD " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in stds2[1::3]]))
+print("Mean RMSE between " + name1 + " and " + name1 +"': " + ' '.join(["{0:0.6f}".format(i) for i in avgs1[0::3]]))
+print("Standard deviations for RMSE " + name1 + " and " + name1 +"': " + ' '.join(["{0:0.6f}".format(i) for i in stds1[0::3]]))
+print("Mean RMSE between " + name2 + " and " + name2 +"': " + ' '.join(["{0:0.6f}".format(i) for i in avgs2[0::3]]))
+print("Standard deviations for RMSE " + name2 + " and " + name2 +"': " + ' '.join(["{0:0.6f}".format(i) for i in stds2[0::3]]))
+print("Mean error per point between " + name1 + " and " + name1 +"': " + ' '.join(["{0:0.6f}".format(i) for i in avgs1[2::3]]))
+print("Standard deviations for ME " + name1 + " and " + name1 +"': " + ' '.join(["{0:0.6f}".format(i) for i in stds1[2::3]]))
+print("Mean error per point between " + name2 + " and " + name2 +"': " + ' '.join(["{0:0.6f}".format(i) for i in avgs2[2::3]]))
+print("Standard deviations for ME " + name2 + " and " + name2 +"': " + ' '.join(["{0:0.6f}".format(i) for i in stds2[2::3]]))
+print("Mean Hausdorff distance between " + name1 + " and " + name1 +"': " + ' '.join(["{0:0.6f}".format(i) for i in avgs1[1::3]]))
+print("Standard deviations for HD " + name1 + " and " + name1 +"': " + ' '.join(["{0:0.6f}".format(i) for i in stds1[1::3]]))
+print("Mean Hausdorff distance between " + name2 + " and " + name2 +"': " + ' '.join(["{0:0.6f}".format(i) for i in avgs2[1::3]]))
+print("Standard deviations for HD " + name2 + " and " + name2 +"': " + ' '.join(["{0:0.6f}".format(i) for i in stds2[1::3]]))
 # weighted sums in the embedding space
 print('############################################################################')
 print("Direct estimation of the manifold using exponential weights:")
