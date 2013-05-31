@@ -19,7 +19,7 @@ numlags=4
 lagsize=8 
 compind1 = 0
 name1 = 'x'
-compind2 = 3
+compind2 = 1
 name2 = 'y'
 startind = 0
 endind=len(timeseries)
@@ -79,7 +79,7 @@ print(eqns+' with lagsize of '+str(lagsize)+'*dt with dt = '+str(dt)+' and recon
 
 # Construct a series of manifolds
 
-listoflens = range(400,3000,400)
+listoflens = range(400,2100,400)
 numiters = 25
 
 def makeSeries(wgtfunc,simMeasure,note,short,ts1=timeseries[startind:endind,compind1],ts2=timeseries[startind:endind,compind2]):
