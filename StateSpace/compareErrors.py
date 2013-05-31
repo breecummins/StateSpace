@@ -89,14 +89,14 @@ def makeSeries(wgtfunc,simMeasure,ts1=timeseries[startind:endind,compind1],ts2=t
     print("Mean error per point between " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in avg2]))
     print("Standard deviations for ME" + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in std2]))
 
-# Sugihara method, full
-lol,avg1,avg2,std1,std2 = CCM.testCausality(timeseries[startind:endind,compind1],timeseries[startind:endind,compind2],numlags,lagsize,listoflens,numiters,Weights.makeExpWeights)
-print("Sugihara method with correlation coefficient:")
-print("Lengths: " + str(lol))
-print("Mean correlation coefficients between " + name1 + " and " + name1 +"': " + str(["{0:0.6f}".format(i) for i in avg1]))
-print("Standard deviations for " + name1 + " and " + name1 +"': " + str(["{0:0.6f}".format(i) for i in std1]))
-print("Mean correlation coefficients between " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in avg2]))
-print("Standard deviations for " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in std2]))
+# # Sugihara method, full
+# lol,avg1,avg2,std1,std2 = CCM.testCausality(timeseries[startind:endind,compind1],timeseries[startind:endind,compind2],numlags,lagsize,listoflens,numiters,Weights.makeExpWeights)
+# print("Sugihara method with correlation coefficient:")
+# print("Lengths: " + str(lol))
+# print("Mean correlation coefficients between " + name1 + " and " + name1 +"': " + str(["{0:0.6f}".format(i) for i in avg1]))
+# print("Standard deviations for " + name1 + " and " + name1 +"': " + str(["{0:0.6f}".format(i) for i in std1]))
+# print("Mean correlation coefficients between " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in avg2]))
+# print("Standard deviations for " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in std2]))
 # Sugihara with intermediate reconstruction
 avgs1 = []
 stds1 = []
@@ -110,9 +110,16 @@ for l in listoflens:
         est1,est2=CCM.crossMap(timeseries[s:s+l,compind1],timeseries[s:s+l,compind2],numlags,lagsize,Weights.makeExpWeights)
         M1Sug=SSR.makeShadowManifold(est1,numlags,lagsize)
         M2Sug=SSR.makeShadowManifold(est2,numlags,lagsize)
-        M1SugRMSE, M2SugRMSE = calcErrs(M1Sug,M2Sug,Similarity.RootMeanSquaredErrorManifold,M1ref=M1[s+2*corr:s+l,:],M2ref=M2[s+2*corr:s+l,:])
-        M1SugHD, M2SugHD = calcErrs(M1Sug,M2Sug,Similarity.HausdorffDistance,M1ref=M1[s+2*corr:s+l,:],M2ref=M2[s+2*corr:s+l,:])
-        M1SugME, M2SugME = calcErrs(M1Sug,M2Sug,Similarity.MeanErrorManifold,M1ref=M1[s+2*corr:s+l,:],M2ref=M2[s+2*corr:s+l,:])
+        try:
+            M1SugRMSE, M2SugRMSE = calcErrs(M1Sug,M2Sug,Similarity.RootMeanSquaredErrorManifold,M1ref=M1[s+2*corr:s+l,:],M2ref=M2[s+2*corr:s+l,:])
+            M1SugHD, M2SugHD = calcErrs(M1Sug,M2Sug,Similarity.HausdorffDistance,M1ref=M1[s+2*corr:s+l,:],M2ref=M2[s+2*corr:s+l,:])
+            M1SugME, M2SugME = calcErrs(M1Sug,M2Sug,Similarity.MeanErrorManifold,M1ref=M1[s+2*corr:s+l,:],M2ref=M2[s+2*corr:s+l,:])
+        except:
+            print('length = {l!s}')
+            print('startind = {s!s}')
+            print(M1Sug.shape)
+            print(M1[s+2*corr:s+l,:].shape)
+            raise
         a1.append(M1SugRMSE)
         a1.append(M1SugHD)
         a1.append(M1SugME)
