@@ -81,6 +81,40 @@ def testCausality(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=Weights.ma
         stdcc2.append(np.std(np.array(cc2)))
     return lol,avgcc1,avgcc2,stdcc1,stdcc2
     
+def crossMapManifold(M1,M2,numlags,lagsize,wgtfunc):
+    '''
+    Estimate timeseries 1 from timeseries 2 and vice versa using  
+    Sugihara's cross-mapping technique between shadow manifolds.
+    In this version, the shadow manifolds are supplied as arguments.
+    Find the nearest points to each point in M1.
+    Construct weights based on their distances to the point of
+    interest. 
+    Use the time indices of these points and the associated weights to 
+    make a weighted-sum estimate of the contemporaneous points in the 
+    second time series. 
+    Repeat starting with points in M2 and casting into time series 1.
+
+    Could also be calculated by estimating the manifold and taking a 
+    projection:
+    Mest1 = estManifold(M2,M1)
+    Mest2 = estManifold(M1,M2)
+    est1 = Mest1[:,0]
+    est2 = Mest2[:,0]
+
+
+    '''
+    def estSeries(M,ts):
+        est=np.zeros(ts.shape)
+        for k in range(M.shape[0]):
+            poi = M[k,:]
+            dists,inds = Similarity.findClosestInclusive(poi,M,numlags+1)
+            w = wgtfunc(np.array(dists))
+            est[k] = (w*ts[list(inds)]).sum()
+        return est
+    est1 = estSeries(M2,M1[:,0])
+    est2 = estSeries(M1,M2[:,0])
+    return est1, est2
+
 
 if __name__ == '__main__':
     import StateSpaceReconstructionPlots as SSRPlots

@@ -107,19 +107,20 @@ for l in listoflens:
     a1=[]
     a2=[]
     for s in startinds:
-        est1,est2=CCM.crossMap(timeseries[s:s+l,compind1],timeseries[s:s+l,compind2],numlags,lagsize,Weights.makeExpWeights)
+        M1orig=SSR.makeShadowManifold(timeseries[s:s+l,compind1],numlags,lagsize)
+        M2orig=SSR.makeShadowManifold(timeseries[s:s+l,compind2],numlags,lagsize)
+        est1,est2=CCM.crossMapManifold(M1orig,M2orig,numlags,lagsize,Weights.makeExpWeights)
         M1Sug=SSR.makeShadowManifold(est1,numlags,lagsize)
         M2Sug=SSR.makeShadowManifold(est2,numlags,lagsize)
-        try:
-            M1SugRMSE, M2SugRMSE = calcErrs(M1Sug,M2Sug,Similarity.RootMeanSquaredErrorManifold,M1ref=M1[s+2*corr:s+l,:],M2ref=M2[s+2*corr:s+l,:])
-            M1SugHD, M2SugHD = calcErrs(M1Sug,M2Sug,Similarity.HausdorffDistance,M1ref=M1[s+2*corr:s+l,:],M2ref=M2[s+2*corr:s+l,:])
-            M1SugME, M2SugME = calcErrs(M1Sug,M2Sug,Similarity.MeanErrorManifold,M1ref=M1[s+2*corr:s+l,:],M2ref=M2[s+2*corr:s+l,:])
-        except:
-            print('length = {l!s}'.format(l))
-            print('startind = {s!s}'.format(s))
-            print(M1Sug.shape)
-            print(M1[s+2*corr:s+l,:].shape)
-            raise
+        M1SugRMSE, M2SugRMSE = calcErrs(M1Sug,M2Sug,Similarity.RootMeanSquaredErrorManifold,M1ref=M1orig[corr:,:],M2ref=M2orig[corr:,:])
+        M1SugHD, M2SugHD = calcErrs(M1Sug,M2Sug,Similarity.HausdorffDistance,M1ref=M1orig[corr:,:],M2ref=M2orig[corr:,:])
+        M1SugME, M2SugME = calcErrs(M1Sug,M2Sug,Similarity.MeanErrorManifold,M1ref=M1orig[corr:,:],M2ref=M2orig[corr:,:])
+        # except:
+        #     print('length = {0!s}'.format(l))
+        #     print('startind = {0!s}'.format(s))
+        #     print(M1Sug.shape)
+        #     print(M1orig[corr:,:].shape)
+        #     raise
         a1.append(M1SugRMSE)
         a1.append(M1SugHD)
         a1.append(M1SugME)
