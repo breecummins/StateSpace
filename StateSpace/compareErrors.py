@@ -107,12 +107,14 @@ for l in listoflens:
     a1=[]
     a2=[]
     for k in range(numiters):
-        est1,est2=CCM.crossMap(timeseries[startind+startinds[k]:endind,compind1],timeseries[startind+startinds[k]:endind,compind2],numlags,lagsize,Weights.makeExpWeights)
+        si = startind+startinds[k]
+        ei = startind+startinds[k] + l
+        est1,est2=CCM.crossMap(timeseries[si:ei,compind1],timeseries[si:ei,compind2],numlags,lagsize,Weights.makeExpWeights)
         M1Sug=SSR.makeShadowManifold(est1,numlags,lagsize)
         M2Sug=SSR.makeShadowManifold(est2,numlags,lagsize)
-        M1SugRMSE, M2SugRMSE = calcErrs(M1Sug,M2Sug,Similarity.RootMeanSquaredErrorManifold,M1ref=M1[corr:corr+l,:],M2ref=M2[corr:corr+l,:])
-        M1SugHD, M2SugHD = calcErrs(M1Sug,M2Sug,Similarity.HausdorffDistance,M1ref=M1[corr:corr+l,:],M2ref=M2[corr:corr+l,:])
-        M1SugME, M2SugME = calcErrs(M1Sug,M2Sug,Similarity.MeanErrorManifold,M1ref=M1[corr:corr+l,:],M2ref=M2[corr:corr+l,:])
+        M1SugRMSE, M2SugRMSE = calcErrs(M1Sug,M2Sug,Similarity.RootMeanSquaredErrorManifold,M1ref=M1[si+corr:ei,:],M2ref=M2[si+corr:ei,:])
+        M1SugHD, M2SugHD = calcErrs(M1Sug,M2Sug,Similarity.HausdorffDistance,M1ref=M1[si+corr:ei,:],M2ref=M2[si+corr:ei,:])
+        M1SugME, M2SugME = calcErrs(M1Sug,M2Sug,Similarity.MeanErrorManifold,M1ref=M1[si+corr:ei,:],M2ref=M2[si+corr:ei,:])
         a1.append(M1SugRMSE)
         a1.append(M1SugHD)
         a1.append(M1SugME)
