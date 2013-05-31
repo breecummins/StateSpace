@@ -20,7 +20,7 @@ lagsize=8
 compind1 = 2
 name1 = 'z'
 compind2 = 3
-name2 = 'W'
+name2 = 'w'
 startind = 0
 endind=len(timeseries)
 corr = (numlags-1)*lagsize
@@ -165,7 +165,7 @@ print("Direct estimation of the manifold using uniform weights:")
 print("Lengths: " + str(listoflens))
 makeSeries(Weights.makeUniformWeights,Similarity.RootMeanSquaredErrorManifold,"RMSE","RMSE")
 makeSeries(Weights.makeUniformWeights,Similarity.MeanErrorManifold,"Mean error per point","ME")
-makeSeries(Weights.makeUniformWeights,Similarity.HausdorffDistance)
+makeSeries(Weights.makeUniformWeights,Similarity.HausdorffDistance,"Hausdorff distance","HD")
 print('############################################################################')
 print("Direct estimation of the manifold using weights made from powers of 1/2:")
 print("Lengths: " + str(listoflens))
