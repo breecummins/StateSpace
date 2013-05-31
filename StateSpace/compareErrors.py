@@ -115,8 +115,8 @@ for l in listoflens:
             M1SugHD, M2SugHD = calcErrs(M1Sug,M2Sug,Similarity.HausdorffDistance,M1ref=M1[s+2*corr:s+l,:],M2ref=M2[s+2*corr:s+l,:])
             M1SugME, M2SugME = calcErrs(M1Sug,M2Sug,Similarity.MeanErrorManifold,M1ref=M1[s+2*corr:s+l,:],M2ref=M2[s+2*corr:s+l,:])
         except:
-            print('length = {l!s}')
-            print('startind = {s!s}')
+            print('length = {l!s}'.format(l))
+            print('startind = {s!s}'.format(s))
             print(M1Sug.shape)
             print(M1[s+2*corr:s+l,:].shape)
             raise
