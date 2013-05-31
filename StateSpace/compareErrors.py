@@ -86,7 +86,7 @@ def makeSeries(wgtfunc,simMeasure,note,short,ts1=timeseries[startind:endind,comp
     lol,avg1,avg2,std1,std2 = CCMAlternatives.testCausalityReconstruction(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=wgtfunc,simMeasure=simMeasure)
     print(note + " between " + name1 + " and " + name1 +"': " + ''.join(["{0:0.6f}".format(i) for i in avg1]))
     print("Standard deviations for " + short + name1 + " and " + name1 +"': " + ''.join(["{0:0.6f}".format(i) for i in std1]))
-    print(note " between " + name2 + " and " + name2 +"': " + ''.join(["{0:0.6f}".format(i) for i in avg2]))
+    print(note + " between " + name2 + " and " + name2 +"': " + ''.join(["{0:0.6f}".format(i) for i in avg2]))
     print("Standard deviations for " + short + name2 + " and " + name2 +"': " + ''.join(["{0:0.6f}".format(i) for i in std2]))
 
 # Sugihara method, full
