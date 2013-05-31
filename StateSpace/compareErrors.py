@@ -98,23 +98,21 @@ print("Standard deviations for " + name1 + " and " + name1 +"': " + str(["{0:0.6
 print("Mean correlation coefficients between " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in avg2]))
 print("Standard deviations for " + name2 + " and " + name2 +"': " + str(["{0:0.6f}".format(i) for i in std2]))
 # Sugihara with intermediate reconstruction
-avg1s = []
-std1s = []
-avg2s = []
-std2s = []
+avgs1 = []
+stds1 = []
+avgs2 = []
+stds2 = []
 for l in listoflens:
-    startinds = random.sample(range(endind-startind-l),numiters)
+    startinds = [ s + startind for s in random.sample(range(endind-startind-l),numiters)]
     a1=[]
     a2=[]
-    for k in range(numiters):
-        si = startind+startinds[k]
-        ei = startind+startinds[k] + l
-        est1,est2=CCM.crossMap(timeseries[si:ei,compind1],timeseries[si:ei,compind2],numlags,lagsize,Weights.makeExpWeights)
+    for s in startinds:
+        est1,est2=CCM.crossMap(timeseries[s:s+l,compind1],timeseries[s:s+l,compind2],numlags,lagsize,Weights.makeExpWeights)
         M1Sug=SSR.makeShadowManifold(est1,numlags,lagsize)
         M2Sug=SSR.makeShadowManifold(est2,numlags,lagsize)
-        M1SugRMSE, M2SugRMSE = calcErrs(M1Sug,M2Sug,Similarity.RootMeanSquaredErrorManifold,M1ref=M1[si+corr:ei,:],M2ref=M2[si+corr:ei,:])
-        M1SugHD, M2SugHD = calcErrs(M1Sug,M2Sug,Similarity.HausdorffDistance,M1ref=M1[si+corr:ei,:],M2ref=M2[si+corr:ei,:])
-        M1SugME, M2SugME = calcErrs(M1Sug,M2Sug,Similarity.MeanErrorManifold,M1ref=M1[si+corr:ei,:],M2ref=M2[si+corr:ei,:])
+        M1SugRMSE, M2SugRMSE = calcErrs(M1Sug,M2Sug,Similarity.RootMeanSquaredErrorManifold,M1ref=M1[s+2*corr:s+l,:],M2ref=M2[s+2*corr:s+l,:])
+        M1SugHD, M2SugHD = calcErrs(M1Sug,M2Sug,Similarity.HausdorffDistance,M1ref=M1[s+2*corr:s+l,:],M2ref=M2[s+2*corr:s+l,:])
+        M1SugME, M2SugME = calcErrs(M1Sug,M2Sug,Similarity.MeanErrorManifold,M1ref=M1[s+2*corr:s+l,:],M2ref=M2[s+2*corr:s+l,:])
         a1.append(M1SugRMSE)
         a1.append(M1SugHD)
         a1.append(M1SugME)
