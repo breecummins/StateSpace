@@ -103,7 +103,7 @@ def testCausalityReconstruction(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=c
     The similarity between a time series (or a manifold) and its estimate will be given by
     simMeasure.
     For manifolds, simMeasure = Similarity.RootMeanSquaredErrorManifold or 
-    Similarity.HausdorffDistance.
+    Similarity.HausdorffDistance or Similarity.MeanErrorManifold.
     For time series, simMeasure = Similarity.RootMeanSquaredErrorTS or Similarity.corrCoeffPearson.
 
     '''
@@ -374,7 +374,7 @@ if __name__ == '__main__':
     #######################################
     import DoublePendulum 
     timeseries = DoublePendulum.solvePendulum([1.0,2.0,3.0,2.0],300.0)
-    numlags = 4
+    numlags = 9
     lagsize = 8
 
     # listoflens = range(500,3000,500)
@@ -423,7 +423,7 @@ if __name__ == '__main__':
     # DPCallSamePts(Similarity.maxNeighborDistMax,'max max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMaxEvery21_Embed09_LongTS_Lag24_StartLater_'))
     # DPCallSamePts(Similarity.meanNeighborDist,'mean mean neighbor dist',os.path.expanduser('~/temp/DPMeanNeighborDistEvery21_Embed09_LongTS_Lag24_StartLater_'))
     # DPCallSamePts(Similarity.meanNeighborDistWithSkip,'mean mean neighbor dist',os.path.expanduser('~/temp/DPMeanNeighborDistWithSkip_Every23_WholeSeries_Embed04_Lag16_Start400_'),callmesameptsscalarfillin)
-    DPCallSamePts(Similarity.maxNeighborDistMeanWithSkip,'mean max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMeanWithSkip_Every23_WholeSeries_Embed04_Lag8_Start200_'),callmesameptsscalarfillin)
+    DPCallSamePts(Similarity.maxNeighborDistMeanWithSkip,'mean max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMeanWithSkip_Every23_WholeSeries_Embed09_Lag08_Start0200_'),callmesameptsscalarfillin)
 
 
     # #######################################
