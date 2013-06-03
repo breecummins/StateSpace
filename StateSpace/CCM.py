@@ -41,7 +41,7 @@ def crossMap(ts1,ts2,numlags,lagsize,wgtfunc):
     est2 = estSeries(M1,M2[:,0])
     return est1, est2
 
-def testCausality(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=Weights.makeExpWeights):
+def testCausality(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=Weights.makeExpWeights,simMeasure=[Similarity.corrCoeffPearson]):
     '''
     Check for convergence (Sugihara) to infer causality between ts1 and ts2.
     ts1 and ts2 must have the same length.
@@ -54,6 +54,9 @@ def testCausality(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=Weights.ma
     locations in the time series. numiters must be <= len(ts1) - max(listoflens).
     The estimated time series will be constructed using the weighting function 
     handle given by wgtfunc.
+    The similarity between the time series and its estimate will be assessed by 
+    each function in simMeasure, and may include Similarity.corrCoeffPearson, 
+    Similarity.RootMeanSquaredErrorTS, and Similarity.MeanAbsoluteErrorTS.
 
     '''
     L = len(ts1)
@@ -65,6 +68,11 @@ def testCausality(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=Weights.ma
     stdcc1=[]
     avgcc2=[]
     stdcc2=[]
+    try:
+        sL = len(simMeasure)
+    except:
+        simMeasure=[simMeasure]
+        sL = 1
     for l in lol:
         startinds = random.sample(range(L-l),numiters)
         cc1=[]
@@ -73,12 +81,13 @@ def testCausality(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=Weights.ma
             est1,est2 = crossMap(ts1[s:s+l],ts2[s:s+l],numlags,lagsize,wgtfunc)
             #correct for the time points lost in shadow manifold construction
             shift = (numlags-1)*lagsize 
-            cc1.append(Similarity.corrCoeffPearson(est1,ts1[s+shift:s+l]))
-            cc2.append(Similarity.corrCoeffPearson(est2,ts2[s+shift:s+l]))
-        avgcc1.append(np.mean(np.array(cc1)))
-        avgcc2.append(np.mean(np.array(cc2)))
-        stdcc1.append(np.std(np.array(cc1)))
-        stdcc2.append(np.std(np.array(cc2)))
+            for simfunc in simMeasure:
+                cc1.append(simfunc(est1,ts1[s+shift:s+l]))
+                cc2.append(simfunc(est2,ts2[s+shift:s+l]))
+        avgcc1.append([np.mean(cc1[_k::sL]) for _k in range(sL)])
+        avgcc2.append([np.mean(cc2[_k::sL]) for _k in range(sL)])
+        stdcc1.append([np.std(cc1[_k::sL]) for _k in range(sL)])
+        stdcc2.append([np.std(cc2[_k::sL]) for _k in range(sL)])
     return lol,avgcc1,avgcc2,stdcc1,stdcc2
     
 def crossMapManifold(M1,M2,numlags,lagsize,wgtfunc):

@@ -13,6 +13,14 @@ def corrCoeffPearson(ts1,ts2):
     s22 = ( shift2*shift2 ).sum()
     return s12 / np.sqrt(s11*s22)
 
+def MeanAbsoluteErrorTS(ts1,ts2):
+    '''
+    Compare a time series and its estimate at contemporaneous
+    points using mean absolute error.
+
+    '''
+    return np.abs(ts1-ts2).sum() / len(ts1)
+
 def RootMeanSquaredErrorTS(ts1,ts2):
     '''
     Compare a time series and its estimate at contemporaneous

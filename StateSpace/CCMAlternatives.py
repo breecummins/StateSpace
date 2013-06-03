@@ -85,7 +85,7 @@ def crossMapModified3(M1,M2,proj,wgtfunc):
     est2 = Mest2[:,proj]
     return est1, est2
 
-def testCausalityReconstruction(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=crossMapModified1,wgtfunc=Weights.makeExpWeights,simMeasure=Similarity.RootMeanSquaredErrorManifold):
+def testCausalityReconstruction(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=crossMapModified1,wgtfunc=Weights.makeExpWeights,simMeasure=[Similarity.RootMeanSquaredErrorManifold]):
     '''
     Check for convergence to infer causality between ts1 and ts2.
     ts1 and ts2 must have the same length.
@@ -101,7 +101,7 @@ def testCausalityReconstruction(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=c
     CM = crossMapModified1 will estimate manifolds.
     CM = crossMapModified2 or 3 will estimate time series.
     The similarity between a time series (or a manifold) and its estimate will be given by
-    simMeasure.
+    each of the measurement functions in simMeasure.
     For manifolds, simMeasure = Similarity.RootMeanSquaredErrorManifold or 
     Similarity.HausdorffDistance or Similarity.MeanErrorManifold.
     For time series, simMeasure = Similarity.RootMeanSquaredErrorTS or Similarity.corrCoeffPearson.
@@ -116,6 +116,11 @@ def testCausalityReconstruction(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=c
     stdcc1=[]
     avgcc2=[]
     stdcc2=[]
+    try:
+        sL = len(simMeasure)
+    except:
+        simMeasure=[simMeasure]
+        sL = 1
     for l in lol:
         startinds = random.sample(range(L-l),numiters)
         cc1=[]
@@ -124,12 +129,13 @@ def testCausalityReconstruction(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=c
             M1 = SSR.makeShadowManifold(ts1[s:s+l],numlags,lagsize)
             M2 = SSR.makeShadowManifold(ts2[s:s+l],numlags,lagsize)
             Mest1,Mest2 = CM(M1,M2,wgtfunc)
-            cc1.append(simMeasure(Mest1,M1))
-            cc2.append(simMeasure(Mest2,M2))
-        avgcc1.append(np.mean(np.array(cc1)))
-        avgcc2.append(np.mean(np.array(cc2)))
-        stdcc1.append(np.std(np.array(cc1)))
-        stdcc2.append(np.std(np.array(cc2)))
+            for simfunc in simMeasure:
+                cc1.append(simfunc(Mest1,M1))
+                cc2.append(simfunc(Mest2,M2))
+        avgcc1.append([np.mean(cc1[_k::sL]) for _k in range(sL)])
+        avgcc2.append([np.mean(cc2[_k::sL]) for _k in range(sL)])
+        stdcc1.append([np.std(cc1[_k::sL]) for _k in range(sL)])
+        stdcc2.append([np.std(cc2[_k::sL]) for _k in range(sL)])
     return lol,avgcc1,avgcc2,stdcc1,stdcc2
 
 def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,startind=0,simMeasure=Similarity.neighborDistance,N=None,poi=None):

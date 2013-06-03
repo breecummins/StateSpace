@@ -19,10 +19,10 @@ def doublePendulum(t,x,mu=0.0,beta=0.0,A=0.0):
 
 if __name__ == '__main__':
     import StateSpaceReconstructionPlots as SSRPlots
-    x = solvePendulum([1.0,2.0,3.0,2.0],300.0,dt=0.05)
+    x = solvePendulum([1.0,2.0,3.0,2.0],300.0,dt=0.1)
     numlags = 2
-    lagsize = 16
-    times = np.arange(0,300.0,0.05)
+    lagsize = 8
+    times = np.arange(0,300.0,0.1)
     # SSRPlots.plotManifold(x[:,:3],show=0,titlestr='x, y, z')
     # SSRPlots.plotManifold(x[:,(0,1,3)],show=1,titlestr='x, y, w')
     # SSRPlots.plotManifold(x[:,(0,3)],show=1,titlestr='x and w')
