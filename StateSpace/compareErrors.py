@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import numpy as np
 import CCM, CCMAlternatives, Similarity, Weights
 import StateSpaceReconstruction as SSR
@@ -64,13 +62,7 @@ def wholeManifoldComparison(names,numlags,lagsize,timeseries,compind1,compind2,s
     calcErrs(M1us1[corr:,:],M2us1[corr:,:],Similarity.MeanErrorManifold,'Mean error per point')
     calcErrs(M1us1[corr:,:],M2us1[corr:,:],Similarity.HausdorffDistance,"Hausdorff dist")
 
-def sequenceOfReconstructions(names,numlags,lagsize,timeseries,compind1,compind2,startind,endind,corr):
-    # Construct a series of manifolds
-    listoflens = range(1000,22600,1000)
-    numiters = 25
-
-    print('The number of iterations per time series length is {0!s}'.format(numiters))
-
+def sequenceOfReconstructions(names,numlags,lagsize,timeseries,compind1,compind2,startind,endind,corr,listoflens,numiters):
     def printResults(note,short,avg1,std1,avg2,std2,name1='M'+names[compind1],name2='M'+names[compind2]):
         print(note + " between " + name1 + " and " + name1 +"': " + ' '.join(["{0:0.6f}".format(i) for i in avg1]))
         # print("Standard deviations for " + short + ' ' + name1 + " and " + name1 +"': " + ' '.join(["{0:0.6f}".format(i) for i in std1]))
@@ -144,15 +136,30 @@ def sequenceOfReconstructions(names,numlags,lagsize,timeseries,compind1,compind2
     printResults("Mean Hausdorff distance","ME",[avgs1[_k][2] for _k in range(len(avgs1))],[stds1[_k][2] for _k in range(len(avgs1))],[avgs2[_k][2] for _k in range(len(avgs1))],[stds2[_k][2] for _k in range(len(avgs1))])
 
 if __name__=='__main__':
-    eqns,names,numlags,lagsize,timeseries = doublependulumTS()
+    # make a time series
+    dt = 0.025
+    eqns,names,numlags,lagsize,timeseries = doublependulumTS(dt=dt)
+
+    # time series indices
+    startind = 500 #how much to cut off the front
+    endind=len(timeseries)-0 #how much to cut off the back
+    corr = (numlags-1)*lagsize #correction term for shadow manifold creation
+
     # comparison variables
     compind1 = 2
     compind2 = 3
-    startind = 500
-    endind=len(timeseries)
-    corr = (numlags-1)*lagsize
-    print('{0} with lagsize of {1!s}*dt with dt = {2!s} and reconstruction dimension {3!s}'.format(eqns,lagsize,dt,numlags))
-    sequenceOfReconstructions(names,numlags,lagsize,timeseries,compind1,compind2,startind,endind,corr)
+
+    # parameters for a sequence of measurements of manifolds of lengths in listoflens with numiters different starting locations (only needed for sequenceOfReconstructions)
+    listoflens = range(1000,22600,1000)
+    numiters = 25
+
+    # print info about the analysis to be done.
+    print('{0} with lagsize of {1!s}*dt with dt = {2!s} and reconstruction dimension {3!s}.'.format(eqns,lagsize,dt,numlags))
+    print('If looking at a sequence of measurements, the lengths range from {0!s} to {1!s} and the number of iterations per length is {2!s}.'.format(listoflens[0],listoflens[-1],numiters))
+
+    # run the analysis
+    sequenceOfReconstructions(names,numlags,lagsize,timeseries,compind1,compind2,startind,endind,corr,listoflens,numiters)
+    # wholeManifoldComparison(names,numlags,lagsize,timeseries,compind1,compind2,startind,endind,corr)
 
 
 
