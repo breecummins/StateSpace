@@ -19,16 +19,20 @@ def doublePendulum(t,x,mu=0.0,beta=0.0,A=0.0):
 
 if __name__ == '__main__':
     import StateSpaceReconstructionPlots as SSRPlots
-    x = solvePendulum([1.0,2.0,3.0,2.0],300.0,dt=0.1)
+    dt = 0.025
+    finaltime = 2400.0
+    x = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt=dt)
     numlags = 2
-    lagsize = 8
-    times = np.arange(0,300.0,0.1)
+    lagsize = int(0.8/dt) #because dt=0.1 with lagsize 8 works well
+    times = np.arange(0,finaltime,dt)
     # SSRPlots.plotManifold(x[:,:3],show=0,titlestr='x, y, z')
     # SSRPlots.plotManifold(x[:,(0,1,3)],show=1,titlestr='x, y, w')
     # SSRPlots.plotManifold(x[:,(0,3)],show=1,titlestr='x and w')
     # SSRPlots.plotManifold(x[:,(1,2)],show=0,titlestr='y and z')
     # SSRPlots.plotManifold(x[:,(1,3)],show=0,titlestr='y and w')
     # SSRPlots.plotShadowManifold(x[:,2]+x[:,3],numlags,lagsize,show=0,hold=0,style='r-')
+    SSRPlots.plotShadowManifold(x[:len(x)/4,3],numlags,lagsize,show=0,hold=0,style='r-')
+    SSRPlots.plotShadowManifold(x[:len(x)/2,3],numlags,lagsize,show=0,hold=0,style='b-')
     SSRPlots.plotShadowManifold(x[:,3],numlags,lagsize,show=1,hold=0,style='g-')
     # SSRPlots.plots(times,x[:,2:],show=1,hold=0,stylestr=['r-','g-'])
     # SSRPlots.plots(times,x[:,3],show=1,hold=0)
