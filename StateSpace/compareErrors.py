@@ -2,7 +2,7 @@ import numpy as np
 import CCM, CCMAlternatives, Similarity, Weights
 import StateSpaceReconstruction as SSR
 # import StateSpaceReconstructionPlots as SSRPlots
-import random
+import random, sys
 
 def lorenzTS(finaltime=80.0,dt=0.01):
     from LorenzEqns import solveLorenz
@@ -34,10 +34,12 @@ def wholeManifoldComparison(names,numlags,lagsize,timeseries,compind1,compind2):
     def printMe(methodnote,name1,name2,err1,err2):
         print("    {0} between {1} and {1}' is {2!s}".format(methodnote,name1,err1))
         print("    {0} between {1} and {1}' is {2!s}".format(methodnote,name2,err2))
+        sys.stdout.flush()
 
     def calcErrs(summary,M1est,M2est,M1ref=M1[corr:,:],M2ref=M2[corr:,:],name1='M{0}'.format(names[compind1]),name2='M{0}'.format(names[compind2])):
         print('############################################################################')
         print(summary)
+        sys.stdout.flush()
         err1 = Similarity.RootMeanSquaredErrorManifold(M1ref,M1est)
         err2 = Similarity.RootMeanSquaredErrorManifold(M2ref,M2est)
         printMe('RMSE',name1,name2,err1,err2)
@@ -82,7 +84,8 @@ def sequenceOfReconstructions(names,numlags,lagsize,timeseries,compind1,compind2
             print("    {0} between {1} and {1}': ".format(note,name2) + ' '.join(["{0:0.6f}".format(_i) for _i in [avgs2[_k][j] for _k in range(len(avgs2))]]))
             if printstd:
                 print("    Standard deviations for {0} {1} and {1}': ".format(shorts[j],name2) + ' '.join(["{0:0.6f}".format(_i) for _i in [stds2[_k][j] for _k in range(len(stds2))]]))
-    
+        sys.stdout.flush()
+        
     def calcSequence(method,wgtfunc,simMeasure,summary,notes,shorts,name1='M{0}'.format(names[compind1]),name2='M{0}'.format(names[compind2]),printstd=0):
         lol,avgs1,avgs2,stds1,stds2 = CCM.causalityWrapper(ts1,ts2,numlags,lagsize,listoflens,numiters,allstartinds,causalitytester=method,morefunctions={'wgtfunc':wgtfunc,'simMeasure':simMeasure})
         printResults(lol,summary,notes,shorts,avgs1,stds1,avgs2,stds2,name1,name2,printstd)
@@ -105,11 +108,12 @@ def sequenceOfReconstructions(names,numlags,lagsize,timeseries,compind1,compind2
 
 if __name__=='__main__':
     # make a time series
-    dt = 0.025
-    eqns,names,numlags,lagsize,timeseries = doublependulumTS(350,dt=dt)
+    dt = 0.05
+    finaltime = 1200.0
+    eqns,names,numlags,lagsize,timeseries = doublependulumTS(finaltime,dt)
 
     # truncate time series if desired
-    startind = 0#500 #how much to cut off the front
+    startind = 1000 #how much to cut off the front
     endind = len(timeseries) #how much to leave at the back
     ts = timeseries[startind:endind,:] 
 
@@ -118,16 +122,17 @@ if __name__=='__main__':
     compind2 = 3
 
     # parameters for a sequence of measurements of manifolds of lengths in listoflens with numiters different starting locations (only needed for sequenceOfReconstructions)
-    listoflens = range(200,400,100)#range(1000,22600,1000)
+    listoflens = range(2000,16100,2000)
     numiters = 25
 
     # print info about the analysis to be done.
     print('{0} with lagsize of {1!s}*dt with dt = {2!s} and reconstruction dimension {3!s}.'.format(eqns,lagsize,dt,numlags))
     print('If looking at a sequence of measurements, the lengths range from {0!s} to {1!s} and the number of iterations per length is {2!s}.'.format(listoflens[0],listoflens[-1],numiters))
+    sys.stdout.flush()
 
     # run the analysis
     sequenceOfReconstructions(names,numlags,lagsize,ts,compind1,compind2,listoflens,numiters)
-    wholeManifoldComparison(names,numlags,lagsize,ts,compind1,compind2)
+    # wholeManifoldComparison(names,numlags,lagsize,ts,compind1,compind2)
 
 
 
