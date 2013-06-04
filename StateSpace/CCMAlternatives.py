@@ -3,8 +3,7 @@ import numpy as np
 import random
 #import home-rolled modules
 import StateSpaceReconstruction as SSR
-import Weights
-import Similarity
+import Weights, Similarity
 
 def estManifold(Mx,My,wgtfunc):
     '''
@@ -85,17 +84,15 @@ def crossMapModified3(M1,M2,proj,wgtfunc):
     est2 = Mest2[:,proj]
     return est1, est2
 
-def testCausalityReconstruction(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=crossMapModified1,wgtfunc=Weights.makeExpWeights,simMeasure=[Similarity.RootMeanSquaredErrorManifold]):
+def testCausalityReconstruction(ts1,ts2,startinds,l,numlags,lagsize,CM=crossMapModified1,wgtfunc=Weights.makeExpWeights,simMeasure=[Similarity.RootMeanSquaredErrorManifold]):
     '''
-    Check for convergence to infer causality between ts1 and ts2.
-    ts1 and ts2 must have the same length.
+    Must be called by CCM.causalityWrapper.
+    
+    startinds contains a number of starting indices to test subintervals of 
+    length l of time series ts1 and ts2.
     numlags is the dimension of the embedding space for the reconstruction.
     Use time lags of size lagsize * dt to construct shadow manifolds. lagsize
     is an integer representing the index of the time lag.
-    listoflens contains the lengths to use to show convergence 
-    Example: range(100,10000,100)
-    Each length will be run numiters times from different random starting 
-    locations in the time series. numiters must be <= len(ts1) - max(listoflens).
     The estimated time series (or manifold) will be constructed using the weighting function 
     handle given by wgtfunc and the cross map function given by CM.
     CM = crossMapModified1 will estimate manifolds.
@@ -104,39 +101,25 @@ def testCausalityReconstruction(ts1,ts2,numlags,lagsize,listoflens,numiters,CM=c
     each of the measurement functions in simMeasure.
     For manifolds, simMeasure = Similarity.RootMeanSquaredErrorManifold or 
     Similarity.HausdorffDistance or Similarity.MeanErrorManifold.
-    For time series, simMeasure = Similarity.RootMeanSquaredErrorTS or Similarity.corrCoeffPearson.
+    For time series, simMeasure = Similarity.RootMeanSquaredErrorTS or Similarity.
+    corrCoeffPearson.
 
     '''
-    L = len(ts1)
-    if len(ts2) != L:
-        raise(ValueError,"The lengths of the two time series must be the same.")
-    listoflens.sort()
-    lol = [l for l in listoflens if l < L]
-    avgcc1=[]
-    stdcc1=[]
-    avgcc2=[]
-    stdcc2=[]
     try:
         sL = len(simMeasure)
     except:
         simMeasure=[simMeasure]
         sL = 1
-    for l in lol:
-        startinds = random.sample(range(L-l),numiters)
-        cc1=[]
-        cc2=[]
-        for s in startinds:
-            M1 = SSR.makeShadowManifold(ts1[s:s+l],numlags,lagsize)
-            M2 = SSR.makeShadowManifold(ts2[s:s+l],numlags,lagsize)
-            Mest1,Mest2 = CM(M1,M2,wgtfunc)
-            for simfunc in simMeasure:
-                cc1.append(simfunc(Mest1,M1))
-                cc2.append(simfunc(Mest2,M2))
-        avgcc1.append([np.mean(cc1[_k::sL]) for _k in range(sL)])
-        avgcc2.append([np.mean(cc2[_k::sL]) for _k in range(sL)])
-        stdcc1.append([np.std(cc1[_k::sL]) for _k in range(sL)])
-        stdcc2.append([np.std(cc2[_k::sL]) for _k in range(sL)])
-    return lol,avgcc1,avgcc2,stdcc1,stdcc2
+    cc1=[]
+    cc2=[]
+    for s in startinds:
+        M1 = SSR.makeShadowManifold(ts1[s:s+l],numlags,lagsize)
+        M2 = SSR.makeShadowManifold(ts2[s:s+l],numlags,lagsize)
+        Mest1,Mest2 = CM(M1,M2,wgtfunc)
+        for simfunc in simMeasure:
+            cc1.append(simfunc(Mest1,M1))
+            cc2.append(simfunc(Mest2,M2))
+    return cc1,cc2,sL
 
 def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,startind=0,simMeasure=Similarity.neighborDistance,N=None,poi=None):
     '''

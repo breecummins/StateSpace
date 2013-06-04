@@ -25,7 +25,6 @@ def crossMap(ts1,ts2,numlags,lagsize,wgtfunc):
     est1 = Mest1[:,0]
     est2 = Mest2[:,0]
 
-
     '''
     M1 = SSR.makeShadowManifold(ts1,numlags,lagsize)
     M2 = SSR.makeShadowManifold(ts2,numlags,lagsize)
@@ -41,54 +40,37 @@ def crossMap(ts1,ts2,numlags,lagsize,wgtfunc):
     est2 = estSeries(M1,M2[:,0])
     return est1, est2
 
-def testCausality(ts1,ts2,numlags,lagsize,listoflens,numiters,wgtfunc=Weights.makeExpWeights,simMeasure=[Similarity.corrCoeffPearson]):
+def testCausality(ts1,ts2,startinds,l,numlags,lagsize,wgtfunc=Weights.makeExpWeights,simMeasure=[Similarity.corrCoeffPearson]):
     '''
-    Check for convergence (Sugihara) to infer causality between ts1 and ts2.
-    ts1 and ts2 must have the same length.
+    Must be called by causalityWrapper.
+
+    startinds contains a number of starting indices to test subintervals of 
+    length l of time series ts1 and ts2.
     numlags is the dimension of the embedding space for the reconstruction.
     Use time lags of size lagsize * dt to construct shadow manifolds. lagsize
     is an integer representing the index of the time lag.
-    listoflens contains the lengths to use to show convergence 
-    Example: range(100,10000,100)
-    Each length will be run numiters times from different random starting 
-    locations in the time series. numiters must be <= len(ts1) - max(listoflens).
-    The estimated time series will be constructed using the weighting function 
-    handle given by wgtfunc.
+    This function constructs the estimated time series using the weighting function 
+    handle given by wgtfunc, which can be any function in the Weights module.
     The similarity between the time series and its estimate will be assessed by 
     each function in simMeasure, and may include Similarity.corrCoeffPearson, 
     Similarity.RootMeanSquaredErrorTS, and Similarity.MeanAbsoluteErrorTS.
 
     '''
-    L = len(ts1)
-    if len(ts2) != L:
-        raise(ValueError,"The lengths of the two time series must be the same.")
-    listoflens.sort()
-    lol = [l for l in listoflens if l < L]
-    avgcc1=[]
-    stdcc1=[]
-    avgcc2=[]
-    stdcc2=[]
     try:
         sL = len(simMeasure)
     except:
         simMeasure=[simMeasure]
         sL = 1
-    for l in lol:
-        startinds = random.sample(range(L-l),numiters)
-        cc1=[]
-        cc2=[]
-        for s in startinds:
-            est1,est2 = crossMap(ts1[s:s+l],ts2[s:s+l],numlags,lagsize,wgtfunc)
-            #correct for the time points lost in shadow manifold construction
-            shift = (numlags-1)*lagsize 
-            for simfunc in simMeasure:
-                cc1.append(simfunc(est1,ts1[s+shift:s+l]))
-                cc2.append(simfunc(est2,ts2[s+shift:s+l]))
-        avgcc1.append([np.mean(cc1[_k::sL]) for _k in range(sL)])
-        avgcc2.append([np.mean(cc2[_k::sL]) for _k in range(sL)])
-        stdcc1.append([np.std(cc1[_k::sL]) for _k in range(sL)])
-        stdcc2.append([np.std(cc2[_k::sL]) for _k in range(sL)])
-    return lol,avgcc1,avgcc2,stdcc1,stdcc2
+    cc1=[]
+    cc2=[]
+    for s in startinds:
+        est1,est2 = crossMap(ts1[s:s+l],ts2[s:s+l],numlags,lagsize,wgtfunc)
+        #correct for the time points lost in shadow manifold construction
+        shift = (numlags-1)*lagsize 
+        for simfunc in simMeasure:
+            cc1.append(simfunc(est1,ts1[s+shift:s+l]))
+            cc2.append(simfunc(est2,ts2[s+shift:s+l]))
+    return cc1,cc2,sL
     
 def crossMapManifold(M1,M2,numlags,lagsize,wgtfunc):
     '''
@@ -124,15 +106,113 @@ def crossMapManifold(M1,M2,numlags,lagsize,wgtfunc):
     est2 = estSeries(M1,M2[:,0])
     return est1, est2
 
+def testCausalityReconstruction(ts1,ts2,startinds,l,numlags,lagsize,wgtfunc=Weights.makeExpWeights,simMeasure=[Similarity.RootMeanSquaredErrorManifold]):
+    '''
+    Must be called by causalityWrapper.
+    
+    startinds contains a number of starting indices to test subintervals of 
+    length l of time series ts1 and ts2.
+    numlags is the dimension of the embedding space for the reconstruction.
+    Use time lags of size lagsize * dt to construct shadow manifolds. lagsize
+    is an integer representing the index of the time lag.
+    This function constructs the estimated time series directly from the 
+    manifolds using the weighting function handle given by wgtfunc, which can be 
+    any function in the Weights module.
+    Instead of comparing a time series to its estimate, we compare a shadow manifold
+    to an estimated shadow manifold constructed from the time series estimates.
+    The similarity between the manifold and its estimate will be assessed by 
+    each function in simMeasure, and may include Similarity.RootMeanSquaredErrorManifold, 
+    Similarity.MeanErrorManifold, and Similarity.HausdorffDistance.
 
+    '''
+    try:
+        sL = len(simMeasure)
+    except:
+        simMeasure=[simMeasure]
+        sL = 1
+    cc1=[]
+    cc2=[]
+    for s in startinds:
+        M1orig=SSR.makeShadowManifold(ts1[s:s+l],numlags,lagsize)
+        M2orig=SSR.makeShadowManifold(ts2[s:s+l],numlags,lagsize)
+        est1,est2=crossMapManifold(M1orig,M2orig,numlags,lagsize,wgtfunc)
+        M1est=SSR.makeShadowManifold(est1,numlags,lagsize)
+        M2est=SSR.makeShadowManifold(est2,numlags,lagsize)
+        #correct for the time points lost in shadow manifold construction
+        shift = (numlags-1)*lagsize 
+        for simfunc in simMeasure:
+            cc1.append(simfunc(M1est,M1orig[shift:,:]))
+            cc2.append(simfunc(M2est,M2orig[shift:,:]))
+    return cc1, cc2, sL
+    
+def causalityWrapper(ts1,ts2,numlags,lagsize,listoflens,numiters,allstartinds=None,causalitytester=testCausality,morefunctions=None):
+    '''
+    Check for convergence to infer causality between the time series ts1 and ts2, 
+    where len(ts1) == len(ts2).
+    
+    numlags is the dimension of the embedding space for the reconstruction.
+    Time lags of size lagsize * dt (dt = uniform time step in series ts1 and ts2) 
+    are used to construct shadow manifolds. lagsize is an integer representing the 
+    index of the time lag.
+    
+    listoflens contains the lengths to use to show convergence.
+    Example: range(100,10000,100)
+    Each length will be run numiters times from different random starting 
+    locations in the time series, where numiters must be <= len(ts1) - max(listoflens).
+    The optional argument allstartinds allows specific starting locations to be
+    specified.
+    
+    The details of the specific causality test is in the function causalitytester.
+    The optional dictionary morefunctions can contain keyword entries for 'CM', 'wgtfunc', 
+    and 'simMeasure'. Default CM, wgtfunc, and simMeasure methods are supplied by each
+    causalitytester function, and allowable functions vary between causalitytesters. 
+    See the notes and defaults for each function.
+
+    causalitytester may be testCausality (Sugihara original), 
+    testCausalityReconstruction (Sugihara with reconstruction), or CCMAlternatives.
+    testCausalityReconstruction (our reconstruction methods). All three functions
+    may specify wgtfunc and simMeasure, but only the third can specify 
+    CM = CCMAlternatives.crossMapModified*, where * = 1, 2, or 3.
+    
+    The estimated time series or manifold will be constructed using the weighting function 
+    handle given by wgtfunc. wgtfunc may be any function in the module Weights.
+    The similarity between the time series or manifold and its estimate will be assessed by 
+    each function in simMeasure. See the notes for each causalitytester for allowable
+    simMeasure functions in the Similarity module.
+    
+    '''
+    L = len(ts1)
+    if len(ts2) != L:
+        raise(ValueError,"The lengths of the two time series must be the same.")
+    listoflens.sort()
+    lol = [l for l in listoflens if l < L]
+    avgcc1=[]
+    stdcc1=[]
+    avgcc2=[]
+    stdcc2=[]
+    if allstartinds == None:
+        allstartinds = []
+        for l in lol:
+            allstartinds.append(random.sample(range(L-l),numiters))
+    if morefunctions == None:
+        morefunctions = {}
+    for k,l in enumerate(lol):
+        startinds = allstartinds[k]
+        cc1, cc2, sL = causalitytester(ts1,ts2,startinds,l,numlags,lagsize,**morefunctions)
+        avgcc1.append([np.mean(cc1[_k::sL]) for _k in range(sL)])
+        avgcc2.append([np.mean(cc2[_k::sL]) for _k in range(sL)])
+        stdcc1.append([np.std(cc1[_k::sL]) for _k in range(sL)])
+        stdcc2.append([np.std(cc2[_k::sL]) for _k in range(sL)])
+    return lol,avgcc1,avgcc2,stdcc1,stdcc2
+    
 if __name__ == '__main__':
     import StateSpaceReconstructionPlots as SSRPlots
     # from LorenzEqns import solveLorenz
     # timeseries = solveLorenz([1.0,0.5,0.5],80.0)
-    # l,avg1,avg2,std1,std2 = testCausality(timeseries[:4001,0],timeseries[:4001,1],2,8,range(20,2000,200),25) 
+    # l,avg1,avg2,std1,std2 = causalityWrapper(timeseries[:4001,0],timeseries[:4001,1],2,8,range(20,2000,200),25,causalitytester=testCausality) 
     # from differenceEqns import solve2Species
     # timeseries = solve2Species([0.4,0.2],8.0)
-    # l,avg1,avg2,std1,std2 = testCausality(timeseries[:,0],timeseries[:,1],2,8,range(20,320,40),25) 
+    # l,avg1,avg2,std1,std2 = causalityWrapper(timeseries[:,0],timeseries[:,1],2,8,range(20,320,40),25,causalitytester=testCausality) 
     # print(np.array(l))
     # print(np.array([avg1,avg2]))
     # avgarr = np.zeros((len(avg1),2))
@@ -148,7 +228,7 @@ if __name__ == '__main__':
     hold = 0
     show = 0
     for k in range(3):
-        l,avg1,avg2,std1,std2 = testCausality(timeseries[200:,k],timeseries[200:,-1],4,8,range(500,3000,500),25)
+        l,avg1,avg2,std1,std2 = causalityWrapper(timeseries[200:,k],timeseries[200:,-1],4,8,range(500,3000,500),25,causalitytester=testCausality)
         print(np.array(l))
         print(np.array([avg1,avg2]))
         avgarr = np.zeros((len(avg1),2))
