@@ -63,15 +63,11 @@ def wholeManifoldComparison(names,numlags,lagsize,timeseries,compind1,compind2):
     M1us,M2us=CCMAlternatives.crossMapModified1(M1,M2,Weights.makeLambdaWeights)
     calcErrs("Direct estimation of the manifold using weights from powers of 1/2:",M1us[corr:,:],M2us[corr:,:])
 
-def sequenceOfReconstructions(names,numlags,lagsize,timeseries,compind1,compind2,listoflens,numiters,growtraj):
+def sequenceOfReconstructions(names,numlags,lagsize,timeseries,compind1,compind2,listoflens,numiters,allstartinds,growtraj):
 
     ts1 = timeseries[:,compind1]
     ts2 = timeseries[:,compind2]
     corr = (numlags-1)*lagsize #correction term for shadow manifold creation
-
-    allstartinds = []
-    for l in listoflens:
-        allstartinds.append(random.sample(range(len(ts1)-l),numiters))
 
     def printResults(lol,summary,notes,shorts,avgs1,stds1,avgs2,stds2,name1,name2,printstd=0):
         print('#####################################################################')
@@ -106,6 +102,36 @@ def sequenceOfReconstructions(names,numlags,lagsize,timeseries,compind1,compind2
     # weighted sum using powers of 2 in the embedding space
     calcSequence(CCMAlternatives.testCausalityReconstruction,Weights.makeLambdaWeights,[Similarity.RootMeanSquaredErrorManifold,Similarity.MeanErrorManifold,Similarity.HausdorffDistance],"Direct estimation of the manifold using weights made from powers of 1/2:",["Mean RMSE","Mean error per point","Mean Hausdorff distance"],["RMSE","ME","HD"])
 
+def sequenceOfDiffeomorphismChecks(names,numlags,lagsize,timeseries,compind1,compind2,listoflens,numiters,allstartinds,listofskips):
+
+    ts1 = timeseries[:,compind1]
+    ts2 = timeseries[:,compind2]
+
+    poi_whole = list(set([p for q in allstartinds for p in q]))
+    poi = [p for p in poi_whole if p < min(listoflens)]
+
+    def printResults(lol,summary,notes,shorts,avgs1,stds1,avgs2,stds2,name1='M{0}'.format(names[compind1]),name2='M{0}'.format(names[compind2]),printstd=0):
+        print('#####################################################################')
+        print(summary)
+        print("Lengths: {0!s}".format(lol))
+        for j,note in enumerate(notes):
+            print("    {0} between {1} and {1}': ".format(note,name1) + ' '.join(["{0:0.6f}".format(_i) for _i in [avgs1[_k][j] for _k in range(len(avgs1))]]))
+            if printstd:
+                print("    Standard deviations for {0} {1} and {1}': ".format(shorts[j],name1) + ' '.join(["{0:0.6f}".format(_i) for _i in [stds1[_k][j] for _k in range(len(stds1))]]))
+            print("    {0} between {1} and {1}': ".format(note,name2) + ' '.join(["{0:0.6f}".format(_i) for _i in [avgs2[_k][j] for _k in range(len(avgs2))]]))
+            if printstd:
+                print("    Standard deviations for {0} {1} and {1}': ".format(shorts[j],name2) + ' '.join(["{0:0.6f}".format(_i) for _i in [stds2[_k][j] for _k in range(len(stds2))]]))
+        sys.stdout.flush()
+
+    lol,avgs1,avgs2,stds1,stds2 = CCMAlternatives.testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,allstartinds,simMeasure=[Similarity.neighborDistance,Similarity.countingMeasure],N=numlags+1)
+    printResults(lol,"Comparing manifolds directly (no estimation) with random, changing starting positions for subintervals",["Neighbor distance","Counting measure"],["ND","CM"],avgs1,stds1,avgs2,stds2)
+    lol,avgs1,avgs2 = CCMAlternatives.testDiffeomorphismSamePoints(ts1,ts2,numlags,lagsize,listoflens,simMeasure=[Similarity.maxNeighborDistMean,Similarity.meanNeighborDist],N=numlags+1,poi=poi)
+    printResults(lol,"Comparing manifolds directly (no estimation) with fixed starting positions for subintervals near the beginning of the series",["Max neighbor distance","Mean neighbor dist"],["MND","mND"],avgs1,None,avgs2,None)
+    lol,avgs1,avgs2 = CCMAlternatives.testDiffeomorphismSamePointsFillIn(ts1,ts2,numlags,lagsize,listofskips,simMeasure=[Similarity.maxNeighborDistMeanWithSkip,Similarity.meanNeighborDistWithSkip],N=numlags+1,poi=poi_whole)
+    printResults(lol,"Comparing manifolds directly (no estimation) with fixed starting positions for subintervals over the whole series",["Max neighbor distance with skip","Mean neighbor dist with skip"],["MNDws","mNDws"],avgs1,None,avgs2,None)
+
+
+
 if __name__=='__main__':
     # make a time series
     dt = 0.025
@@ -122,8 +148,11 @@ if __name__=='__main__':
 
     # parameters for a sequence of measurements of manifolds of lengths in listoflens with numiters different starting locations (only needed for sequenceOfReconstructions)
     listoflens = range(4000,32100,4000)
+    listofskips = [2**n for n in range(5,0,-1)]
     numiters = 10
-    growtraj = 1 #grow the trajectories from the same locations
+    allstartinds = []
+    for l in listoflens:
+        allstartinds.append(random.sample(range(ts.shape[0]-l),numiters))
 
     # print info about the analysis to be done.
     print('{0} with lagsize of {1!s}*dt with dt = {2!s} and reconstruction dimension {3!s}.'.format(eqns,lagsize,dt,numlags))
@@ -131,7 +160,17 @@ if __name__=='__main__':
     sys.stdout.flush() #Forces immediate print to screen. Useful if dumping long analysis to text file.
 
     # run the analysis
-    sequenceOfReconstructions(names,numlags,lagsize,ts,compind1,compind2,listoflens,numiters,growtraj)
+    print('#####################################################################')
+    print('Convergence checks between M{0} and M{1} directly.'.format(names(compind1),names(compind2)))
+    sequenceOfDiffeomorphismChecks(names,numlags,lagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,listofskips)
+    print('#####################################################################')
+    print("Convergence checks between original quanities and estimates (M{0} and M{0}', M{1} and M{1}', {0} and {0}', and {1} and {1}') with random starting positions at each subinterval length.".format(names(compind1),names(compind2)))
+    sequenceOfReconstructions(names,numlags,lagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,0)
+    print('#####################################################################')
+    print("Convergence checks between original quanities and estimates (M{0} and M{0}', M{1} and M{1}', {0} and {0}', and {1} and {1}') with fixed starting positions for all subinterval lengths.".format(names(compind1),names(compind2)))
+    sequenceOfReconstructions(names,numlags,lagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,1)
+    # print('#####################################################################')
+    # print("Whole manifold checks between M{0} and M{0}' and M{1} and M{1}'.".format(names(compind1),names(compind2)))
     # wholeManifoldComparison(names,numlags,lagsize,ts,compind1,compind2)
 
 

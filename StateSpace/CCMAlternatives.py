@@ -1,6 +1,6 @@
 #import python modules
 import numpy as np
-import random
+import random, types
 #import home-rolled modules
 import StateSpaceReconstruction as SSR
 import Weights, Similarity
@@ -121,8 +121,10 @@ def testCausalityReconstruction(ts1,ts2,startinds,l,numlags,lagsize,CM=crossMapM
             cc2.append(simfunc(Mest2,M2))
     return cc1,cc2,sL
 
-def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,startind=0,simMeasure=Similarity.neighborDistance,N=None,poi=None):
+def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,allstartinds=None,simMeasure=[Similarity.neighborDistance],N=None,poi=None):
     '''
+    This function could be ported to causalityWrapper with some work.
+
     Check for diffeomorphism between shadow manifolds constructed from ts1 and ts2.
     ts1 and ts2 must have the same length.
     numlags is the dimension of the embedding space for the reconstruction.
@@ -143,42 +145,49 @@ def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,startind=0,si
     (numlags), so is constructed in the body of the function.
     poi is an optional argument of simMeasure that indicates the indices of points
     to track as the length of the tested time series increases. The default is set in 
-    simMeasure and is all the points in the time series. Note that the poi indices reference  
-    the truncated time series: ts[startind:startind+l] for l in listoflens. 
+    simMeasure and is all the points in the time series. Note that the poi indices 
+    reference the truncated time series: ts[startind:startind+l] for l in listoflens. 
     So max(poi) is required to be < min(listoflens).
 
     '''
+    if type(simMeasure) is not types.ListType:
+        simMeasure = [simMeasure]
     if N == None:
         N = numlags+1
     L = len(ts1)
     if len(ts2) != L:
         raise(ValueError,"The lengths of the two time series must be the same.")
     listoflens.sort()
-    lol = [l for l in listoflens if l < L-startind]
+    lol = [l for l in listoflens if l < L]
+    if allstartinds == None:
+        allstartinds = []
+        for l in lol:
+            allstartinds.append(random.sample(range(L-l),numiters))
     avgcc1=[]
     stdcc1=[]
     avgcc2=[]
     stdcc2=[]
     for l in lol:
-        startinds = random.sample(range(startind,L-l),numiters)
+        startinds = allstartinds[k]
         cc1=[]
         cc2=[]
         for s in startinds:
             M1 = SSR.makeShadowManifold(ts1[s:s+l],numlags,lagsize)
             M2 = SSR.makeShadowManifold(ts2[s:s+l],numlags,lagsize)
-            if not poi:
-               c12,c21 = simMeasure(M1,M2,N)
-            else:
-               c12,c21 = simMeasure(M1,M2,N,poi)            
-            cc1.append(c12)
-            cc2.append(c21)
+            for simfunc in simMeasure:
+                if not poi:
+                   c12,c21 = simfunc(M1,M2,N)
+                else:
+                   c12,c21 = simfunc(M1,M2,N,poi)            
+                cc1.append(c12)
+                cc2.append(c21)
         avgcc1.append(np.mean(np.array(cc1)))
         stdcc1.append(np.std(np.array(cc1)))
         avgcc2.append(np.mean(np.array(cc2)))
         stdcc2.append(np.std(np.array(cc2)))
     return lol,avgcc1,stdcc1,avgcc2,stdcc2
 
-def testDiffeomorphismSamePoints(ts1,ts2,numlags,lagsize,listoflens,startind=0,simMeasure=Similarity.maxNeighborDistArray,N=None,poi=None):
+def testDiffeomorphismSamePoints(ts1,ts2,numlags,lagsize,listoflens,simMeasure=[Similarity.maxNeighborDistArray],N=None,poi=None):
     '''
     Check for diffeomorphism between shadow manifolds constructed from ts1 and ts2.
     ts1 and ts2 must have the same length.
@@ -196,29 +205,32 @@ def testDiffeomorphismSamePoints(ts1,ts2,numlags,lagsize,listoflens,startind=0,s
     (numlags), so is constructed in the body of the function.
     poi is an optional argument of simMeasure that indicates the indices of points
     to track as the length of the tested time series increases. The default is set in 
-    simMeasure and is all the points in the time series. Note that the poi indices reference  
-    the truncated time series: ts[startind:startind+l] for l in listoflens. 
+    simMeasure and is all the points in the time series. Note that the poi indices
+    reference the truncated time series: ts[startind:startind+l] for l in listoflens. 
     So max(poi) is required to be < min(listoflens).
 
     '''
+    if type(simMeasure) is not types.ListType:
+        simMeasure = [simMeasure]
     if N == None:
         N = numlags+1
     L = len(ts1)
     if len(ts2) != L:
         raise(ValueError,"The lengths of the two time series must be the same.")
     listoflens.sort()
-    lol = [l for l in listoflens if l < L-startind]
+    lol = [l for l in listoflens if l < L]
     sm12=[]
     sm21=[]
     for l in lol:
-        M1 = SSR.makeShadowManifold(ts1[startind:startind+l],numlags,lagsize)
-        M2 = SSR.makeShadowManifold(ts2[startind:startind+l],numlags,lagsize)
-        s12,s21 = simMeasure(M1,M2,N,poi)
-        sm12.append(s12)
-        sm21.append(s21)
+        M1 = SSR.makeShadowManifold(ts1[:l],numlags,lagsize)
+        M2 = SSR.makeShadowManifold(ts2[:l],numlags,lagsize)
+        for simfunc in simMeasure:
+            s12,s21 = simfunc(M1,M2,N,poi)
+            sm12.append(s12)
+            sm21.append(s21)
     return lol,sm12,sm21
 
-def testDiffeomorphismSamePointsFillIn(ts1,ts2,numlags,lagsize,listofskips,startind=0,simMeasure=Similarity.meanNeighborDistWithSkip,N=None,poi=None):
+def testDiffeomorphismSamePointsFillIn(ts1,ts2,numlags,lagsize,listofskips,simMeasure=[Similarity.meanNeighborDistWithSkip],N=None,poi=None):
     '''
     Check for diffeomorphism between shadow manifolds constructed from ts1 and ts2.
     ts1 and ts2 must have the same length.
@@ -227,7 +239,7 @@ def testDiffeomorphismSamePointsFillIn(ts1,ts2,numlags,lagsize,listofskips,start
     is an integer representing the index of the time lag.
     listofskips contains the successive index skips in the full time series to use 
     to show convergence.
-    Example: [2**n for n in range(5,-1,-1)]
+    Example: [2**n for n in range(5,0,-1)]
     startind is an optional argument that allows a different starting index for the 
     time series (default = 0). Can be used to remove a transient.
     Neighborhoods of contemporaneous points will be assessed for similarity using
@@ -241,23 +253,26 @@ def testDiffeomorphismSamePointsFillIn(ts1,ts2,numlags,lagsize,listofskips,start
     the truncated time series: ts[startind:].
 
     '''
+    if type(simMeasure) is not types.ListType:
+        simMeasure = [simMeasure]
     if N == None:
         N = numlags+1
     L = len(ts1)
     if len(ts2) != L:
         raise(ValueError,"The lengths of the two time series must be the same.")
-    M1 = SSR.makeShadowManifold(ts1[startind:],numlags,lagsize)
-    M2 = SSR.makeShadowManifold(ts2[startind:],numlags,lagsize)
+    M1 = SSR.makeShadowManifold(ts1,numlags,lagsize)
+    M2 = SSR.makeShadowManifold(ts2,numlags,lagsize)
     sm12=[]
     sm21=[]
     for s in listofskips:
-        s12,s21 = simMeasure(M1,M2,N,poi,s)
-        sm12.append(s12)
-        sm21.append(s21)
+        for simfunc in simMeasure:
+            s12,s21 = simfunc(M1,M2,N,poi,s)
+            sm12.append(s12)
+            sm21.append(s21)
     return [1.0/s for s in listofskips],sm12,sm21
 
 def callme(ts1,ts2,numlags,lagsize,listoflens,N,ystr,leglabels,fname,note,simMeasure,startind=1000,numiters=25,poi=None):
-        l,avg1,std1, avg2, std2 = testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,startind,simMeasure,N,poi) 
+        l,avg1,std1, avg2, std2 = testDiffeomorphism(ts1[startind:],ts2[startind:],numlags,lagsize,listoflens,numiters,simMeasure=simMeasure,N=N,poi=poi) 
         cPickle.dump({'listoflens':l,'avg1':avg1,'avg2':avg2,'std1':std1,'std2':std2,'note':note,'numlags':numlags,'lagsize':lagsize,'timeseries':timeseries,'numneighbors':N,'startind':startind,'poi':poi},open(fname+'.pickle','w'))        
         print(np.array(l))
         print(np.array([avg1,avg2]))
@@ -267,7 +282,7 @@ def callme(ts1,ts2,numlags,lagsize,listoflens,N,ystr,leglabels,fname,note,simMea
         SSRPlots.plots(np.array(l),avgarr,hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname+'.pdf')  
 
 def callmesamepts(ts1,ts2,numlags,lagsize,listoflens,N,ystr,leglabels,fname,note,simMeasure,startind=1000,numiters=0,poi=None):
-        lol,sm12,sm21 = testDiffeomorphismSamePoints(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi) 
+        lol,sm12,sm21 = testDiffeomorphismSamePoints(ts1[startind:],ts2[startind:],numlags,lagsize,listoflens,simMeasure,N,poi) 
         sm12 = np.array(sm12)
         sm21 = np.array(sm21)
         lol = np.array(lol)
@@ -281,7 +296,7 @@ def callmesamepts(ts1,ts2,numlags,lagsize,listoflens,N,ystr,leglabels,fname,note
         SSRPlots.plots(lol,sm21,hold=0,show=0,stylestr=stylestr,leglabels=None, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname+'_1.pdf',titlestr=leglabels[1])  
 
 def callmesameptsscalar(ts1,ts2,numlags,lagsize,listoflens,N,ystr,leglabels,fname,note,simMeasure,startind=1000,numiters=0,poi=None):
-        lol,sm12,sm21 = testDiffeomorphismSamePoints(ts1,ts2,numlags,lagsize,listoflens,startind,simMeasure,N,poi) 
+        lol,sm12,sm21 = testDiffeomorphismSamePoints(ts1[startind:],ts2[startind:],numlags,lagsize,listoflens,simMeasure,N,poi) 
         arr = np.array([sm12,sm21])
         lol = np.array(lol)
         cPickle.dump({'listoflens':lol,'sm12':sm12,'sm21':sm21,'note':note,'numlags':numlags,'lagsize':lagsize,'timeseries':timeseries,'numneighbors':N,'startind':startind,'poi':poi},open(fname+'.pickle','w'))
@@ -290,7 +305,7 @@ def callmesameptsscalar(ts1,ts2,numlags,lagsize,listoflens,N,ystr,leglabels,fnam
         SSRPlots.plots(lol,arr.transpose(),hold=0,show=0,stylestr=['b-','r-'],leglabels=leglabels, legloc=0,xstr='length of time interval',ystr=ystr,fname=fname+'.pdf')  
 
 def callmesameptsscalarfillin(ts1,ts2,numlags,lagsize,listofskips,N,ystr,leglabels,fname,note,simMeasure=Similarity.meanNeighborDistWithSkip,startind=1000,numiters=0,poi=None):
-        tsprop,sm12,sm21 = testDiffeomorphismSamePointsFillIn(ts1,ts2,numlags,lagsize,listofskips,startind,simMeasure,N,poi) 
+        tsprop,sm12,sm21 = testDiffeomorphismSamePointsFillIn(ts1[startind:],ts2[startind:],numlags,lagsize,listofskips,simMeasure,N,poi) 
         arr = np.array([sm12,sm21])
         tsprop = np.array(tsprop)
         cPickle.dump({'tsprop':tsprop,'sm12':sm12,'sm21':sm21,'note':note,'numlags':numlags,'lagsize':lagsize,'timeseries':timeseries,'numneighbors':N,'startind':startind,'poi':poi},open(fname+'.pickle','w'))
