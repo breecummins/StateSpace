@@ -145,7 +145,7 @@ def testCausalityReconstruction(ts1,ts2,startinds,l,numlags,lagsize,wgtfunc=Weig
             cc2.append(simfunc(M2est,M2orig[shift:,:]))
     return cc1, cc2, sL
     
-def causalityWrapper(ts1,ts2,numlags,lagsize,listoflens,numiters,allstartinds=None,causalitytester=testCausality,morefunctions=None):
+def causalityWrapper(ts1,ts2,numlags,lagsize,listoflens,numiters,allstartinds=None,growtraj=0,causalitytester=testCausality,morefunctions=None):
     '''
     Check for convergence to infer causality between the time series ts1 and ts2, 
     where len(ts1) == len(ts2).
@@ -160,7 +160,10 @@ def causalityWrapper(ts1,ts2,numlags,lagsize,listoflens,numiters,allstartinds=No
     Each length will be run numiters times from different random starting 
     locations in the time series, where numiters must be <= len(ts1) - max(listoflens).
     The optional argument allstartinds allows specific starting locations to be
-    specified.
+    specified instead of randomly generating the starting indices.
+    The optional argument growtraj=0 (default) or 1 says whether or not to keep the same 
+    starting indices across all lengths in listoflens, so that the examples are growing 
+    in the same locations instead of at random locations.
     
     The details of the specific causality test is in the function causalitytester.
     The optional dictionary morefunctions can contain keyword entries for 'CM', 'wgtfunc', 
@@ -197,7 +200,10 @@ def causalityWrapper(ts1,ts2,numlags,lagsize,listoflens,numiters,allstartinds=No
     if morefunctions == None:
         morefunctions = {}
     for k,l in enumerate(lol):
-        startinds = allstartinds[k]
+        if growtraj:
+            startinds = allstartinds[-1]
+        else:
+            startinds = allstartinds[k]
         cc1, cc2, sL = causalitytester(ts1,ts2,startinds,l,numlags,lagsize,**morefunctions)
         avgcc1.append([np.mean(cc1[_k::sL]) for _k in range(sL)])
         avgcc2.append([np.mean(cc2[_k::sL]) for _k in range(sL)])

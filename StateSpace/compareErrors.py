@@ -63,7 +63,7 @@ def wholeManifoldComparison(names,numlags,lagsize,timeseries,compind1,compind2):
     M1us,M2us=CCMAlternatives.crossMapModified1(M1,M2,Weights.makeLambdaWeights)
     calcErrs("Direct estimation of the manifold using weights from powers of 1/2:",M1us[corr:,:],M2us[corr:,:])
 
-def sequenceOfReconstructions(names,numlags,lagsize,timeseries,compind1,compind2,listoflens,numiters):
+def sequenceOfReconstructions(names,numlags,lagsize,timeseries,compind1,compind2,listoflens,numiters,growtraj):
 
     ts1 = timeseries[:,compind1]
     ts2 = timeseries[:,compind2]
@@ -87,7 +87,7 @@ def sequenceOfReconstructions(names,numlags,lagsize,timeseries,compind1,compind2
         sys.stdout.flush()
 
     def calcSequence(method,wgtfunc,simMeasure,summary,notes,shorts,name1='M{0}'.format(names[compind1]),name2='M{0}'.format(names[compind2]),printstd=0):
-        lol,avgs1,avgs2,stds1,stds2 = CCM.causalityWrapper(ts1,ts2,numlags,lagsize,listoflens,numiters,allstartinds,causalitytester=method,morefunctions={'wgtfunc':wgtfunc,'simMeasure':simMeasure})
+        lol,avgs1,avgs2,stds1,stds2 = CCM.causalityWrapper(ts1,ts2,numlags,lagsize,listoflens,numiters,allstartinds,growtraj,causalitytester=method,morefunctions={'wgtfunc':wgtfunc,'simMeasure':simMeasure})
         printResults(lol,summary,notes,shorts,avgs1,stds1,avgs2,stds2,name1,name2,printstd)
 
     #############################################
@@ -123,6 +123,7 @@ if __name__=='__main__':
     # parameters for a sequence of measurements of manifolds of lengths in listoflens with numiters different starting locations (only needed for sequenceOfReconstructions)
     listoflens = range(4000,32100,4000)
     numiters = 10
+    growtraj = 1 #grow the trajectories from the same locations
 
     # print info about the analysis to be done.
     print('{0} with lagsize of {1!s}*dt with dt = {2!s} and reconstruction dimension {3!s}.'.format(eqns,lagsize,dt,numlags))
@@ -130,7 +131,7 @@ if __name__=='__main__':
     sys.stdout.flush() #Forces immediate print to screen. Useful if dumping long analysis to text file.
 
     # run the analysis
-    sequenceOfReconstructions(names,numlags,lagsize,ts,compind1,compind2,listoflens,numiters)
+    sequenceOfReconstructions(names,numlags,lagsize,ts,compind1,compind2,listoflens,numiters,growtraj)
     # wholeManifoldComparison(names,numlags,lagsize,ts,compind1,compind2)
 
 
