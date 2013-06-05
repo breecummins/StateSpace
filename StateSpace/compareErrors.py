@@ -108,22 +108,21 @@ def sequenceOfReconstructions(names,numlags,lagsize,timeseries,compind1,compind2
 
 if __name__=='__main__':
     # make a time series
-    dt = 0.05
+    dt = 0.025
     finaltime = 1200.0
     eqns,names,numlags,lagsize,timeseries = doublependulumTS(finaltime,dt)
 
     # truncate time series if desired
-    startind = 1000 #how much to cut off the front
-    endind = len(timeseries) #how much to leave at the back
-    ts = timeseries[startind:endind,:] 
+    startind = 2000 #how much to cut off the front
+    ts = timeseries[startind:,:] 
 
     # comparison variables
     compind1 = 2
     compind2 = 3
 
     # parameters for a sequence of measurements of manifolds of lengths in listoflens with numiters different starting locations (only needed for sequenceOfReconstructions)
-    listoflens = range(2000,16100,2000)
-    numiters = 25
+    listoflens = range(4000,32100,4000)
+    numiters = 10
 
     # print info about the analysis to be done.
     print('{0} with lagsize of {1!s}*dt with dt = {2!s} and reconstruction dimension {3!s}.'.format(eqns,lagsize,dt,numlags))
