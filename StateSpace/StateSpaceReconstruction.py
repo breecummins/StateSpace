@@ -1,6 +1,6 @@
 import numpy as np
 
-def makeShadowManifold(timeseries, numlags, lagsize):
+def makeShadowManifoldSmooth(timeseries, numlags, lagsize):
     '''
     timeseries is a sequence of observations.
     numlags is a integer indicating the dimension of the shadow manifold
@@ -9,12 +9,37 @@ def makeShadowManifold(timeseries, numlags, lagsize):
     It is required that numlags*lagsize << len(timeseries) to make a good
     reconstruction. 
 
+    Reconstruct all time points.
+
     '''
     Mx = np.zeros((len(timeseries)-(numlags-1)*lagsize,numlags))
     for t in range(0,len(timeseries)-(numlags-1)*lagsize):
         inds = np.arange(t+(numlags-1)*lagsize,t-1,-lagsize)
         Mx[t,:] = timeseries[inds]
     return Mx
+
+def makeShadowManifoldSkip(timeseries, numlags, lagsize):
+    '''
+    timeseries is a sequence of observations.
+    numlags is a integer indicating the dimension of the shadow manifold
+    to be constructed. 
+    lagsize is the number of time points in each lag.
+    It is required that numlags*lagsize << len(timeseries) to make a good
+    reconstruction. 
+
+    Reconstruct only time points that are multiples of lagsize.
+
+    '''
+    # excise non-multiples of lagsize
+    timeseries = timeseries[::lagsize]
+    lagsize = 1
+    return makeShadowManifoldSmooth(timeseries, numlags, lagsize)
+
+def makeShadowManifold(timeseries, numlags, lagsize, smooth=1):
+    if smooth:
+        return makeShadowManifoldSmooth(timeseries, numlags, lagsize)
+    else:
+        return makeShadowManifoldSkip(timeseries, numlags, lagsize)
 
 
 

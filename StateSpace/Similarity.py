@@ -98,12 +98,13 @@ def countingMeasure(M1,M2,N=None):
     For each point y in M2, find the contemporaneous point x in M1 and the set
     of points containing the N nearest neighbors of the N nearest neighbors of x. 
     Count the points in this neighborhood that share a time index 
-    with any of the N nearest neighbors of y. Normalize by N and average over
-    the number of points in the manifold (M1.shape = M2.shape).
+    with any of the N nearest neighbors of y. Normalize by N to put the values 
+    on the range [0,1] and average over the manifold.
     This is analogous to estimating M1 from M2 using Sugihara's method and 
     testing for causality in the 1 -> 2 direction. In Sugihara's method, the N 
     nearest neighbors of y are assumed to be "close to" x. So I check for these 
-    points in a larger radius around x. In terms of maps, this tests for a 1-1 map 
+    points in a larger radius around x. A counting measure close to 1 means that 
+    the neighborhoods are similar. In terms of maps, this tests for a 1-1 map 
     in the M2 -> M1 direction.
     Also do the same calculation starting at x in M1.
     Outputs are returned in the M1 -> M2, M2 -> M1 order for consistency 
@@ -241,7 +242,6 @@ def meanNeighborDistWithSkip(M1,M2,N,poi=None,skip=1):
     ndistsx = []
     ndistsy = []
     keepinds = range(0,M1.shape[0],skip)
-    print(len(set(poi).intersection(set(keepinds))))    
     for ind in poi:
         x = M1[ind,:]
         y = M2[ind,:]

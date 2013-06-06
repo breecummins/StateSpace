@@ -152,6 +152,7 @@ def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,allstartinds=
     '''
     if type(simMeasure) is not types.ListType:
         simMeasure = [simMeasure]
+    sL = len(simMeasure)
     if N == None:
         N = numlags+1
     L = len(ts1)
@@ -167,7 +168,7 @@ def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,allstartinds=
     stdcc1=[]
     avgcc2=[]
     stdcc2=[]
-    for l in lol:
+    for k,l in enumerate(lol):
         startinds = allstartinds[k]
         cc1=[]
         cc2=[]
@@ -181,10 +182,10 @@ def testDiffeomorphism(ts1,ts2,numlags,lagsize,listoflens,numiters,allstartinds=
                    c12,c21 = simfunc(M1,M2,N,poi)            
                 cc1.append(c12)
                 cc2.append(c21)
-        avgcc1.append(np.mean(np.array(cc1)))
-        stdcc1.append(np.std(np.array(cc1)))
-        avgcc2.append(np.mean(np.array(cc2)))
-        stdcc2.append(np.std(np.array(cc2)))
+        avgcc1.append([np.mean(cc1[_k::sL]) for _k in range(sL)])
+        avgcc2.append([np.mean(cc2[_k::sL]) for _k in range(sL)])
+        stdcc1.append([np.std(cc1[_k::sL]) for _k in range(sL)])
+        stdcc2.append([np.std(cc2[_k::sL]) for _k in range(sL)])
     return lol,avgcc1,stdcc1,avgcc2,stdcc2
 
 def testDiffeomorphismSamePoints(ts1,ts2,numlags,lagsize,listoflens,simMeasure=[Similarity.maxNeighborDistArray],N=None,poi=None):
@@ -239,7 +240,7 @@ def testDiffeomorphismSamePointsFillIn(ts1,ts2,numlags,lagsize,listofskips,simMe
     is an integer representing the index of the time lag.
     listofskips contains the successive index skips in the full time series to use 
     to show convergence.
-    Example: [2**n for n in range(5,0,-1)]
+    Example: [2**n for n in range(5,-1,-1)]
     startind is an optional argument that allows a different starting index for the 
     time series (default = 0). Can be used to remove a transient.
     Neighborhoods of contemporaneous points will be assessed for similarity using

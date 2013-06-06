@@ -34,6 +34,9 @@ if __name__ == '__main__':
     lagsize = int(0.08/dt) #because lagsize=8 is good with dt = 0.01
     # SSRPlots.plotManifold(timeseries,show=0)
     # SSRPlots.plotShadowManifold(timeseries[:,0],3,8,show=0,hold=1,style='r-')
-    SSRPlots.plotShadowManifold(timeseries[:,0],2,8,show=0,hold=0,style='r-')
-    SSRPlots.plotShadowManifold(timeseries[:,1],2,8,show=0,hold=0,style='g-')
-    SSRPlots.plotShadowManifold(timeseries[:,2],2,8,show=1,hold=0,style='k-')
+    SSRPlots.plotShadowManifold(timeseries[:,0],3,8,show=0,hold=0,style='r-')
+    SSRPlots.plotShadowManifold(timeseries[:,1],3,8,show=0,hold=0,style='g-')
+    SSRPlots.plotShadowManifold(timeseries[:,2],3,8,show=1,hold=0,style='k-')
+    SSRPlots.plotShadowManifold(timeseries[:,0],3,8,show=0,hold=0,style='r-',smooth=0)
+    SSRPlots.plotShadowManifold(timeseries[:,1],3,8,show=0,hold=0,style='g-',smooth=0)
+    SSRPlots.plotShadowManifold(timeseries[:,2],3,8,show=1,hold=0,style='k-',smooth=0)

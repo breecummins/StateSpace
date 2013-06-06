@@ -50,7 +50,7 @@ def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False
 
 
 
-def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-',titlestr=None,scatter=False):
+def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-',titlestr=None,scatter=False, smooth=1):
     '''
     timeseries is a sequence of observations.
     numlags is a integer indicating the dimension of the shadow manifold
@@ -58,7 +58,7 @@ def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-',ti
     lagsize is the number of time points in each lag.
 
     '''
-    pts = SSR.makeShadowManifold(timeseries,numlags,lagsize)
+    pts = SSR.makeShadowManifold(timeseries,numlags,lagsize,smooth)
     plotManifold(pts,show=show,hold=hold,style=style,titlestr=titlestr,scatter=scatter)
 
 def plotEstShadowManifoldSugihara(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeights):
@@ -68,27 +68,27 @@ def plotEstShadowManifoldSugihara(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeEx
     plotShadowManifold(ts2,numlags,lagsize,0,0,'k-')
     plotShadowManifold(est2,numlags,lagsize,1,1,'g-')
 
-def plotEstShadowManifoldUs1(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeights):
-    M1 = SSR.makeShadowManifold(ts1,numlags,lagsize)
-    M2 = SSR.makeShadowManifold(ts2,numlags,lagsize)
+def plotEstShadowManifoldUs1(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeights,smooth=1):
+    M1 = SSR.makeShadowManifold(ts1,numlags,lagsize,smooth)
+    M2 = SSR.makeShadowManifold(ts2,numlags,lagsize,smooth)
     Mest1,Mest2 = CCMAlternatives.crossMapModified1(M1,M2,wgtfunc)
     plotManifold(M1,0)
     plotManifold(Mest1,0,1,'r-')
     plotManifold(M2,0,0,'k-')
     plotManifold(Mest2,1,1,'g-')
 
-def plotEstShadowManifoldUs2(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeights):
-    M1 = SSR.makeShadowManifold(ts1,numlags,lagsize)
-    M2 = SSR.makeShadowManifold(ts2,numlags,lagsize)
+def plotEstShadowManifoldUs2(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeights,smooth=1):
+    M1 = SSR.makeShadowManifold(ts1,numlags,lagsize,smooth)
+    M2 = SSR.makeShadowManifold(ts2,numlags,lagsize,smooth)
     est1,est2 = CCMAlternatives.crossMapModified2(M1,M2,wgtfunc)
     plotShadowManifold(ts1,numlags,lagsize,0)
     plotShadowManifold(est1,numlags,lagsize,0,1,'r-')
     plotShadowManifold(ts2,numlags,lagsize,0,0,'k-')
     plotShadowManifold(est2,numlags,lagsize,1,1,'g-')
 
-def plotEstShadowManifoldUs3(ts1,ts2,numlags,lagsize,proj,wgtfunc=Weights.makeExpWeights):
-    M1 = SSR.makeShadowManifold(ts1,numlags,lagsize)
-    M2 = SSR.makeShadowManifold(ts2,numlags,lagsize)
+def plotEstShadowManifoldUs3(ts1,ts2,numlags,lagsize,proj,wgtfunc=Weights.makeExpWeights,smooth=1):
+    M1 = SSR.makeShadowManifold(ts1,numlags,lagsize,smooth)
+    M2 = SSR.makeShadowManifold(ts2,numlags,lagsize,smooth)
     est1,est2 = CCMAlternatives.crossMapModified3(M1,M2,proj,wgtfunc)
     plotShadowManifold(ts1,numlags,lagsize,0)
     plotShadowManifold(est1,numlags,lagsize,0,1,'r-')
