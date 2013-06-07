@@ -147,12 +147,12 @@ def sequenceOfDiffeomorphismChecks(names,numlags,lagsize,timeseries,compind1,com
 
 if __name__=='__main__':
     # make a time series
-    dt = 0.025
+    dt = 0.1#0.025
     finaltime = 1200.0
     eqns,names,numlags,lagsize,timeseries = doublependulumTS(finaltime,dt)
 
     # truncate time series if desired
-    startind = 2000 #how much to cut off the front
+    startind = int(50/dt)#2000 #how much to cut off the front
     ts = timeseries[startind:,:] 
 
     # subsample time series according to lagsize
@@ -182,17 +182,17 @@ if __name__=='__main__':
     # print("Whole manifold checks between M{0} and M{0}' and M{1} and M{1}'.".format(names[compind1],names[compind2]))
     # wholeManifoldComparison(names,numlags,newlagsize,ts,compind1,compind2)
 
-    # print('#####################################################################')
-    # print("Convergence checks between original quantities and estimates (M{0} and M{0}', M{1} and M{1}', {0} and {0}', and {1} and {1}') with random starting positions at each subinterval length.".format(names[compind1],names[compind2]))
-    # sequenceOfReconstructions(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,0)
-
-    # print('#####################################################################')
-    # print("Convergence checks between original quantities and estimates (M{0} and M{0}', M{1} and M{1}', {0} and {0}', and {1} and {1}') with fixed starting positions for all subinterval lengths.".format(names[compind1],names[compind2]))
-    # sequenceOfReconstructions(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,1)
+    print('#####################################################################')
+    print("Convergence checks between original quantities and estimates (M{0} and M{0}', M{1} and M{1}', {0} and {0}', and {1} and {1}') with random starting positions at each subinterval length.".format(names[compind1],names[compind2]))
+    sequenceOfReconstructions(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,0)
 
     print('#####################################################################')
-    print('Convergence checks between M{0} and M{1} directly.'.format(names[compind1],names[compind2]))
-    sequenceOfDiffeomorphismChecks(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,listofskips)
+    print("Convergence checks between original quantities and estimates (M{0} and M{0}', M{1} and M{1}', {0} and {0}', and {1} and {1}') with fixed starting positions for all subinterval lengths.".format(names[compind1],names[compind2]))
+    sequenceOfReconstructions(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,1)
+
+    # print('#####################################################################')
+    # print('Convergence checks between M{0} and M{1} directly.'.format(names[compind1],names[compind2]))
+    # sequenceOfDiffeomorphismChecks(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,listofskips)
 
 
 
