@@ -377,10 +377,38 @@ if __name__ == '__main__':
     # # LorenzCallSamePts(Similarity.maxNeighborDistMean,'mean max neighbor dist',os.path.expanduser('~/temp/LorenzMaxNeighborDistMeanEvery21_'),callmesameptsscalar)
 
     #######################################
-    import DoublePendulum 
-    timeseries = DoublePendulum.solvePendulum([1.0,2.0,3.0,2.0],300.0)
-    numlags = 9
-    lagsize = 8
+    import DoublePendulum, CCM
+    dt = 0.1
+    timeseries = DoublePendulum.solvePendulum([1.0,2.0,3.0,2.0],2400.0,dt=dt)
+    numlags = 4
+    lagsize = int(0.8/dt)
+
+    # truncate time series if desired
+    startind = int(50/dt)#2000 #how much to cut off the front
+    ts = timeseries[startind:,:] 
+
+    # subsample time series according to lagsize
+    # this will analyze the subsequence of multiples of lagsize*dt in the time series
+    ts = ts[::lagsize,:]
+    newlagsize = 1
+
+    # comparison variables
+    compind1 = 0
+    compind2 = 3
+
+    # parameters for a sequence of measurements of manifolds of lengths in listoflens with numiters different starting locations (only needed for sequenceOfReconstructions)
+    listoflens = range(250,2600,250)
+    listofskips = [2**n for n in range(4,-1,-1)]
+    numiters = 10
+    allstartinds = []
+    for l in listoflens:
+        allstartinds.append(random.sample(range(ts.shape[0]-l),numiters))
+    lol,avgs1,avgs2,stds1,stds2 = CCM.causalityWrapper(ts[:,compind1],ts[:,compind2],numlags,lagsize,listoflens,numiters,allstartinds,0,causalitytester=testCausalityReconstruction,morefunctions={'wgtfunc':Weights.makeExpWeights,'simMeasure':Similarity.RootMeanSquaredErrorManifold})
+    arr = np.array([avgs1,avgs2])
+    lol = np.array(lol)
+    print(lol)
+    print(arr.squeeze())
+    SSRPlots.plots(lol,arr.squeeze().transpose(),hold=0,show=1,stylestr=['b-','r-'],leglabels=[r'$x \rightarrow w$',r'$w \rightarrow x$'], legloc=0,xstr='length of time interval',ystr='Root mean squared error',fname='/Users/bree/Desktop/PicturesForTomas/convergence.pdf')
 
     # listoflens = range(500,3000,500)
     listofskips = [2**n for n in range(5,-1,-1)]
@@ -397,17 +425,17 @@ if __name__ == '__main__':
     def DPCallSamePts(simMeasure,ystr,fname,whichcall=callmesameptsscalar):
         # leglabels1=[r'$f$: $M_x$ -> $M_y$',r'$f$: $M_y$ -> $M_x$']
         leglabels2=[r'$f$: $M_x$ -> $M_w$',r'$f$: $M_w$ -> $M_x$']
-        leglabels3=[r'$f$: $M_z$ -> $M_w$',r'$f$: $M_w$ -> $M_z$']
+        # leglabels3=[r'$f$: $M_z$ -> $M_w$',r'$f$: $M_w$ -> $M_z$']
         # leglabels4=[r'$f$: $M_z$ + 0.1$M_x$ -> $M_w$',r'$f$: $M_w$ -> $M_z$+ 0.1$M_x$']
         # leglabels5=[r'$f$: $M_z$ + $M_y$ -> $M_w$',r'$f$: $M_w$ -> $M_z$+ $M_y$']
         # note1 = "Make My from Mx in sm12 (does y -> x?), make Mx from My in sm21 (does x->y?), double pendulum eqns"
         note2 = "Make Mw from Mx in sm12 (does w -> x?), make Mx from Mw in sm21 (does x->w?), double pendulum eqns"
-        note3 = "Make Mw from Mz in sm12 (does w -> z?), make Mz from Mw in sm21 (does z->w?), double pendulum eqns"
+        # note3 = "Make Mw from Mz in sm12 (does w -> z?), make Mz from Mw in sm21 (does z->w?), double pendulum eqns"
         # note4 = "Make Mw from Mz + 0.1Mx in sm12 (does w -> z + a little x?), make Mz + 0.1Mx from Mw in sm21 (does z + a little x ->w?), double pendulum eqns"
         # note5 = "Make Mw from Mz + My in sm12 (does w -> z + y?), make Mz + My from Mw in sm21 (does z + y ->w?), double pendulum eqns"
         # fname1 = fname + 'xy'
         fname2 = fname + 'xw'
-        fname3 = fname + 'zw'
+        # fname3 = fname + 'zw'
         # fname4 = fname + 'zxw'
         # fname5 = fname + 'zyw'
 
@@ -419,7 +447,7 @@ if __name__ == '__main__':
 
         # doruns('xy,'+str(N)+ ' neighbors',timeseries[:,0],timeseries[:,1],leglabels1,fname1,note1)
         doruns('xw,'+str(N)+ ' neighbors',timeseries[:,0],timeseries[:,3],leglabels2,fname2,note2)
-        doruns('zw,'+str(N)+ ' neighbors',timeseries[:,2],timeseries[:,3],leglabels3,fname3,note3)
+        # doruns('zw,'+str(N)+ ' neighbors',timeseries[:,2],timeseries[:,3],leglabels3,fname3,note3)
         # doruns('z + 0.1x and w, '+str(N)+' neighbors',timeseries[:,2]+ 0.1*timeseries[:,0],timeseries[:,3],leglabels4,fname4,note4)
         # doruns('z + y and w, '+str(N)+' neighbors',timeseries[:,2]+ timeseries[:,1],timeseries[:,3],leglabels5,fname5,note5)
 
@@ -428,7 +456,7 @@ if __name__ == '__main__':
     # DPCallSamePts(Similarity.maxNeighborDistMax,'max max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMaxEvery21_Embed09_LongTS_Lag24_StartLater_'))
     # DPCallSamePts(Similarity.meanNeighborDist,'mean mean neighbor dist',os.path.expanduser('~/temp/DPMeanNeighborDistEvery21_Embed09_LongTS_Lag24_StartLater_'))
     # DPCallSamePts(Similarity.meanNeighborDistWithSkip,'mean mean neighbor dist',os.path.expanduser('~/temp/DPMeanNeighborDistWithSkip_Every23_WholeSeries_Embed04_Lag16_Start400_'),callmesameptsscalarfillin)
-    DPCallSamePts(Similarity.maxNeighborDistMeanWithSkip,'mean max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMeanWithSkip_Every23_WholeSeries_Embed09_Lag08_Start0200_'),callmesameptsscalarfillin)
+    # DPCallSamePts(Similarity.maxNeighborDistMeanWithSkip,'mean max neighbor dist',os.path.expanduser('~/temp/DPMaxNeighborDistMeanWithSkip_Every23_WholeSeries_Embed09_Lag08_Start0200_'),callmesameptsscalarfillin)
 
 
     # #######################################
