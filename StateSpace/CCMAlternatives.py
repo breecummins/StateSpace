@@ -379,7 +379,7 @@ if __name__ == '__main__':
     #######################################
     import DoublePendulum, CCM
     dt = 0.1
-    timeseries = DoublePendulum.solvePendulum([1.0,2.0,3.0,2.0],2400.0,dt=dt)
+    timeseries = DoublePendulum.solvePendulum([1.0,2.0,3.0,2.0],4800.0,dt=dt)
     numlags = 4
     lagsize = int(0.8/dt)
 
@@ -397,7 +397,7 @@ if __name__ == '__main__':
     compind2 = 3
 
     # parameters for a sequence of measurements of manifolds of lengths in listoflens with numiters different starting locations (only needed for sequenceOfReconstructions)
-    listoflens = range(250,2600,250)
+    listoflens = range(250,5600,250)
     listofskips = [2**n for n in range(4,-1,-1)]
     numiters = 10
     allstartinds = []
