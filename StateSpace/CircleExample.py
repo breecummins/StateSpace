@@ -1,13 +1,6 @@
 import numpy as np
+from scipy.special import gamma
 import StateSpaceReconstruction as SSR
-
-# This is an implementation of Cao's nearest neighbor method using data from a perfect circle
-# and from a noisy circle. 
-
-times = np.arange(0,10*np.pi,0.05)
-ts = np.cos(times)
-ts2 = ts + 0.1*np.random.normal(ts.shape)
-lagsize = 30
 
 def L1(poi,pts):
     try:    
@@ -26,6 +19,43 @@ def Linf(poi,pts):
         return (np.abs(pts - poi)).max(1)
     except:
         return (np.abs(pts - poi)).max()
+
+def autocorrelation(ts,M=None):
+    mu = np.mean(ts)
+    s2 = np.var(ts,ddof=1) #unbiased estimator of variance
+    N = len(ts)
+    if M == None:
+        M = np.floor(N/100.)
+    autocc = []
+    for k in range(1,M+1):
+        autocc.append( ((ts[:N-k] - mu)*(ts[k:] - mu)).sum() / ( s2 *(N-k) ) )
+    return autocc
+
+def findFirstMin(arr):
+    # This method of finding minima is sensitive to noise.
+    # Also, when Casdagli was talking about other people's work on autocorrelation, I think he meant the first zero
+    # rather than the first minimum. They are the same if one shifts by the mean and then takes the absolute value.
+    # In sum, I probably won't use this function.
+    d = [arr[_k+1] - arr[_k] for _k in range(len(arr)-1)]
+    inds = [_k for _k in range(1,len(d)-2) if -d[_k-1] >= 0 and -d[_k] >=0 and d[_k+1] >= 0 and d[_k+2] >= 0]
+    return min(inds)
+
+def findFirstZero(arr):
+    arr = np.array(arr)
+    up = np.nonzero(arr >= 0)[0]
+    down = np.nonzero(arr < 0)[0]
+    for i in up:
+        if i+1 in down:
+            if np.abs(arr[i]) >= np.abs(arr[i+1]):
+                return i+1
+            else:
+                return i
+        if i-1 in down:
+            if np.abs(arr[i]) >= np.abs(arr[i-1]):
+                return i-1
+            else:
+                return i
+    return None
 
 def findNearestNeighbor(poi,pts,norm=L2):
     '''
@@ -64,5 +94,19 @@ def CaoNeighborRatio(ts,lagsize,dims=4,norm=Linf):
     print([E[k+1] / E[k] for k in range(dims-2)])
 
 if __name__ == '__main__':
-    CaoNeighborRatio(ts,lagsize,10)
+    times = np.arange(0,10*np.pi,0.05)
+    ts1 = np.cos(times)
+    ts2 = ts1 + 0.4*np.random.normal(ts1.shape)
+    lagsize = 30 #found empirically after trying many smaller taus, used the fact that I *knew* dim=2 is the correct answer
+    CaoNeighborRatio(ts1,lagsize,10)
     CaoNeighborRatio(ts2,lagsize,10)
+
+    M=200
+    autocc = autocorrelation(ts1,M)
+    lagsize1 = findFirstZero(autocc)
+    print(lagsize1)
+    autocc = autocorrelation(ts2,M)
+    lagsize2 = findFirstZero(autocc)
+    print(lagsize2)
+    CaoNeighborRatio(ts1,lagsize1,10)
+    CaoNeighborRatio(ts2,lagsize2,10)
