@@ -20,7 +20,7 @@ def Linf(poi,pts):
     except:
         return (np.abs(pts - poi)).max()
 
-def autocorrelation(ts,M=None):
+def lagFromFirstZeroAutocorrelation(ts,M=None):
     mu = np.mean(ts)
     s2 = np.var(ts,ddof=1) #unbiased estimator of variance
     N = len(ts)
@@ -29,16 +29,7 @@ def autocorrelation(ts,M=None):
     autocc = []
     for k in range(1,M+1):
         autocc.append( ((ts[:N-k] - mu)*(ts[k:] - mu)).sum() / ( s2 *(N-k) ) )
-    return autocc
-
-def findFirstMin(arr):
-    # This method of finding minima is sensitive to noise.
-    # Also, when Casdagli was talking about other people's work on autocorrelation, I think he meant the first zero
-    # rather than the first minimum. They are the same if one shifts by the mean and then takes the absolute value.
-    # In sum, I probably won't use this function.
-    d = [arr[_k+1] - arr[_k] for _k in range(len(arr)-1)]
-    inds = [_k for _k in range(1,len(d)-2) if -d[_k-1] >= 0 and -d[_k] >=0 and d[_k+1] >= 0 and d[_k+2] >= 0]
-    return min(inds)
+    return findFirstZero(autocc)
 
 def findFirstZero(arr):
     arr = np.array(arr)
@@ -56,6 +47,17 @@ def findFirstZero(arr):
             else:
                 return i
     return None
+
+def lagFromFirstMinMutualInfo(ts,M=None):
+    #FIXME: stub
+    mi = None
+    return findFirstMin(mi)
+
+def findFirstMin(arr):
+    # This method of finding minima is sensitive to noise.
+    d = [arr[_k+1] - arr[_k] for _k in range(len(arr)-1)]
+    inds = [_k for _k in range(1,len(d)-2) if -d[_k-1] >= 0 and -d[_k] >=0 and d[_k+1] >= 0 and d[_k+2] >= 0]
+    return min(inds)
 
 def findNearestNeighbor(poi,pts,norm=L2):
     '''
@@ -102,11 +104,9 @@ if __name__ == '__main__':
     CaoNeighborRatio(ts2,lagsize,10)
 
     M=200
-    autocc = autocorrelation(ts1,M)
-    lagsize1 = findFirstZero(autocc)
+    lagsize1 = lagFromFirstZeroAutocorrelation(ts1,M)
     print(lagsize1)
-    autocc = autocorrelation(ts2,M)
-    lagsize2 = findFirstZero(autocc)
+    lagsize2 = lagFromFirstZeroAutocorrelation(ts2,M)
     print(lagsize2)
     CaoNeighborRatio(ts1,lagsize1,10)
     CaoNeighborRatio(ts2,lagsize2,10)
