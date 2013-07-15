@@ -8,7 +8,7 @@ def lagFromFirstZeroAutocorrelation(ts,M=None):
     s2 = np.var(ts,ddof=1) #unbiased estimator of variance
     N = len(ts)
     if M == None:
-        M = np.floor(N/100.)
+        M = int(np.floor(N/10.))
     autocc = []
     for k in range(1,M+1):
         autocc.append( ((ts[:N-k] - mu)*(ts[k:] - mu)).sum() / ( s2 *(N-k) ) )
@@ -80,30 +80,66 @@ def CaoNeighborRatio(ts,lagsize,dims=4,norm=Linf):
     print([E[k+1] / E[k] for k in range(dims-2)])
 
 if __name__ == '__main__':
-    times = np.arange(0,10*np.pi,0.05)
-    ts1 = np.cos(times)
-    ts2 = ts1 + 0.4*np.random.normal(ts1.shape)
-    lagsize = 30 #found empirically after trying many smaller taus, used the fact that I *knew* dim=2 is the correct answer
+    # print('Circle examples - perfect and noisy')
+    # dt = 0.05
+    # times = np.arange(0,10*np.pi,dt)
+    # ts1 = np.cos(times)
+    # ts2 = ts1 + 0.4*np.random.normal(ts1.shape)
+    # print('dt = {0}'.format(dt))
+    # lagsize = 10 #arbitrary
+    # print('arbitrary lagsize = {0}'.format(lagsize))
+    # print('Cao neighbor method for embedding dimension, perfect and noisy circle')
     # CaoNeighborRatio(ts1,lagsize,10)
     # CaoNeighborRatio(ts2,lagsize,10)
 
-    M=200
-    lagsize1 = lagFromFirstZeroAutocorrelation(ts1,M)
-    print(lagsize1)
-    lagsize2 = lagFromFirstZeroAutocorrelation(ts2,M)
-    print(lagsize2)
-    print('Linf')
-    CaoNeighborRatio(ts1,lagsize1,dims=10,norm=Linf)
-    CaoNeighborRatio(ts2,lagsize2,dims=10,norm=Linf)
-    print('L5')
-    CaoNeighborRatio(ts1,lagsize1,dims=10,norm=partial(Ln,n=5))
-    CaoNeighborRatio(ts2,lagsize2,dims=10,norm=partial(Ln,n=5))
-    print('L2')
-    CaoNeighborRatio(ts1,lagsize1,dims=10,norm=partial(Ln,n=2))
-    CaoNeighborRatio(ts2,lagsize2,dims=10,norm=partial(Ln,n=2))
-    print('L1')
-    CaoNeighborRatio(ts1,lagsize1,dims=10,norm=partial(Ln,n=1))
-    CaoNeighborRatio(ts2,lagsize2,dims=10,norm=partial(Ln,n=1))
-    print('L1/2')
-    CaoNeighborRatio(ts1,lagsize1,dims=10,norm=partial(Ln,n=0.5))
-    CaoNeighborRatio(ts2,lagsize2,dims=10,norm=partial(Ln,n=0.5))
+    # # M=200
+    # lagsize1 = lagFromFirstZeroAutocorrelation(ts1)
+    # print('autocorr lagsize = {0}'.format(lagsize1))
+    # lagsize2 = lagFromFirstZeroAutocorrelation(ts2)
+    # print('noisy autocorr lagsize = {0}'.format(lagsize2))
+    # print('Cao neighbor method for embedding dimension, perfect and noisy circle')
+    # CaoNeighborRatio(ts1,lagsize1,dims=10,norm=Linf)
+    # CaoNeighborRatio(ts2,lagsize2,dims=10,norm=Linf)
+    # # print('L5')
+    # # CaoNeighborRatio(ts1,lagsize1,dims=10,norm=partial(Ln,n=5))
+    # # CaoNeighborRatio(ts2,lagsize2,dims=10,norm=partial(Ln,n=5))
+    # # print('L2')
+    # # CaoNeighborRatio(ts1,lagsize1,dims=10,norm=partial(Ln,n=2))
+    # # CaoNeighborRatio(ts2,lagsize2,dims=10,norm=partial(Ln,n=2))
+    # # print('L1')
+    # # CaoNeighborRatio(ts1,lagsize1,dims=10,norm=partial(Ln,n=1))
+    # # CaoNeighborRatio(ts2,lagsize2,dims=10,norm=partial(Ln,n=1))
+    # # print('L1/2')
+    # # CaoNeighborRatio(ts1,lagsize1,dims=10,norm=partial(Ln,n=0.5))
+    # # CaoNeighborRatio(ts2,lagsize2,dims=10,norm=partial(Ln,n=0.5))
+
+    # dt = 0.01
+    # times = np.arange(0,10*np.pi,dt)
+    # ts1 = np.cos(times)
+    # ts2 = ts1 + 0.4*np.random.normal(ts1.shape)
+    # print('dt = {0}'.format(dt))
+    # # M=1000
+    # lagsize1 = lagFromFirstZeroAutocorrelation(ts1)
+    # print('autocorr lagsize = {0}'.format(lagsize1))
+    # lagsize2 = lagFromFirstZeroAutocorrelation(ts2)
+    # print('noisy autocorr lagsize = {0}'.format(lagsize2))
+    # print('Cao neighbor method for embedding dimension, perfect and noisy circle')
+    # CaoNeighborRatio(ts1,lagsize1,dims=10,norm=Linf)
+    # CaoNeighborRatio(ts2,lagsize2,dims=10,norm=Linf)
+
+    import LorenzEqns
+    print('Lorenz attractor')
+    dt = 0.01
+    finaltime = 80.0
+    timeseries = LorenzEqns.solveLorenz([1.0,0.5,0.5],finaltime,dt)
+    ts = np.squeeze(timeseries[:,0])
+    lagsize = int(0.08/dt) #because lagsize=8 is good with dt = 0.01
+    print('eyeball lagsize = {0}'.format(lagsize))
+    print('Cao neighbor method for embedding dimension')
+    CaoNeighborRatio(ts,lagsize,dims=10,norm=Linf)
+    M=2000
+    lagsize1 = lagFromFirstZeroAutocorrelation(ts,M)
+    print('autocorr lagsize = {0}'.format(lagsize1))
+    print('Cao neighbor method for embedding dimension, Lorenz attractor')
+    CaoNeighborRatio(ts,lagsize1,dims=10,norm=Linf)
+
