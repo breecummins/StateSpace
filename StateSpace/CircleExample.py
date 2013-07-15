@@ -1,24 +1,7 @@
 import numpy as np
+from functools import partial
 from scipy.special import gamma
 import StateSpaceReconstruction as SSR
-
-def L1(poi,pts):
-    try:    
-        return (np.abs(pts - poi)).sum(1)
-    except:
-        return (np.abs(pts - poi)).sum()
-
-def L2(poi,pts):
-    try:
-        return np.sqrt(((pts - poi)**2).sum(1))
-    except:
-        return np.sqrt(((pts - poi)**2).sum())
-
-def Linf(poi,pts):
-    try:
-        return (np.abs(pts - poi)).max(1)
-    except:
-        return (np.abs(pts - poi)).max()
 
 def lagFromFirstZeroAutocorrelation(ts,M=None):
     mu = np.mean(ts)
@@ -48,18 +31,19 @@ def findFirstZero(arr):
                 return i
     return None
 
-def lagFromFirstMinMutualInfo(ts,M=None):
-    #FIXME: stub
-    mi = None
-    return findFirstMin(mi)
+def Ln(poi,pts,n=None):
+    try:
+        return (((np.abs(pts - poi))**n).sum(1))**(1./n)
+    except:
+        return (((np.abs(pts - poi))**n).sum())**(1./n)
 
-def findFirstMin(arr):
-    # This method of finding minima is sensitive to noise.
-    d = [arr[_k+1] - arr[_k] for _k in range(len(arr)-1)]
-    inds = [_k for _k in range(1,len(d)-2) if -d[_k-1] >= 0 and -d[_k] >=0 and d[_k+1] >= 0 and d[_k+2] >= 0]
-    return min(inds)
+def Linf(poi,pts):
+    try:
+        return (np.abs(pts - poi)).max(1)
+    except:
+        return (np.abs(pts - poi)).max()
 
-def findNearestNeighbor(poi,pts,norm=L2):
+def findNearestNeighbor(poi,pts,norm=None):
     '''
     Find the closest distinct neighbor in pts (numpy array) 
     to poi.
@@ -100,13 +84,26 @@ if __name__ == '__main__':
     ts1 = np.cos(times)
     ts2 = ts1 + 0.4*np.random.normal(ts1.shape)
     lagsize = 30 #found empirically after trying many smaller taus, used the fact that I *knew* dim=2 is the correct answer
-    CaoNeighborRatio(ts1,lagsize,10)
-    CaoNeighborRatio(ts2,lagsize,10)
+    # CaoNeighborRatio(ts1,lagsize,10)
+    # CaoNeighborRatio(ts2,lagsize,10)
 
     M=200
     lagsize1 = lagFromFirstZeroAutocorrelation(ts1,M)
     print(lagsize1)
     lagsize2 = lagFromFirstZeroAutocorrelation(ts2,M)
     print(lagsize2)
-    CaoNeighborRatio(ts1,lagsize1,10)
-    CaoNeighborRatio(ts2,lagsize2,10)
+    print('Linf')
+    CaoNeighborRatio(ts1,lagsize1,dims=10,norm=Linf)
+    CaoNeighborRatio(ts2,lagsize2,dims=10,norm=Linf)
+    print('L5')
+    CaoNeighborRatio(ts1,lagsize1,dims=10,norm=partial(Ln,n=5))
+    CaoNeighborRatio(ts2,lagsize2,dims=10,norm=partial(Ln,n=5))
+    print('L2')
+    CaoNeighborRatio(ts1,lagsize1,dims=10,norm=partial(Ln,n=2))
+    CaoNeighborRatio(ts2,lagsize2,dims=10,norm=partial(Ln,n=2))
+    print('L1')
+    CaoNeighborRatio(ts1,lagsize1,dims=10,norm=partial(Ln,n=1))
+    CaoNeighborRatio(ts2,lagsize2,dims=10,norm=partial(Ln,n=1))
+    print('L1/2')
+    CaoNeighborRatio(ts1,lagsize1,dims=10,norm=partial(Ln,n=0.5))
+    CaoNeighborRatio(ts2,lagsize2,dims=10,norm=partial(Ln,n=0.5))
