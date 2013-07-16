@@ -95,7 +95,7 @@ def getLagDim(arr,cols=None,dims=10):
     for c in cols:
         ts = np.squeeze(arr[:,c])
         lg.append(lagFromFirstZeroAutocorrelation(ts))
-        rats.append(CaoNeighborRatio(np.squeeze(timeseries[:,c]),lg[-1],dims=dims))
+        rats.append(CaoNeighborRatio(ts,lg[-1],dims=dims))
     if len(lg)> 1:
         diffs = [abs(lg[k] - lg[j]) for k in range(len(lg)) for j in range(k+1,len(lg))]
         if max(diffs) > 2:
@@ -103,8 +103,6 @@ def getLagDim(arr,cols=None,dims=10):
     inds = [min([i+1 for i in range(len(rat)) if rat[i] > thresh]) for rat in rats]
     numlags = max(inds)
     lagsize = lg[inds.index(numlags)]
-    print(lg)
-    print(inds)
     return lagsize, numlags
 
 if __name__ == '__main__':
