@@ -100,6 +100,7 @@ def getLagDim(arr,cols=None,dims=10):
         diffs = [abs(lg[k] - lg[j]) for k in range(len(lg)) for j in range(k+1,len(lg))]
         if max(diffs) > 2:
             print('Discrepancy in lagsizes: {0}'.format(lg))
+    print(rats)
     inds = [min([i+1 for i in range(len(rat)) if rat[i] > thresh]) for rat in rats]
     numlags = max(inds)
     lagsize = lg[inds.index(numlags)]
