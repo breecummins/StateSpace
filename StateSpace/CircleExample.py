@@ -82,6 +82,36 @@ def CaoNeighborRatio(ts,lagsize,dims=4,norm=Linf):
         E.append(np.mean(rats))
     return [E[k+1] / E[k] for k in range(len(E)-1)]
 
+def CaoNeighborRatio2(ts,lagsize,thresh=0.97,norm=Linf):
+    manifolds = []
+    d0 = 2
+    d = 1
+    E = 0
+    while E < thresh:
+        d = d+1
+        dif = d - len(manifolds)
+        for k in range(dif,-1,-1):
+            dim = d+d0-k
+            m = SSR.makeShadowManifold(ts,dim,lagsize)
+            manifolds.append(m)
+        shifts = [(_d-1)*lagsize for _d in range(d,d+3)]
+        corrections = [shifts[-1] - s for s in shifts]
+        print(corrections)
+        e=[]
+        for i in range(d-d0,d-d0+2):
+            m = manifolds[i][corrections[i]:,:]
+            m1 = manifolds[i+1][corrections[i+1]:,:]
+            rats = []
+            for k in range(len(ts)-shifts[-1]):
+                nk, distknk = findNearestNeighbor(m[k,:],m,norm)
+                dist1 = norm(m1[k,:],m1[nk,:])
+                rats.append(dist1/distknk)
+            e.append(np.mean(rats))
+        E = e[1]/e[0]
+    return d
+
+
+
 def getLagDim(arr,cols=None,dims=10):
     '''
     Employs an arbitrary threshold to choose the embedding dim.
@@ -103,6 +133,28 @@ def getLagDim(arr,cols=None,dims=10):
     print(rats)
     inds = [min([i+1 for i in range(len(rat)) if rat[i] > thresh]) for rat in rats]
     numlags = max(inds)
+    lagsize = lg[inds.index(numlags)]
+    return lagsize, numlags
+
+def getLagDim2(timeseries,cols=None,thresh=0.97):
+    '''
+    Employs an arbitrary threshold to choose the embedding dim.
+
+    '''
+    if cols == None:
+        cols = range(timeseries.shape[1])
+    lg = []
+    nl = []
+    for c in cols:
+        ts = np.squeeze(timeseries[:,c])
+        lg.append(lagFromFirstZeroAutocorrelation(ts))
+        nl.append(CaoNeighborRatio2(ts,lg[-1],thresh=thresh))
+    if len(lg)> 1:
+        diffs = [abs(lg[k] - lg[j]) for k in range(len(lg)) for j in range(k+1,len(lg))]
+        if max(diffs) > 2:
+            print('Discrepancy in lagsizes: {0}'.format(lg))
+    print(nl)
+    numlags = max(nl)
     lagsize = lg[inds.index(numlags)]
     return lagsize, numlags
 
@@ -177,6 +229,6 @@ if __name__ == '__main__':
     timeseries = DoublePendulum.solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt)
     startind = int(50/dt)#2000 #how much to cut off the front
     timeseries = timeseries[startind:,:]
-    lagsize,numlags=getLagDim(timeseries,cols=[0,3],dims=12)
+    lagsize,numlags=getLagDim2(timeseries,cols=[0,3])
     print(lagsize)
     print(numlags)
