@@ -157,47 +157,47 @@ if __name__=='__main__':
     compind1 = 0
     compind2 = 3
 
-    # get the lagsize and number of lags to construct the shadow manifold
-    lagsize,numlags = getLagDim(timeseries,cols=[compind1,compind2],dims=15)
+    # # get the lagsize and number of lags to construct the shadow manifold
+    lagsize,numlags = getLagDim(timeseries,cols=[compind1,compind2],dims=12)
+    # lagsize = #did getLagDim before running full script
+    # numlags = 
     print('lagsize = {0}, numlags = {1}'.format(lagsize,numlags))
     sys.stdout.flush() #Forces immediate print to screen. Useful if dumping long analysis to text file.
 
-    # subsample time series according to lagsize
-    # this will analyze the subsequence of multiples of lagsize*dt in the time series
-    ts = ts[::lagsize,:]
-    newlagsize = 1
+    # # subsample time series according to lagsize
+    # # this will analyze the subsequence of multiples of lagsize*dt in the time series
+    # ts = ts[::lagsize,:]
+    # newlagsize = 1
 
-    # parameters for a sequence of measurements of manifolds of lengths in listoflens with numiters different starting locations (only needed for sequenceOfReconstructions)
-    listoflens = range(200,1300,200)
-    listofskips = [2**n for n in range(4,-1,-1)]
-    numiters = 10
-    allstartinds = []
-    for l in listoflens:
-        allstartinds.append(random.sample(range(ts.shape[0]-l),numiters))
+    # # parameters for a sequence of measurements of manifolds of lengths in listoflens with numiters different starting locations (only needed for sequenceOfReconstructions)
+    # listoflens = range(200,1300,200)
+    # listofskips = [2**n for n in range(4,-1,-1)]
+    # numiters = 10
+    # allstartinds = []
+    # for l in listoflens:
+    #     allstartinds.append(random.sample(range(ts.shape[0]-l),numiters))
 
-    # print info about the analysis to be done.
-    print('{0} with lagsize of {1}*dt with dt = {2} and reconstruction dimension {3} using only times located at multiples of lagsize*dt.'.format(eqns,lagsize,dt,numlags))
-    print('If looking at a sequence of measurements, the lengths range from {0} to {1} and the number of iterations per length is {2}.'.format(listoflens[0],listoflens[-1],numiters))
-    sys.stdout.flush() #Forces immediate print to screen. Useful if dumping long analysis to text file.
+    # # print info about the analysis to be done.
+    # print('{0} with lagsize of {1}*dt with dt = {2} and reconstruction dimension {3} using only times located at multiples of lagsize*dt.'.format(eqns,lagsize,dt,numlags))
+    # print('If looking at a sequence of measurements, the lengths range from {0} to {1} and the number of iterations per length is {2}.'.format(listoflens[0],listoflens[-1],numiters))
+    # sys.stdout.flush() #Forces immediate print to screen. Useful if dumping long analysis to text file.
 
-    # run the analysis
-    print('#####################################################################')
-    print("Whole manifold checks between M{0} and M{0}' and M{1} and M{1}'.".format(names[compind1],names[compind2]))
-    wholeManifoldComparison(names,numlags,newlagsize,ts,compind1,compind2)
+    # # run the analysis
+    # print('#####################################################################')
+    # print("Whole manifold checks between M{0} and M{0}' and M{1} and M{1}'.".format(names[compind1],names[compind2]))
+    # wholeManifoldComparison(names,numlags,newlagsize,ts,compind1,compind2)
 
-    print('#####################################################################')
-    print("Convergence checks between original quantities and estimates (M{0} and M{0}', M{1} and M{1}', {0} and {0}', and {1} and {1}') with random starting positions at each subinterval length.".format(names[compind1],names[compind2]))
-    sequenceOfReconstructions(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,0)
+    # print('#####################################################################')
+    # print("Convergence checks between original quantities and estimates (M{0} and M{0}', M{1} and M{1}', {0} and {0}', and {1} and {1}') with random starting positions at each subinterval length.".format(names[compind1],names[compind2]))
+    # sequenceOfReconstructions(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,0)
 
-    print('#####################################################################')
-    print("Convergence checks between original quantities and estimates (M{0} and M{0}', M{1} and M{1}', {0} and {0}', and {1} and {1}') with fixed starting positions for all subinterval lengths.".format(names[compind1],names[compind2]))
-    sequenceOfReconstructions(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,1)
+    # print('#####################################################################')
+    # print("Convergence checks between original quantities and estimates (M{0} and M{0}', M{1} and M{1}', {0} and {0}', and {1} and {1}') with fixed starting positions for all subinterval lengths.".format(names[compind1],names[compind2]))
+    # sequenceOfReconstructions(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,1)
 
-    print('#####################################################################')
-    print('Convergence checks between M{0} and M{1} directly.'.format(names[compind1],names[compind2]))
-    sequenceOfDiffeomorphismChecks(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,listofskips)
-
-
+    # print('#####################################################################')
+    # print('Convergence checks between M{0} and M{1} directly.'.format(names[compind1],names[compind2]))
+    # sequenceOfDiffeomorphismChecks(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,listofskips)
 
 
 
@@ -206,33 +206,35 @@ if __name__=='__main__':
 
 
 
-    # # average over the different estimates of a point in time
-    # est1,est2=CCMAlternatives.crossMapModified2(M1,M2,Weights.makeExpWeights)
-    # M1us2=SSR.makeShadowManifold(est1,numlags,lagsize)
-    # M2us2=SSR.makeShadowManifold(est2,numlags,lagsize)
-    # M1us2RMSE, M2us2RMSE = calcErrs(M1us2,M2us2,Similarity.RootMeanSquaredError)
-    # M1us2HD, M2us2HD = calcErrs(M1us2,M2us2,Similarity.HausdorffDistance)
-    # M1us2CM, M2us2CM = calcErrs(M1us2,M2us2,Similarity.countingMeasure)
-    # print("Our method 2, average the different time series estimations:")
-    # printMe("RMSE",M1us2RMSE,M2us2RMSE)
-    # printMe("Hausdorff dist",M1us2HD,M2us2HD)
-    # printMe("Counting measure",M1us2CM,M2us2CM)
-    # # take a different projection than Sugihara
-    # proj = numlags - 1 
-    # est1,est2=CCMAlternatives.crossMapModified3(M1,M2,proj,Weights.makeExpWeights)
-    # M1us3=SSR.makeShadowManifold(est1,numlags,lagsize)
-    # M2us3=SSR.makeShadowManifold(est2,numlags,lagsize)
-    # M1us3RMSE, M2us3RMSE = calcErrs(M1us3,M2us3,Similarity.RootMeanSquaredError,M1[corr-proj:-proj,:],M2[corr-proj:-proj,:])
-    # M1us3HD, M2us3HD = calcErrs(M1us3,M2us3,Similarity.HausdorffDistance,M1[corr-proj:-proj,:],M2[corr-proj:-proj,:])
-    # M1us3CM, M2us3CM = calcErrs(M1us3,M2us3,Similarity.countingMeasure,M1[corr-proj:-proj,:],M2[corr-proj:-proj,:])
-    # print("Our method 3, take a different projection (index "+ str(proj) +"):")
-    # printMe("RMSE",M1us3RMSE,M2us3RMSE)
-    # printMe("Hausdorff dist",M1us3HD,M2us3HD)
-    # printMe("Counting measure",M1us3CM,M2us3CM)
 
-    # # plot the shadow manifolds and their estimates
-    # SSRPlots.plotEstShadowManifoldSugihara(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize)     
-    # SSRPlots.plotEstShadowManifoldUs1(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize)        
-    # SSRPlots.plotEstShadowManifoldUs2(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize)        
-    # SSRPlots.plotEstShadowManifoldUs3(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize,proj)        
+
+    # # # average over the different estimates of a point in time
+    # # est1,est2=CCMAlternatives.crossMapModified2(M1,M2,Weights.makeExpWeights)
+    # # M1us2=SSR.makeShadowManifold(est1,numlags,lagsize)
+    # # M2us2=SSR.makeShadowManifold(est2,numlags,lagsize)
+    # # M1us2RMSE, M2us2RMSE = calcErrs(M1us2,M2us2,Similarity.RootMeanSquaredError)
+    # # M1us2HD, M2us2HD = calcErrs(M1us2,M2us2,Similarity.HausdorffDistance)
+    # # M1us2CM, M2us2CM = calcErrs(M1us2,M2us2,Similarity.countingMeasure)
+    # # print("Our method 2, average the different time series estimations:")
+    # # printMe("RMSE",M1us2RMSE,M2us2RMSE)
+    # # printMe("Hausdorff dist",M1us2HD,M2us2HD)
+    # # printMe("Counting measure",M1us2CM,M2us2CM)
+    # # # take a different projection than Sugihara
+    # # proj = numlags - 1 
+    # # est1,est2=CCMAlternatives.crossMapModified3(M1,M2,proj,Weights.makeExpWeights)
+    # # M1us3=SSR.makeShadowManifold(est1,numlags,lagsize)
+    # # M2us3=SSR.makeShadowManifold(est2,numlags,lagsize)
+    # # M1us3RMSE, M2us3RMSE = calcErrs(M1us3,M2us3,Similarity.RootMeanSquaredError,M1[corr-proj:-proj,:],M2[corr-proj:-proj,:])
+    # # M1us3HD, M2us3HD = calcErrs(M1us3,M2us3,Similarity.HausdorffDistance,M1[corr-proj:-proj,:],M2[corr-proj:-proj,:])
+    # # M1us3CM, M2us3CM = calcErrs(M1us3,M2us3,Similarity.countingMeasure,M1[corr-proj:-proj,:],M2[corr-proj:-proj,:])
+    # # print("Our method 3, take a different projection (index "+ str(proj) +"):")
+    # # printMe("RMSE",M1us3RMSE,M2us3RMSE)
+    # # printMe("Hausdorff dist",M1us3HD,M2us3HD)
+    # # printMe("Counting measure",M1us3CM,M2us3CM)
+
+    # # # plot the shadow manifolds and their estimates
+    # # SSRPlots.plotEstShadowManifoldSugihara(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize)     
+    # # SSRPlots.plotEstShadowManifoldUs1(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize)        
+    # # SSRPlots.plotEstShadowManifoldUs2(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize)        
+    # # SSRPlots.plotEstShadowManifoldUs3(timeseries[:endind,compind1],timeseries[:endind,compind2],numlags,lagsize,proj)        
 

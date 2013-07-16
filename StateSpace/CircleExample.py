@@ -174,6 +174,8 @@ if __name__ == '__main__':
     dt = 0.1
     finaltime = 1200.0
     timeseries = DoublePendulum.solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt)
-    lagsize,numlags=getLagDim(timeseries,cols=[0,3],dims=15)
+    startind = int(50/dt)#2000 #how much to cut off the front
+    timeseries = timeseries[startind:,:]
+    lagsize,numlags=getLagDim(timeseries,cols=[0,3],dims=12)
     print(lagsize)
     print(numlags)
