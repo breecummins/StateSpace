@@ -58,17 +58,20 @@ def findNearestNeighbor(poi,pts,norm=None):
     return i, dists[i]
 
 def CaoNeighborRatio(ts,lagsize,dims=4,norm=Linf):
-    # first make all the reconstructions and shift them so that the 
+    # add extra dims that will get absorbed during the process
+    # of making ratios
+    dims = dims + 3
+    # make all the reconstructions and shift them so that the 
     # indices always refer to the same point
     manifolds = []
-    shifts = [(d-1)*lagsize for d in range(1,dims+1)]
+    shifts = [(d-1)*lagsize for d in range(1,dims)]
     corrections = [shifts[-1] - s for s in shifts]
-    for d in range(1,dims+1):
+    for d in range(1,dims):
         m = SSR.makeShadowManifold(ts,d,lagsize)
         manifolds.append(m[corrections[d-1]:,:])
     # now find nearest neighbors and calculate Cao ratio
     E = []
-    for d in range(dims-1):
+    for d in range(len(manifolds)-1):
         m = manifolds[d]
         m1 = manifolds[d+1]
         rats = []
@@ -77,7 +80,32 @@ def CaoNeighborRatio(ts,lagsize,dims=4,norm=Linf):
             dist1 = norm(m1[k,:],m1[nk,:])
             rats.append(dist1/distknk)
         E.append(np.mean(rats))
-    print([E[k+1] / E[k] for k in range(dims-2)])
+    return [E[k+1] / E[k] for k in range(len(E)-1)]
+
+def getLagDim(arr,cols=None,dims=10):
+    '''
+    Employs an arbitrary threshold to choose the embedding dim.
+
+    '''
+    thresh = 0.97
+    if cols == None:
+        cols = range(arr.shape[1])
+    lg = []
+    rats = []
+    for c in cols:
+        ts = np.squeeze(arr[:,c])
+        lg.append(lagFromFirstZeroAutocorrelation(ts))
+        rats.append(CaoNeighborRatio(np.squeeze(timeseries[:,c]),lg[-1],dims=dims))
+    if len(lg)> 1:
+        diffs = [abs(lg[k] - lg[j]) for k in range(len(lg)) for j in range(k+1,len(lg))]
+        if max(diffs) > 2:
+            print('Discrepancy in lagsizes: {0}'.format(lg))
+    inds = [min([i+1 for i in range(len(rat)) if rat[i] > thresh]) for rat in rats]
+    numlags = max(inds)
+    lagsize = lg[inds.index(numlags)]
+    print(lg)
+    print(inds)
+    return lagsize, numlags
 
 if __name__ == '__main__':
     # print('Circle examples - perfect and noisy')
@@ -127,19 +155,27 @@ if __name__ == '__main__':
     # CaoNeighborRatio(ts1,lagsize1,dims=10,norm=Linf)
     # CaoNeighborRatio(ts2,lagsize2,dims=10,norm=Linf)
 
-    import LorenzEqns
-    print('Lorenz attractor')
-    dt = 0.01
-    finaltime = 80.0
-    timeseries = LorenzEqns.solveLorenz([1.0,0.5,0.5],finaltime,dt)
-    ts = np.squeeze(timeseries[:,0])
-    lagsize = int(0.08/dt) #because lagsize=8 is good with dt = 0.01
-    print('eyeball lagsize = {0}'.format(lagsize))
-    print('Cao neighbor method for embedding dimension')
-    CaoNeighborRatio(ts,lagsize,dims=10,norm=Linf)
-    M=2000
-    lagsize1 = lagFromFirstZeroAutocorrelation(ts,M)
-    print('autocorr lagsize = {0}'.format(lagsize1))
-    print('Cao neighbor method for embedding dimension, Lorenz attractor')
-    CaoNeighborRatio(ts,lagsize1,dims=10,norm=Linf)
+    # import LorenzEqns
+    # print('Lorenz attractor')
+    # dt = 0.01
+    # finaltime = 80.0
+    # timeseries = LorenzEqns.solveLorenz([1.0,0.5,0.5],finaltime,dt)
+    # ts = np.squeeze(timeseries[:,1])
+    # lagsize = int(0.08/dt) #because lagsize=8 is good with dt = 0.01
+    # print('eyeball lagsize = {0}'.format(lagsize))
+    # print('Cao neighbor method for embedding dimension')
+    # CaoNeighborRatio(ts,lagsize,dims=10,norm=Linf)
+    # M=2000
+    # lagsize1 = lagFromFirstZeroAutocorrelation(ts,M)
+    # print('autocorr lagsize = {0}'.format(lagsize1))
+    # print('Cao neighbor method for embedding dimension, Lorenz attractor')
+    # CaoNeighborRatio(ts,lagsize1,dims=10,norm=Linf)
 
+    import DoublePendulum
+    print('Double pendulum attractor')
+    dt = 0.1
+    finaltime = 1200.0
+    timeseries = DoublePendulum.solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt)
+    lagsize,numlags=getLagDim(timeseries,cols=[0,3],dims=15)
+    print(lagsize)
+    print(numlags)
