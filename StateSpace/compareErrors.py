@@ -158,46 +158,46 @@ if __name__=='__main__':
     compind2 = 3
 
     # # get the lagsize and number of lags to construct the shadow manifold
-    lagsize,numlags = getLagDim(timeseries,cols=[compind1,compind2],dims=12)
-    # lagsize = #did getLagDim before running full script
-    # numlags = 
-    print('lagsize = {0}, numlags = {1}'.format(lagsize,numlags))
+    # lagsize,numlags = getLagDim(timeseries,cols=[compind1,compind2],dims=12)
+    # print('lagsize = {0}, numlags = {1}'.format(lagsize,numlags))
+    # sys.stdout.flush() #Forces immediate print to screen. Useful if dumping long analysis to text file.
+    lagsize = 5 #need to try 11 also, did getLagDim before running full script
+    numlags = 28
+
+    # subsample time series according to lagsize
+    # this will analyze the subsequence of multiples of lagsize*dt in the time series
+    ts = ts[::lagsize,:]
+    newlagsize = 1
+
+    # parameters for a sequence of measurements of manifolds of lengths in listoflens with numiters different starting locations (only needed for sequenceOfReconstructions)
+    listoflens = range(200,1300,200)
+    listofskips = [2**n for n in range(4,-1,-1)]
+    numiters = 10
+    allstartinds = []
+    for l in listoflens:
+        allstartinds.append(random.sample(range(ts.shape[0]-l),numiters))
+
+    # print info about the analysis to be done.
+    print('{0} with lagsize of {1}*dt with dt = {2} and reconstruction dimension {3} using only times located at multiples of lagsize*dt.'.format(eqns,lagsize,dt,numlags))
+    print('If looking at a sequence of measurements, the lengths range from {0} to {1} and the number of iterations per length is {2}.'.format(listoflens[0],listoflens[-1],numiters))
     sys.stdout.flush() #Forces immediate print to screen. Useful if dumping long analysis to text file.
 
-    # # subsample time series according to lagsize
-    # # this will analyze the subsequence of multiples of lagsize*dt in the time series
-    # ts = ts[::lagsize,:]
-    # newlagsize = 1
+    # run the analysis
+    print('#####################################################################')
+    print("Whole manifold checks between M{0} and M{0}' and M{1} and M{1}'.".format(names[compind1],names[compind2]))
+    wholeManifoldComparison(names,numlags,newlagsize,ts,compind1,compind2)
 
-    # # parameters for a sequence of measurements of manifolds of lengths in listoflens with numiters different starting locations (only needed for sequenceOfReconstructions)
-    # listoflens = range(200,1300,200)
-    # listofskips = [2**n for n in range(4,-1,-1)]
-    # numiters = 10
-    # allstartinds = []
-    # for l in listoflens:
-    #     allstartinds.append(random.sample(range(ts.shape[0]-l),numiters))
+    print('#####################################################################')
+    print("Convergence checks between original quantities and estimates (M{0} and M{0}', M{1} and M{1}', {0} and {0}', and {1} and {1}') with random starting positions at each subinterval length.".format(names[compind1],names[compind2]))
+    sequenceOfReconstructions(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,0)
 
-    # # print info about the analysis to be done.
-    # print('{0} with lagsize of {1}*dt with dt = {2} and reconstruction dimension {3} using only times located at multiples of lagsize*dt.'.format(eqns,lagsize,dt,numlags))
-    # print('If looking at a sequence of measurements, the lengths range from {0} to {1} and the number of iterations per length is {2}.'.format(listoflens[0],listoflens[-1],numiters))
-    # sys.stdout.flush() #Forces immediate print to screen. Useful if dumping long analysis to text file.
+    print('#####################################################################')
+    print("Convergence checks between original quantities and estimates (M{0} and M{0}', M{1} and M{1}', {0} and {0}', and {1} and {1}') with fixed starting positions for all subinterval lengths.".format(names[compind1],names[compind2]))
+    sequenceOfReconstructions(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,1)
 
-    # # run the analysis
-    # print('#####################################################################')
-    # print("Whole manifold checks between M{0} and M{0}' and M{1} and M{1}'.".format(names[compind1],names[compind2]))
-    # wholeManifoldComparison(names,numlags,newlagsize,ts,compind1,compind2)
-
-    # print('#####################################################################')
-    # print("Convergence checks between original quantities and estimates (M{0} and M{0}', M{1} and M{1}', {0} and {0}', and {1} and {1}') with random starting positions at each subinterval length.".format(names[compind1],names[compind2]))
-    # sequenceOfReconstructions(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,0)
-
-    # print('#####################################################################')
-    # print("Convergence checks between original quantities and estimates (M{0} and M{0}', M{1} and M{1}', {0} and {0}', and {1} and {1}') with fixed starting positions for all subinterval lengths.".format(names[compind1],names[compind2]))
-    # sequenceOfReconstructions(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,1)
-
-    # print('#####################################################################')
-    # print('Convergence checks between M{0} and M{1} directly.'.format(names[compind1],names[compind2]))
-    # sequenceOfDiffeomorphismChecks(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,listofskips)
+    print('#####################################################################')
+    print('Convergence checks between M{0} and M{1} directly.'.format(names[compind1],names[compind2]))
+    sequenceOfDiffeomorphismChecks(names,numlags,newlagsize,ts,compind1,compind2,listoflens,numiters,allstartinds,listofskips)
 
 
 
