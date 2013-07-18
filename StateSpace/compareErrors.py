@@ -166,7 +166,7 @@ if __name__=='__main__':
 
     # subsample time series according to lagsize
     # this will analyze the subsequence of multiples of lagsize*dt in the time series
-    ts = ts[::lagsize,:]
+    ts = timeseries[::lagsize,:]
     newlagsize = 1
 
     # parameters for a sequence of measurements of manifolds of lengths in listoflens with numiters different starting locations (only needed for sequenceOfReconstructions)
