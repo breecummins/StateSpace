@@ -153,8 +153,8 @@ if __name__=='__main__':
     timeseries = timeseries[startind:,:]
     
     # comparison variables
-    # compind1 = 2
-    compind1 = 0
+    compind1 = 2
+    # compind1 = 0
     compind2 = 3
 
     # # get the lagsize and number of lags to construct the shadow manifold
