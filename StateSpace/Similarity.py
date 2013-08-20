@@ -65,8 +65,8 @@ def HausdorffDistance(M1,M2):
 
 def findClosestInclusive(poi,pts,N):
     '''
-    Find the closest N points in pts (numpy array) to poi, 
-    where poi is a member of pts.
+    Find the closest N points in pts (numpy array) to poi
+    but excluding poi, where poi is known to be a member of pts.
 
     '''
     dists = np.sqrt(((pts - poi)**2).sum(1))
@@ -82,7 +82,7 @@ def findClosestInclusive(poi,pts,N):
 def findClosestExclusive(poi,pts,N):
     '''
     Find the closest N points in pts (numpy array) to poi, 
-    where poi is not (known to be) a member of pts.
+    where poi is not a member of pts.
 
     '''
     dists = np.sqrt(((pts - poi)**2).sum(1))
