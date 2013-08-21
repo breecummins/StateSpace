@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.misc import comb
 import random
+import sys
 
 def getBinomialMax(n,p):
     '''
@@ -52,7 +53,8 @@ def findPtsWithinDelta(M,ind,delta):
     '''
     dists = np.sqrt(((M - M[ind,:])**2).sum(1))
     inds = list(np.nonzero(dists < delta)[0])
-    return inds.remove(ind)
+    inds.remove(ind)
+    return inds
 
 def countDeltaPtsMappedToEps(M1,M2,delta,eps,ind):
     '''
@@ -64,10 +66,10 @@ def countDeltaPtsMappedToEps(M1,M2,delta,eps,ind):
 
     '''
     deltainds = findPtsWithinDelta(M1,ind,delta)
-    if deltainds == None:
+    if len(deltainds) == 0:
         return None
     for k in deltainds:
-        if np.sqrt(((M2[k,:] - M2[ind,:])**2).sum(1)) >= eps:
+        if np.sqrt(((M2[k,:] - M2[ind,:])**2).sum()) >= eps:
             return False
     return len(deltainds)
 
@@ -87,7 +89,7 @@ def continuityTest(M1,M2,ptinds,eps,startdelta):
             out = False
             while out is False:
                 delta = delta*0.5
-                out = countDeltaPtsMappedToEps(M1,M2,delta,eps,ind)                
+                out = countDeltaPtsMappedToEps(M1,M2,delta,eps,ind) 
             if out: #out can be None, in which case we want to leave zero in contstat
                 contstat[k] = getContinuityConfidence(neps,out,M1.shape[0])
     return np.mean(contstat)
@@ -114,7 +116,7 @@ def convergenceWithContinuityTest(M1,M2,Nlist,mastereps=np.array([0.005,0.01,0.0
     epsilon values for the continuity test. The different epsilons 
     to try are calculated as proportions of the standard deviation 
     of the distances of points in M1 and M2 from their respective
-    mean values. 
+    mean values. These proportions are given in mastereps.
 
     '''
     epslist1 = chooseEpsilons(M2,mastereps) # M2 is range in forward continuity 
