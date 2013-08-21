@@ -161,8 +161,15 @@ if __name__=='__main__':
     # lagsize,numlags = getLagDim(timeseries,cols=[compind1,compind2],dims=12)
     # print('lagsize = {0}, numlags = {1}'.format(lagsize,numlags))
     # sys.stdout.flush() #Forces immediate print to screen. Useful if dumping long analysis to text file.
-    lagsize = 5 #need to try 11 also, did getLagDim before running full script
-    numlags = 28
+
+    # ######################################
+    # # FIXME: I think these are backwards
+    # lagsize = 5 #need to try 11 also, did getLagDim before running full script
+    # numlags = 28
+    # ######################################
+
+    lagsize = 28 
+    numlags = 5 #need to try 11 also, did getLagDim before running full script
 
     # subsample time series according to lagsize
     # this will analyze the subsequence of multiples of lagsize*dt in the time series

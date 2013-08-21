@@ -6,14 +6,15 @@ import StateSpaceReconstruction as SSR
 def lagFromFirstZeroAutocorrelation(ts,M=None):
     '''
     Calculate autocorrelation of a 1D timeseries and 
-    return the first zero crossing.
+    return the first zero crossing. Check all lags from
+    1 to M+1. Default is M = len(ts)/10. 
 
     '''
     mu = np.mean(ts)
     s2 = np.var(ts,ddof=1) #unbiased estimator of variance
     N = len(ts)
     if M == None:
-        M = int(np.floor(N/10.))
+        M = int(N/10.)
     autocc = []
     for k in range(1,M+1):
         autocc.append( ((ts[:N-k] - mu)*(ts[k:] - mu)).sum() / ( s2 *(N-k) ) )
@@ -24,21 +25,18 @@ def findFirstZero(arr):
     arr must be a list or 1D numpy array
 
     '''
-    arr = np.array(arr)
-    up = np.nonzero(arr >= 0)[0]
-    down = np.nonzero(arr < 0)[0]
-    for i in up:
-        if i+1 in down:
-            if np.abs(arr[i]) >= np.abs(arr[i+1]):
-                return i+1
-            else:
-                return i
-        if i-1 in down:
-            if np.abs(arr[i]) >= np.abs(arr[i-1]):
-                return i-1
-            else:
-                return i
-    return None
+    signs = np.sign(arr[1:]) + np.sign(arr[:-1])
+    ind = np.argmax(np.abs(signs) < 2)
+    if ind == 0 and np.abs(signs[0]) == 2: 
+        # False positive: if there is no zero crossing, argmax will return 
+        # the first index, so I have to manually return None.
+        return None 
+    elif np.abs(arr[ind]) < np.abs(arr[ind+1]):
+        # return whichever of the two indices flanking zero has the smallest value
+        return ind
+    else:
+        return ind+1
+
 
 def Ln(poi,pts,n=None):
     '''

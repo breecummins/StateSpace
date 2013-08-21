@@ -41,6 +41,39 @@ def makeShadowManifold(timeseries, numlags, lagsize, smooth=1):
     else:
         return makeShadowManifoldSkip(timeseries, numlags, lagsize)
 
+def findFirstZero(arr):
+    '''
+    arr must be a list or 1D numpy array
+
+    '''
+    signs = np.sign(arr[1:]) + np.sign(arr[:-1])
+    ind = np.argmax(np.abs(signs) < 2)
+    if ind == 0 and np.abs(signs[0]) == 2: 
+        # False positive: if there is no zero crossing, argmax will return 
+        # the first index, so I have to manually check that signs[0] < 2.
+        return None 
+    elif np.abs(arr[ind]) < np.abs(arr[ind+1]):
+        # return whichever of the two indices flanking zero has the smallest value
+        return ind
+    else:
+        return ind+1
+
+def lagsizeFromFirstZeroOfAutocorrelation(ts,T=None):
+    '''
+    Calculate autocorrelation of a 1D timeseries and 
+    return the first zero crossing. Check all lags from
+    1 to T. Default is T = len(ts)/10. 
+
+    '''
+    N = len(ts)
+    if T == None:
+        T = int(N/10.)
+    mu = np.mean(ts)
+    s2 = np.var(ts,ddof=1) #unbiased estimator of variance
+    autocc = []
+    for k in range(1,T+1):
+        autocc.append( ((ts[:N-k] - mu)*(ts[k:] - mu)).sum() / ( s2 *(N-k) ) )
+    return findFirstZero(autocc)
 
 
 
