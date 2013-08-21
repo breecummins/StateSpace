@@ -21,22 +21,22 @@ def doublependulumTS(finaltime=2400.0,dt=0.025):
     names = ['x','y','z','w']
     return eqns,names,timeseries
 
-def plotOutput(contconf,invcontconf,Nlist,title,mastereps):
+def plotOutput(contconf,invcontconf,Mlens,title,mastereps):
     plt.figure(0)
     plt.plot(mastereps,contconf.transpose())
-    plt.legend([str(N) for N in Nlist])
-    plt.ylabel(r'\theta (C^0)')
-    plt.xlabel(r'\epsilon')
+    plt.legend([str(m) for m in Mlens],loc=0)
+    plt.ylabel(r'$\theta_{C^0}$')
+    plt.xlabel(r'$\epsilon$')
     plt.title(title+' forward')
     plt.figure(1)
     plt.plot(mastereps,invcontconf.transpose())
-    plt.legend([str(N) for N in Nlist])
-    plt.ylabel(r'\theta (I^0)')
-    plt.xlabel(r'\epsilon')
+    plt.legend([str(m) for m in Mlens],loc=0)
+    plt.ylabel(r'$\theta_{I^0}$')
+    plt.xlabel(r'$\epsilon$')
     plt.title(title+' inverse')
     plt.show()
 
-def testLorenz(Nlistmaster,mastereps):
+def testLorenz(masterts,mastereps):
     eqns,names,ts = lorenzTS()
     compind1=0
     compind2=1
@@ -46,12 +46,12 @@ def testLorenz(Nlistmaster,mastereps):
     # print(lagsize)
     Mx = SSR.makeShadowManifold(ts[:,compind1], numlags, lagsize)
     My = SSR.makeShadowManifold(ts[:,compind2], numlags, lagsize)
-    Nlist = (Nlistmaster*len(ts)).astype(int)
-    contconf, invcontconf = PM.convergenceWithContinuityTest(Mx,My,Nlist,mastereps)
-    title = eqns + ' M{0} -> M{1}'.format(compind1,compind2)
-    plotOutput(contconf,invcontconf,Nlist,title,mastereps)
+    N = int(0.1*Mx.shape[0])
+    contconf, invcontconf = PM.convergenceWithContinuityTest(Mx,My,N,masterts,mastereps)
+    title = eqns + r', M{0} $\to$ M{1}'.format(names[compind1],names[compind2])
+    plotOutput(contconf,invcontconf,(masterts*len(ts)).astype(int),title,mastereps)
 
 if __name__ == '__main__':
-    Nlistmaster = np.arange(0.1,0.6,0.1)
+    masterts = np.arange(0.2,1.1,0.2)
     mastereps=np.array([0.005,0.01,0.02,0.05,0.1,0.2])
-    testLorenz(Nlistmaster,mastereps)
+    testLorenz(masterts,mastereps)

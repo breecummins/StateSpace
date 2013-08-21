@@ -106,28 +106,35 @@ def chooseEpsilons(M,mastereps):
     stdM = np.std(dists)
     return stdM*mastereps
 
-def convergenceWithContinuityTest(M1,M2,Nlist,mastereps=np.array([0.005,0.01,0.02,0.05,0.1,0.2])):
+def convergenceWithContinuityTest(M1,M2,N,masterts=np.arange(0.2,1.1,0.2),mastereps=np.array([0.005,0.01,0.02,0.05,0.1,0.2])):
     '''
     Do Pecora method (continuity and inverse continuity) on the 
     reconstructions M1 and M2, which are mxn numpy arrays of m 
     points in n dimensions. 
-    Method is performed on different numbers of random points given
-    in Nlist. We are checking for convergence patterns in N and in
-    epsilon values for the continuity test. The different epsilons 
-    to try are calculated as proportions of the standard deviation 
-    of the distances of points in M1 and M2 from their respective
-    mean values. These proportions are given in mastereps.
+    The method is performed on N random points for increasing length
+    reconstructions. The proportional lengths of the full reconstructions
+    to be used are in masterts.
+    The method is also performed for varying continuity parameter epsilon,
+    since a priori an appropriate epsilon is unknown. The proportions in
+    mastereps are multiplied by the standard deviation of the distances of 
+    points in M1 and M2 from their respective mean values to give the 
+    epsilon parameters that will be tested. 
+
+    We are checking for convergence patterns in masterts and in mastereps
+    to establish a confidence level for continuity and inverse continuity
+    between M1 and M2. 
 
     '''
     epslist1 = chooseEpsilons(M2,mastereps) # M2 is range in forward continuity 
     epslist2 = chooseEpsilons(M1,mastereps) # M1 is range in inverse continuity
-    contconf = np.zeros((len(Nlist),len(epslist1)))
-    invcontconf = np.zeros((len(Nlist),len(epslist2)))
-    for j,N in enumerate(Nlist):
-        ptinds = random.sample(range(M1.shape[0]),N)
+    Mlens = (masterts*M1.shape[0]).astype(int)
+    contconf = np.zeros((len(Mlens),len(epslist1)))
+    invcontconf = np.zeros((len(Mlens),len(epslist2)))
+    for j,L in enumerate(Mlens):
+        ptinds = random.sample(range(L),N) # different points for each different reconstruction len
         for k in range(len(epslist1)):
-            contconf[j,k] = continuityTest(M1,M2,ptinds,epslist1[k],epslist2[k])
-            invcontconf[j,k] = continuityTest(M2,M1,ptinds,epslist2[k],epslist1[k])
+            contconf[j,k] = continuityTest(M1[:L,:],M2[:L,:],ptinds,epslist1[k],epslist2[k])
+            invcontconf[j,k] = continuityTest(M2[:L,:],M1[:L,:],ptinds,epslist2[k],epslist1[k])
     return contconf, invcontconf
 
 
