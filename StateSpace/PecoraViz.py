@@ -78,4 +78,4 @@ if __name__ == '__main__':
     masterts = np.arange(0.2,1.1,0.2)
     mastereps=np.array([0.01,0.05,0.1,0.2])
     # testLorenz(masterts,mastereps)
-    testDoublePendulum(masterts,mastereps)
+    testDoublePendulum(masterts,mastereps,fname='/home/bcummins/DP600ptszw.pickle')

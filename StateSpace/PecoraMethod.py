@@ -34,46 +34,32 @@ def getContinuityConfidence(neps,ndelta,numpts):
     pmax = getBinomialMax(ndelta,p)
     return 1 - (p**ndelta)/pmax
 
-def countPtsWithinEps(M,ind,eps):
+def countPtsWithinEps(dists,eps):
     '''
-    M is an mxn numpy array with one n-dimensional point on each
-    row. Count the number of points within eps of M[ind,:]. Exclude 
-    the M[ind,:] point itself by subtracting 1 from the count.
+    Distances between the point of interest and the other points in
+    the reconstruction are cached in dists. Count the distances less than eps
+    and return it, subtracting 1 to remove the zero distance to the
+    point itself.
 
     '''
-    dists = np.sqrt(((M - M[ind,:])**2).sum(1))
     return (dists < eps).sum() - 1 
 
-def findPtsWithinDelta(M,ind,delta):
+def countDeltaPtsMappedToEps(M1,M2,delta,eps,ind,dists1):
     '''
-    M is an mxn numpy array with one n-dimensional point on each
-    row. Find the indices of the points within delta of M[ind,:]. 
-    Exclude ind from the returned indices.
+    Find all points within delta of M1[ind,:] using cached distances, 
+    then check to see if their images fall within eps of M2[ind,:]. If 
+    they all do, we have a success and return the number of points 
+    within delta less the point itself. If we fail, then return False 
+    (delta is too big). 
 
     '''
-    dists = np.sqrt(((M - M[ind,:])**2).sum(1))
-    inds = list(np.nonzero(dists < delta)[0])
-    inds.remove(ind)
-    return inds
+    deltainds = np.nonzero(dists1 < delta)[0]
+    if np.any( np.sqrt(((M2[deltainds,:] - M2[ind,:])**2).sum(axis=1)) >= eps ):
+        return False
+    else:
+        return len(deltainds)-1
 
-def countDeltaPtsMappedToEps(M1,M2,delta,eps,ind):
-    '''
-    Find all points within delta of M1[ind,:], then check to see
-    if their images fall within eps of M2[ind,:]. If they all do,
-    we have a success and return the number of points within delta.
-    If we fail, then return False (delta is too big). If there are 
-    no points within delta, then return None (delta is too small).
-
-    '''
-    deltainds = findPtsWithinDelta(M1,ind,delta)
-    if len(deltainds) == 0:
-        return None
-    for k in deltainds:
-        if np.sqrt(((M2[k,:] - M2[ind,:])**2).sum()) >= eps:
-            return False
-    return len(deltainds)
-
-def continuityTest(M1,M2,ptinds,eps,startdelta):
+def continuityTest(M1,M2,ptinds,eps,startdelta,dists1,dists2):
     '''
     Do Pecora continuity test on the reconstructions M1 and M2 using 
     the points with indices ptinds and continuity parameter eps. 
@@ -83,17 +69,25 @@ def continuityTest(M1,M2,ptinds,eps,startdelta):
     '''
     contstat = np.zeros(len(ptinds))
     for k,ind in enumerate(ptinds):
-        neps = countPtsWithinEps(M2,ind,eps)
+        neps = countPtsWithinEps(dists2[k],eps)
         if neps > 0: # if eps big enough, continue; else leave 0 in place
             delta = 2*startdelta
             out = False
             while out is False:
                 delta = delta*0.5
-                out = countDeltaPtsMappedToEps(M1,M2,delta,eps,ind) 
-            if out: #out can be None, in which case we want to leave zero in contstat
+                out = countDeltaPtsMappedToEps(M1,M2,delta,eps,ind,dists1[k]) 
+            if out: #out can be 0, in which case we want to report 0 confidence
                 contstat[k] = getContinuityConfidence(neps,out,M1.shape[0])
     return np.mean(contstat)
 
+def cacheDistances(M1,M2,ptinds):
+    dists1 = []
+    dists2 = []
+    for ind in ptinds:
+        dists1.append(np.sqrt(((M1 - M1[ind,:])**2).sum(axis=1)))
+        dists2.append(np.sqrt(((M2 - M2[ind,:])**2).sum(axis=1)))
+    return dists1,dists2
+ 
 def chooseEpsilons(M,mastereps):
     '''
     Estimate the standard deviation of the manifold M (sensu Pecora)
@@ -137,10 +131,11 @@ def convergenceWithContinuityTest(M1,M2,N,masterts=np.arange(0.2,1.1,0.2),master
         ptinds = random.sample(range(L),N) # different points for each different reconstruction len
         M1L = M1[:L,:]
         M2L = M2[:L,:]
+        dists1,dists2 = cacheDistances(M1L,M2L,ptinds)
         for k,eps1 in enumerate(epslist1):
             print('{0} of {1} epsilons'.format(k+1,len(epslist1)))
-            forwardconf[j,k] = continuityTest(M1L,M2L,ptinds,eps1,epslist2[k])
-            inverseconf[j,k] = continuityTest(M2L,M1L,ptinds,epslist2[k],eps1)
+            forwardconf[j,k] = continuityTest(M1L,M2L,ptinds,eps1,epslist2[k],dists1,dists2)
+            inverseconf[j,k] = continuityTest(M2L,M1L,ptinds,epslist2[k],eps1,dists2,dists1)
     return forwardconf, inverseconf
 
 
