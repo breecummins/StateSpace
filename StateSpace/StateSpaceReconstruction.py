@@ -64,6 +64,9 @@ def lagsizeFromFirstZeroOfAutocorrelation(ts,T=None):
     return the first zero crossing. Check all lags from
     1 to T. Default is T = len(ts)/10. 
 
+    Note: This method doesn't seem to work very well for 
+    the Lorenz equations.
+
     '''
     N = len(ts)
     if T == None:

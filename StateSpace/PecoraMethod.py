@@ -128,13 +128,19 @@ def convergenceWithContinuityTest(M1,M2,N,masterts=np.arange(0.2,1.1,0.2),master
     epslist1 = chooseEpsilons(M2,mastereps) # M2 is range in forward continuity 
     epslist2 = chooseEpsilons(M1,mastereps) # M1 is range in inverse continuity
     Mlens = (masterts*M1.shape[0]).astype(int)
-    contconf = np.zeros((len(Mlens),len(epslist1)))
-    invcontconf = np.zeros((len(Mlens),len(epslist2)))
+    forwardconf = np.zeros((len(Mlens),len(epslist1)))
+    inverseconf = np.zeros((len(Mlens),len(epslist2)))
     for j,L in enumerate(Mlens):
+        print('-----------------------')
+        print('{0} of {1} lengths'.format(j+1,len(Mlens)))
+        print('-----------------------')
         ptinds = random.sample(range(L),N) # different points for each different reconstruction len
-        for k in range(len(epslist1)):
-            contconf[j,k] = continuityTest(M1[:L,:],M2[:L,:],ptinds,epslist1[k],epslist2[k])
-            invcontconf[j,k] = continuityTest(M2[:L,:],M1[:L,:],ptinds,epslist2[k],epslist1[k])
-    return contconf, invcontconf
+        M1L = M1[:L,:]
+        M2L = M2[:L,:]
+        for k,eps1 in enumerate(epslist1):
+            print('{0} of {1} epsilons'.format(k+1,len(epslist1)))
+            forwardconf[j,k] = continuityTest(M1L,M2L,ptinds,eps1,epslist2[k])
+            inverseconf[j,k] = continuityTest(M2L,M1L,ptinds,epslist2[k],eps1)
+    return forwardconf, inverseconf
 
 
