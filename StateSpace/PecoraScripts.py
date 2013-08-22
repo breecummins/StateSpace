@@ -33,7 +33,7 @@ def testLorenz(masterts,mastereps,fname=''):
     inversetitle = eqns + r', M{1} $\to$ M{0}'.format(names[compind1],names[compind2])
     outdict = dict([(x,locals()[x]) for x in ['forwardconf','inverseconf','forwardtitle','inversetitle','N','numlags','lagsize','ts','masterts','mastereps']])
     if fname:
-        fileops.dumpPickle(outdict)
+        fileops.dumpPickle(outdict,fname)
     else:
         return outdict
 
@@ -53,7 +53,7 @@ def testDoublePendulum(masterts,mastereps,fname=''):
     inversetitle = eqns + r', M{1} $\to$ M{0}'.format(names[compind1],names[compind2])
     outdict = dict([(x,locals()[x]) for x in ['forwardconf','inverseconf','forwardtitle','inversetitle','N','numlags','lagsize','ts','masterts','mastereps']])
     if fname:
-        fileops.dumpPickle(outdict)
+        fileops.dumpPickle(outdict,fname)
     else:
         return outdict
 
