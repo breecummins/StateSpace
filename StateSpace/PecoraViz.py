@@ -22,8 +22,8 @@ def plotOutput(forwardconf,inverseconf,mastereps,masterts,tslength,forwardtitle,
 
 if __name__ == '__main__':
     import PecoraScripts as PS
-    masterts = np.arange(0.2,0.7,0.2)
+    masterts = np.arange(0.2,1.1,0.2)
     mastereps=np.array([0.01,0.05,0.1,0.2])
-    outdict = PS.testLorenz(masterts,mastereps)
-    # outdict = PS.testDoublePendulum(masterts,mastereps)
+    # outdict = PS.testLorenz(masterts,mastereps)
+    outdict = PS.testDoublePendulum(masterts,mastereps)
     plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['mastereps'],outdict['masterts'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'])

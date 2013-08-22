@@ -44,22 +44,22 @@ def countPtsWithinEps(dists,eps):
     '''
     return (dists < eps).sum() - 1 
 
-def countDeltaPtsMappedToEps(M1,M2,delta,eps,ind,dists1):
+def countDeltaPtsMappedToEps(dists1,dists2,delta,eps):
     '''
     Find all points within delta of M1[ind,:] using cached distances, 
-    then check to see if their images fall within eps of M2[ind,:]. If 
-    they all do, we have a success and return the number of points 
-    within delta less the point itself. If we fail, then return False 
-    (delta is too big). 
+    then check to see if their images fall within eps of M2[ind,:], also
+    using cached distances. If all delta pts fall within eps, we have a
+    success and return the number of points within delta less the point 
+    itself. If we fail, then return False (delta is too big). 
 
     '''
     deltainds = np.nonzero(dists1 < delta)[0]
-    if np.any( np.sqrt(((M2[deltainds,:] - M2[ind,:])**2).sum(axis=1)) >= eps ):
-        return False
-    else:
-        return len(deltainds)-1
+    for ind in deltainds:
+        if dists2[ind] >= eps:
+            return False
+    return len(deltainds)-1
 
-def continuityTest(M1,M2,ptinds,eps,startdelta,dists1,dists2):
+def continuityTest(dists1,dists2,ptinds,eps,startdelta):
     '''
     Do Pecora continuity test on the reconstructions M1 and M2 using 
     the points with indices ptinds and continuity parameter eps. 
@@ -68,16 +68,16 @@ def continuityTest(M1,M2,ptinds,eps,startdelta,dists1,dists2):
 
     '''
     contstat = np.zeros(len(ptinds))
-    for k,ind in enumerate(ptinds):
+    for k in range(len(ptinds)):
         neps = countPtsWithinEps(dists2[k],eps)
         if neps > 0: # if eps big enough, continue; else leave 0 in place
             delta = 2*startdelta
             out = False
             while out is False:
                 delta = delta*0.5
-                out = countDeltaPtsMappedToEps(M1,M2,delta,eps,ind,dists1[k]) 
+                out = countDeltaPtsMappedToEps(dists1[k],dists2[k],delta,eps) 
             if out: #out can be 0, in which case we want to report 0 confidence
-                contstat[k] = getContinuityConfidence(neps,out,M1.shape[0])
+                contstat[k] = getContinuityConfidence(neps,out,len(dists1[k]))
     return np.mean(contstat)
 
 def cacheDistances(M1,M2,ptinds):
@@ -119,9 +119,9 @@ def convergenceWithContinuityTest(M1,M2,N,masterts=np.arange(0.2,1.1,0.2),master
     between M1 and M2. 
 
     '''
+    Mlens = (masterts*M1.shape[0]).astype(int)
     epslist1 = chooseEpsilons(M2,mastereps) # M2 is range in forward continuity 
     epslist2 = chooseEpsilons(M1,mastereps) # M1 is range in inverse continuity
-    Mlens = (masterts*M1.shape[0]).astype(int)
     forwardconf = np.zeros((len(Mlens),len(epslist1)))
     inverseconf = np.zeros((len(Mlens),len(epslist2)))
     for j,L in enumerate(Mlens):
@@ -129,13 +129,11 @@ def convergenceWithContinuityTest(M1,M2,N,masterts=np.arange(0.2,1.1,0.2),master
         print('{0} of {1} lengths'.format(j+1,len(Mlens)))
         print('-----------------------')
         ptinds = random.sample(range(L),N) # different points for each different reconstruction len
-        M1L = M1[:L,:]
-        M2L = M2[:L,:]
-        dists1,dists2 = cacheDistances(M1L,M2L,ptinds)
+        dists1,dists2 = cacheDistances(M1[:L,:],M2[:L,:],ptinds)
         for k,eps1 in enumerate(epslist1):
             print('{0} of {1} epsilons'.format(k+1,len(epslist1)))
-            forwardconf[j,k] = continuityTest(M1L,M2L,ptinds,eps1,epslist2[k],dists1,dists2)
-            inverseconf[j,k] = continuityTest(M2L,M1L,ptinds,epslist2[k],eps1,dists2,dists1)
+            forwardconf[j,k] = continuityTest(dists1,dists2,ptinds,eps1,epslist2[k])
+            inverseconf[j,k] = continuityTest(dists2,dists1,ptinds,epslist2[k],eps1)
     return forwardconf, inverseconf
 
 
