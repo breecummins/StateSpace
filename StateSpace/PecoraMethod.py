@@ -15,19 +15,25 @@ def getBinomialMax(n,p):
 
 def getContinuityConfidence(neps,ndelta,numpts):
     '''
-    Compare the probability of observing that all ndelta points
-    map to the epsilon set with the null hypthesis that the
-    points are randomly distributed. Random distribution 
-    corresponds to neps/numpts probability per point, where neps
-    is the number of points observed within eps of the image
-    point and numpts is the total number of points in the 
-    reconstruction. Successes (falling within eps of the image) should
-    follow a binomial distribution for an underlyning random distribution.
-    If ndelta is large enough to be unlikely, then we can reject
-    the null hypothesis of random distribution. Since the points
-    are consistent with the definition of continuity, we say we 
-    are relatively confident (or not) of the presence of a 
-    continuous function.
+    Calculate a confidence that points are _not_ randomly distributed
+    over the manifolds M1 and M2. 
+
+    We observed that the ndelta nearest points to x mapped to within 
+    epsilon of the image point f(x). We also observed that a total of 
+    neps points were within epsilon of f(x). Under the null hypothesis 
+    that the points in M1 and M2 are randomly distributed, the 
+    probability of our observation of ndelta successes is given by
+    (neps / numpts)**ndelta, where numpts is the number of points in M1
+    (and likewise in M2). If this probability is small compared to 1, and 
+    also small compared to the maximum probability (p_max) in the binomial 
+    distribution B(ndelta, neps/numpts), then we are confident that the 
+    points are not randomly distributed. We define the confidence level
+    to be 1 - (neps / numpts)**ndelta / p_max.
+
+    Since we made our observations to be consistent with the definition
+    of continuity, we say we are relatively confident (output near 1) or 
+    not (output near 0) of the presence of a continuous function between
+    M1 and M2. 
 
     '''
     p = float(neps) / numpts
@@ -36,10 +42,8 @@ def getContinuityConfidence(neps,ndelta,numpts):
 
 def countPtsWithinEps(dists,eps):
     '''
-    Distances between the point of interest and the other points in
-    the reconstruction are cached in dists. Count the distances less than eps
-    and return it, subtracting 1 to remove the zero distance to the
-    point itself.
+    Count the distances less than eps and return the count less 1 to 
+    remove the zero distance to the point itself.
 
     '''
     return (dists < eps).sum() - 1 
@@ -62,9 +66,11 @@ def countDeltaPtsMappedToEps(dists1,dists2,delta,eps):
 def continuityTest(dists1,dists2,ptinds,eps,startdelta):
     '''
     Do Pecora continuity test on the reconstructions M1 and M2 using 
-    the points with indices ptinds and continuity parameter eps. 
+    the points with indices ptinds and continuity parameter eps. dists1
+    and dists2 contain the distances to the points of interest (ptinds), 
+    which are all that is needed from M1 and M2. 
     Guess delta values beginning with startdelta, which ideally has the
-    relation startdelta/|M1| is approximately eps/|M2|.
+    relation startdelta/|M1| approximates eps/|M2|.
 
     '''
     contstat = np.zeros(len(ptinds))
@@ -80,13 +86,11 @@ def continuityTest(dists1,dists2,ptinds,eps,startdelta):
                 contstat[k] = getContinuityConfidence(neps,out,len(dists1[k]))
     return np.mean(contstat)
 
-def cacheDistances(M1,M2,ptinds):
-    dists1 = []
-    dists2 = []
+def cacheDistances(M,ptinds):
+    dists = []
     for ind in ptinds:
-        dists1.append(np.sqrt(((M1 - M1[ind,:])**2).sum(axis=1)))
-        dists2.append(np.sqrt(((M2 - M2[ind,:])**2).sum(axis=1)))
-    return dists1,dists2
+        dists.append(np.sqrt(((M - M[ind,:])**2).sum(axis=1)))
+    return dists
  
 def chooseEpsilons(M,mastereps):
     '''
@@ -106,13 +110,13 @@ def convergenceWithContinuityTest(M1,M2,N,masterts=np.arange(0.2,1.1,0.2),master
     reconstructions M1 and M2, which are mxn numpy arrays of m 
     points in n dimensions. 
     The method is performed on N random points for increasing length
-    reconstructions. The proportional lengths of the full reconstructions
-    to be used are in masterts.
+    reconstructions, where the lengths are given by the proportions in 
+    masterts multiplied by the number of points in M1 (or M2). 
     The method is also performed for varying continuity parameter epsilon,
-    since a priori an appropriate epsilon is unknown. The proportions in
-    mastereps are multiplied by the standard deviation of the distances of 
-    points in M1 and M2 from their respective mean values to give the 
-    epsilon parameters that will be tested. 
+    since a priori an appropriate epsilon is unknown. The epsilon parameters
+    to test are given by the proportions in mastereps multiplied by the standard 
+    deviation of the distances of points in M1 and M2 from their respective 
+    mean values.
 
     We are checking for convergence patterns in masterts and in mastereps
     to establish a confidence level for continuity and inverse continuity
@@ -129,7 +133,8 @@ def convergenceWithContinuityTest(M1,M2,N,masterts=np.arange(0.2,1.1,0.2),master
         print('{0} of {1} lengths'.format(j+1,len(Mlens)))
         print('-----------------------')
         ptinds = random.sample(range(L),N) # different points for each different reconstruction len
-        dists1,dists2 = cacheDistances(M1[:L,:],M2[:L,:],ptinds)
+        dists1 = cacheDistances(M1[:L,:],ptinds)
+        dists2 = cacheDistances(M2[:L,:],ptinds)
         for k,eps1 in enumerate(epslist1):
             print('{0} of {1} epsilons'.format(k+1,len(epslist1)))
             forwardconf[j,k] = continuityTest(dists1,dists2,ptinds,eps1,epslist2[k])
