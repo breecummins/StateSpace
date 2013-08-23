@@ -42,7 +42,7 @@ def testDoublePendulum(masterts,mastereps,fname=''):
     compind1=2
     compind2=3
     numlags = 5 #num dims
-    lagsize = 504 #307 #117 #28
+    lagsize = 6900 #504 #307 #117 #28
     # lagsize = SSR.numlagsFromFirstZeroOfAutocorrelation(ts[:,compind1])
     # print(lagsize)
     M1 = SSR.makeShadowManifold(ts[:,compind1], numlags, lagsize)
@@ -61,5 +61,5 @@ if __name__ == '__main__':
     masterts = np.arange(0.2,1.1,0.2)
     mastereps=np.array([0.01,0.05,0.1,0.2])
     # testLorenz(masterts,mastereps)
-    testDoublePendulum(masterts,mastereps,fname='/home/bcummins/DP_2400pts_504lag_zw.pickle')
+    testDoublePendulum(masterts,mastereps,fname='/home/bcummins/DP_2400pts_6900lag_zw.pickle')
     # outdict = testDoublePendulum(masterts,mastereps)
