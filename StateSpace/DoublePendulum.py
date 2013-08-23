@@ -27,8 +27,10 @@ if __name__ == '__main__':
     # SSRPlots.plots(np.arange(1,len(acc3)+1),np.array(acc3),show=0,titlestr='w autocc')
     finaltime = 1200.0
     x = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt=dt)
-    Mz = SSR.makeShadowManifold(x[:,2],3,115*60)
-    print(Mz.shape)
+    newlags = SSR.chooseLagSize(x)
+    print(newlags)
+    # Mz = SSR.makeShadowManifold(x[:,2],3,115*60)
+    # print(Mz.shape)
     # acc3 = SSR.getAutocorrelation(x[:,3],int(x.shape[0] / 10.))
     # SSRPlots.plots(np.arange(1,len(acc3)+1),np.array(acc3),show=0,titlestr='w autocc')
     # finaltime = 2400.0

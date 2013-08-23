@@ -103,50 +103,56 @@ def getAllLags(ts):
     '''
     lags = []
     for j in range(ts.shape[1]):
-        lag = None
-        T = 0.05*ts.shape[0]
-        while lag == None:
-            T = 2*T
-            if T > ts.shape[0]:
-                raise ValueError('Variable {0} has no zeros in its autocorrelation.'.format(j))
-            lag = lagsizeFromFirstZeroOfAutocorrelation(ts,T)
+        lag = lagsizeFromFirstZeroOfAutocorrelation(ts[:,j],int(0.10*ts.shape[0]))
+        if lag == None:
+           lag = lagsizeFromFirstZeroOfAutocorrelation(ts[:,j],int(0.3*ts.shape[0]))
+           if lag == None:
+                raise ValueError('No zero in the first 0.30 of the time series for variable {0}'.format(j))
         lags.append(lag)
     return lags
 
-def evaluateLagSimilarity(ts):
+def evaluateSimilarity(arr):
     '''
-    Decide whether the first zeros of the autocorrelations of
-    the columns of ts are similar or different. ts is an mxn
-    numpy array, where m is the number of points in the time 
-    series and n is the number of measured variables.
+    Given a 1D integer array, quantize the integers into 1 or 2 groups that are
+    divided by the mean.
 
     '''
-    lags = getAllLags(ts)
-    props = [float(l)/ts.shape[0] for l in lags]
-    sim = []
-    notsim = []
-    for p in props:
-        s = []
-        ns = []
-        for q in props:
-            if p/q > 2 or q/p > 2:
-                ns.append( q )
-            else:
-                s.append( q )
-        sim.append( s )
-        notsim.append( ns )
-    return lags, sim, notsim
+    mu = np.mean(arr)
+    if np.all( np.abs(arr - mu) < np.std(arr) ): 
+        return [range(len(arr))]
+    else:
+        newarr = [np.array([j for j,a in enumerate(arr) if a < mu]), np.array([j for j,a in enumerate(arr) if a >= mu])]
+        return newarr
 
 def chooseLagSize(ts):
     '''
     Choose lag sizes for the columns of ts (mxn numpy array).
-    Ideally they are all the same, but in reality this won't 
-    always happen.
+    Decide whether the first zeros of the autocorrelations of
+    the columns of ts are similar or different. Ideally they 
+    are all the same, but in reality this won't always happen.
 
     '''
-    lags, sim, notsim = evaluateLagSimilarity(ts)
-    # find largest similar groups and average lags for choice
-    # for nonsimilar pairs, make one an integer multiple of the other
+    lags = getAllLags(ts)
+    sim = evaluateSimilarity(lags)
+    if len(sim) == 1:
+        newlags = int(np.mean(lags))*np.ones(len(lags)).astype(int)
+    else:
+        newlags = np.zeros(len(lags)).astype(int)
+        for s in sim:
+            newlags[s] = int(np.mean(np.array(lags)[s]))
+        u = sorted(list(set(list(newlags))))
+        multiplier = int(float(u[1])/u[0])
+        newlags[newlags==u[1]] = multiplier*u[0]
+    print('Original calculated lags: {0}'.format(lags))
+    print('New binned and averaged lags: {0}'.format(newlags))
+    accept = raw_input("Do you accept the new lags? (y or n) ") 
+    if accept == 'n':
+        inlags = input("Enter a new numpy array of the same size, such as np.array([2,2,90,47]) for a 4 variable problem. ")
+        if len(inlags) == len(newlags):
+            newlags = inlags
+        else:
+            newlags = input("Try again. ")
+    return newlags
 
 
 
