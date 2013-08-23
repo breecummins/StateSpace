@@ -34,5 +34,5 @@ if __name__ == '__main__':
     # plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['mastereps'],outdict['masterts'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'])    
     # outdict = fileops.loadPickle('DP_2400pts_504lag_zw.pickle')
     # plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['mastereps'],outdict['masterts'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'])
-    outdict = fileops.loadPickle('DP_2400pts_6900lag_zw.pickle')
+    outdict = fileops.loadPickle('DP_2400pts_6900lag_zw_closeup.pickle')
     plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['mastereps'],outdict['masterts'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'])

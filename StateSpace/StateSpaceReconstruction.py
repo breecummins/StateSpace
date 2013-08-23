@@ -89,14 +89,64 @@ def lagsizeFromFirstZeroOfAutocorrelation(ts,T=None):
     return the first zero crossing. Check all lags from
     1 to T. Default is T = len(ts)/10. 
 
-    Note: This method doesn't seem to work very well for 
-    the Lorenz equations.
-
     '''
     if T == None:
         T = int(len(ts)/10.)
     autocc = getAutocorrelation(ts,T)
     return findFirstZero(autocc)
+
+def getAllLags(ts):
+    '''
+    Find all the first zeros of the autocorrelation functions
+    of the columns of ts, an mxn numpy array.
+
+    '''
+    lags = []
+    for j in range(ts.shape[1]):
+        lag = None
+        T = 0.05*ts.shape[0]
+        while lag == None:
+            T = 2*T
+            if T > ts.shape[0]:
+                raise ValueError('Variable {0} has no zeros in its autocorrelation.'.format(j))
+            lag = lagsizeFromFirstZeroOfAutocorrelation(ts,T)
+        lags.append(lag)
+    return lags
+
+def evaluateLagSimilarity(ts):
+    '''
+    Decide whether the first zeros of the autocorrelations of
+    the columns of ts are similar or different. ts is an mxn
+    numpy array, where m is the number of points in the time 
+    series and n is the number of measured variables.
+
+    '''
+    lags = getAllLags(ts)
+    props = [float(l)/ts.shape[0] for l in lags]
+    sim = []
+    notsim = []
+    for p in props:
+        s = []
+        ns = []
+        for q in props:
+            if p/q > 2 or q/p > 2:
+                ns.append( q )
+            else:
+                s.append( q )
+        sim.append( s )
+        notsim.append( ns )
+    return lags, sim, notsim
+
+def chooseLagSize(ts):
+    '''
+    Choose lag sizes for the columns of ts (mxn numpy array).
+    Ideally they are all the same, but in reality this won't 
+    always happen.
+
+    '''
+    lags, sim, notsim = evaluateLagSimilarity(ts)
+    # find largest similar groups and average lags for choice
+    # for nonsimilar pairs, make one an integer multiple of the other
 
 
 
