@@ -19,15 +19,29 @@ def doublePendulum(t,x,mu=0.0,beta=0.0,A=0.0):
 
 if __name__ == '__main__':
     import StateSpaceReconstructionPlots as SSRPlots
+    import StateSpaceReconstruction as SSR
     dt = 0.025
     finaltime = 600.0
     x = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt=dt)
     numlags = 2
     lagsize = int(0.8/dt) #because dt=0.1 with lagsize 8 works well with smooth manifold
+    lagsize0 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,0])
+    lagsize1 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,1])
+    lagsize2 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,2])
+    lagsize3 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,3])
+    print((lagsize0,lagsize1,lagsize2,lagsize3))
     # times = np.arange(0,finaltime,dt)
     # SSRPlots.plotManifold(x[:,:3],show=0,titlestr='x, y, z')
-    SSRPlots.plotManifold(x[:,(0,1,3)],show=0,titlestr='x, y, w')
-    SSRPlots.plotManifold(np.hstack([x[:,(0,1)],-4*np.ones((x.shape[0],1))]),show=1,hold=1,style='r')
+    SSRPlots.plotManifold(x[:,(0,1,3)],show=0,titlestr='x, y, w',style='g-')
+    SSRPlots.plotManifold(x[:,(0,1,2)],show=0,titlestr='x, y, z',style='r-')
+    # SSRPlots.plotShadowManifold(x[:,2],numlags,lagsize2,show=0,hold=0,style='r-')
+    SSRPlots.plotShadowManifold(x[:,3],numlags,lagsize3,show=0,hold=0,style='g-',titlestr='lagsize {0}'.format(lagsize3))
+    SSRPlots.plotShadowManifold(x[:,2],numlags,lagsize3,show=0,hold=0,style='r-',titlestr='lagsize {0}'.format(lagsize3))
+    SSRPlots.plotShadowManifold(x[:,3],numlags,lagsize,show=0,hold=0,style='g-',titlestr='lagsize {0}'.format(lagsize))
+    SSRPlots.plotShadowManifold(x[:,2],numlags,lagsize,show=0,hold=0,style='r-',titlestr='lagsize {0}'.format(lagsize))
+    SSRPlots.plotShadowManifold(x[:,3],numlags,75,show=0,hold=0,style='g-',titlestr='lagsize 75')
+    SSRPlots.plotShadowManifold(x[:,2],numlags,75,show=1,hold=0,style='r-',titlestr='lagsize 75')
+    # SSRPlots.plotManifold(np.hstack([x[:,(0,1)],-4*np.ones((x.shape[0],1))]),show=1,hold=1,style='r')
     # SSRPlots.plotManifold(x[:,(1,2)],show=0,titlestr='y and z')
     # SSRPlots.plotManifold(x[:,(1,3)],show=0,titlestr='y and w')
     # SSRPlots.plotShadowManifold(x[:,2]+x[:,3],numlags,lagsize,show=0,hold=0,style='r-')
