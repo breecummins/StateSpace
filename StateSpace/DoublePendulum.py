@@ -21,7 +21,7 @@ if __name__ == '__main__':
     import StateSpaceReconstructionPlots as SSRPlots
     import StateSpaceReconstruction as SSR
     dt = 0.025
-    finaltime = 600.0
+    finaltime = 1200.0
     x = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt=dt)
     numlags = 2
     lagsize = int(0.8/dt) #because dt=0.1 with lagsize 8 works well with smooth manifold
@@ -30,17 +30,30 @@ if __name__ == '__main__':
     lagsize2 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,2])
     lagsize3 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,3])
     print((lagsize0,lagsize1,lagsize2,lagsize3))
+    acc0 = SSR.getAutocorrelation(x[:,0],int(x.shape[0] / 10.))
+    acc1 = SSR.getAutocorrelation(x[:,1],int(x.shape[0] / 10.))
+    acc2 = SSR.getAutocorrelation(x[:,2],int(x.shape[0] / 10.))
+    acc3 = SSR.getAutocorrelation(x[:,3],int(x.shape[0] / 10.))
+    zeros0 = SSR.findAllZeros(acc0)
+    zeros1 = SSR.findAllZeros(acc1)
+    zeros2 = SSR.findAllZeros(acc2)
+    zeros3 = SSR.findAllZeros(acc3)
+    print(zeros3)
+    SSRPlots.plots(np.arange(1,len(acc0)+1),np.array(acc0),show=0,titlestr='x autocc')
+    SSRPlots.plots(np.arange(1,len(acc1)+1),np.array(acc1),show=0,titlestr='y autocc')
+    SSRPlots.plots(np.arange(1,len(acc2)+1),np.array(acc2),show=0,titlestr='z autocc')
+    SSRPlots.plots(np.arange(1,len(acc3)+1),np.array(acc3),show=0,titlestr='w autocc')
     # times = np.arange(0,finaltime,dt)
     # SSRPlots.plotManifold(x[:,:3],show=0,titlestr='x, y, z')
-    SSRPlots.plotManifold(x[:,(0,1,3)],show=0,titlestr='x, y, w',style='g-')
-    SSRPlots.plotManifold(x[:,(0,1,2)],show=0,titlestr='x, y, z',style='r-')
-    # SSRPlots.plotShadowManifold(x[:,2],numlags,lagsize2,show=0,hold=0,style='r-')
+    # SSRPlots.plotManifold(x[:,(0,1,3)],show=0,titlestr='x, y, w',style='g-')
+    # SSRPlots.plotManifold(x[:,(0,1,2)],show=0,titlestr='x, y, z',style='r-')
+    # # SSRPlots.plotShadowManifold(x[:,2],numlags,lagsize2,show=0,hold=0,style='r-')
     SSRPlots.plotShadowManifold(x[:,3],numlags,lagsize3,show=0,hold=0,style='g-',titlestr='lagsize {0}'.format(lagsize3))
     SSRPlots.plotShadowManifold(x[:,2],numlags,lagsize3,show=0,hold=0,style='r-',titlestr='lagsize {0}'.format(lagsize3))
     SSRPlots.plotShadowManifold(x[:,3],numlags,lagsize,show=0,hold=0,style='g-',titlestr='lagsize {0}'.format(lagsize))
     SSRPlots.plotShadowManifold(x[:,2],numlags,lagsize,show=0,hold=0,style='r-',titlestr='lagsize {0}'.format(lagsize))
-    SSRPlots.plotShadowManifold(x[:,3],numlags,75,show=0,hold=0,style='g-',titlestr='lagsize 75')
-    SSRPlots.plotShadowManifold(x[:,2],numlags,75,show=1,hold=0,style='r-',titlestr='lagsize 75')
+    SSRPlots.plotShadowManifold(x[:,3],numlags,zeros3[1],show=0,hold=0,style='g-',titlestr='lagsize {0}'.format(zeros3[1]))
+    SSRPlots.plotShadowManifold(x[:,2],numlags,zeros3[1],show=1,hold=0,style='r-',titlestr='lagsize {0}'.format(zeros3[1]))
     # SSRPlots.plotManifold(np.hstack([x[:,(0,1)],-4*np.ones((x.shape[0],1))]),show=1,hold=1,style='r')
     # SSRPlots.plotManifold(x[:,(1,2)],show=0,titlestr='y and z')
     # SSRPlots.plotManifold(x[:,(1,3)],show=0,titlestr='y and w')

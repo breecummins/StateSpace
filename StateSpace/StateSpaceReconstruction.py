@@ -41,6 +41,22 @@ def makeShadowManifold(timeseries, numlags, lagsize, smooth=1):
     else:
         return makeShadowManifoldSkip(timeseries, numlags, lagsize)
 
+def findAllZeros(arr):
+    '''
+    arr must be a list or 1D numpy array
+
+    '''
+    signs = np.sign(arr[1:]) + np.sign(arr[:-1])
+    ind = np.nonzero(np.abs(signs) < 2)[0]
+    zeros = []
+    for i in ind:        
+        # record whichever of the two indices flanking zero has the smallest value
+        if np.abs(arr[i]) < np.abs(arr[i+1]):
+            zeros.append(i)
+        else:
+            zeros.append(i+1)
+    return zeros
+
 def findFirstZero(arr):
     '''
     arr must be a list or 1D numpy array
@@ -58,6 +74,15 @@ def findFirstZero(arr):
     else:
         return ind+1
 
+def getAutocorrelation(ts,T):
+    N = len(ts)
+    mu = np.mean(ts)
+    s2 = np.var(ts,ddof=1) #unbiased estimator of variance
+    autocc = []
+    for k in range(1,T+1):
+        autocc.append( ((ts[:N-k] - mu)*(ts[k:] - mu)).sum() / ( s2 *(N-k) ) )
+    return autocc
+
 def lagsizeFromFirstZeroOfAutocorrelation(ts,T=None):
     '''
     Calculate autocorrelation of a 1D timeseries and 
@@ -68,14 +93,9 @@ def lagsizeFromFirstZeroOfAutocorrelation(ts,T=None):
     the Lorenz equations.
 
     '''
-    N = len(ts)
     if T == None:
-        T = int(N/10.)
-    mu = np.mean(ts)
-    s2 = np.var(ts,ddof=1) #unbiased estimator of variance
-    autocc = []
-    for k in range(1,T+1):
-        autocc.append( ((ts[:N-k] - mu)*(ts[k:] - mu)).sum() / ( s2 *(N-k) ) )
+        T = int(len(ts)/10.)
+    autocc = getAutocorrelation(ts,T)
     return findFirstZero(autocc)
 
 
