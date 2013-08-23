@@ -26,5 +26,5 @@ if __name__ == '__main__':
     # mastereps=np.array([0.01,0.05,0.1,0.2])
     # # outdict = PS.testLorenz(masterts,mastereps)
     # outdict = PS.testDoublePendulum(masterts,mastereps)
-    outdict = fileops.loadPickle('DP1200ptszw.pickle')
+    outdict = fileops.loadPickle('DP_1200pts_307lag_zw.pickle')
     plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['mastereps'],outdict['masterts'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'])
