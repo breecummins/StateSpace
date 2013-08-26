@@ -35,5 +35,5 @@ if __name__ == '__main__':
     masterts = np.arange(0.6,1.05,0.1)
     mastereps=np.array([0.05,0.075,0.1,0.15,0.2])
     # testLorenz(masterts,mastereps)
-    testDoublePendulum(masterts,mastereps,fname='/home/bcummins/DP_1200time_biggestlag_zw.pickle',lags = [[3248,116],[2964,114],[2964,114],[5244,114],[6900,115]])
+    testDoublePendulum(masterts,mastereps,fname='/home/bcummins/DP_1200time_biggestlag_zw.pickle',lags = [[3306,114],[2964,114],[2964,114],[5244,114],[6954,114]])
     # outdict = testDoublePendulum(masterts,mastereps)
