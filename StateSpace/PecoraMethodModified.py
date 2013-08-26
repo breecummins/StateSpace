@@ -105,46 +105,51 @@ def chooseEpsilons(M,mastereps):
     stdM = np.std(dists)
     return stdM*mastereps
 
-def chooseBiggerLags(ts1,ts2,Mlens):
+def chooseLags(ts1,ts2,Mlens):
     lags = []
     for L in Mlens:
         print("Time series length: {0}".format(L))
-        ls = SSR.chooseLagSizeBiggest(ts1[:L],ts2[:L])
+        ls = SSR.chooseLagSize(ts1[:L],ts2[:L])
         lags.append(ls)
     return lags
 
-def convergenceWithContinuityTestBiggestLag(ts1,ts2,embeddim,masterts=np.arange(0.2,1.1,0.2),mastereps=np.array([0.005,0.01,0.02,0.05,0.1,0.2]),lags=None):
+def convergenceWithContinuityTest(ts1,ts2,numlags,lags=None,masterts=np.arange(0.4,1.1,0.2),mastereps=np.array([0.005,0.01,0.02,0.05,0.1,0.2])):
     '''
-    We are checking for convergence patterns in masterts and in mastereps
+    We are checking for convergence patterns in time series length and in mastereps
     to establish a confidence level for continuity and inverse continuity
     between reconstructions M1 and M2 built from timeseries ts1 and ts2. 
 
     '''
-    Mlens = (masterts*len(ts1)).astype(int)
+    Mlens = (np.round(len(ts1)*masterts)).astype(int)
     if lags == None:
-        lags = chooseBiggerLags(ts1,ts2,Mlens)
-    M1 = SSR.makeShadowManifold(ts1,embeddim,min(lags))
-    M2 = SSR.makeShadowManifold(ts2,embeddim,min(lags))
-    epslist1 = chooseEpsilons(M2,mastereps) # M2 is range in forward continuity 
-    epslist2 = chooseEpsilons(M1,mastereps) # M1 is range in inverse continuity
-    N = int(0.1*M1.shape[0])
+        lags = chooseLags(ts1,ts2,Mlens)
     forwardconf = np.zeros((len(Mlens),len(mastereps)))
     inverseconf = np.zeros((len(Mlens),len(mastereps)))
+    M1 = None
+    M2 = None
     for j,L in enumerate(Mlens):
         print('-----------------------')
         print('{0} of {1} lengths'.format(j+1,len(Mlens)))
         print('-----------------------')
-        if lags[j] != min(lags):
-            M1L = SSR.makeShadowManifold(ts1[:L+(embeddim-1)*lags[j]],embeddim,lags[j])
-            M2L = SSR.makeShadowManifold(ts2[:L+(embeddim-1)*lags[j]],embeddim,lags[j])
-        else:
-            M1L = M1[:L,:]
-            M2L = M2[:L,:]
-        print(L)
-        print(M1L.shape[0])
-        ptinds = random.sample(range(L),N) # different points for each different reconstruction len
-        dists1 = cacheDistances(M1L,ptinds)
-        dists2 = cacheDistances(M2L,ptinds)
+        if lags[j][0]*numlags >= L or lags[j][1]*numlags >= L:
+            print("Lag {0} is too big compared to timeseries length {1}.".format(max(lags[j]),L))
+            continue
+        M1 = SSR.makeShadowManifold(ts1[:L],numlags,lags[j][0])
+        M2 = SSR.makeShadowManifold(ts2[:L],numlags,lags[j][1])
+        if M2.shape[0] > M1.shape[0]:
+            M2 = M2[(lags[j][0]-lags[j][1])*(numlags-1):,:]
+        elif M1.shape[0] > M2.shape[0]:
+            M1 = M1[(lags[j][1]-lags[j][0])*(numlags-1):,:]
+        if M1.shape[0] != M2.shape[0]:
+            print('M1 has shape {0} with lag {1}'.format(M1.shape,lags[j][0]))
+            print('M2 has shape {0} with lag {1}'.format(M2.shape,lags[j][1]))
+            raise ValueError('M1 and M2 must be the same shape. Debug.')
+        epslist1 = chooseEpsilons(M2,mastereps) # M2 is range in forward continuity 
+        epslist2 = chooseEpsilons(M1,mastereps) # M1 is range in inverse continuity
+        N = int(0.1*M1.shape[0])
+        ptinds = random.sample(range(M1.shape[0]),N) # different points for each different reconstruction len
+        dists1 = cacheDistances(M1,ptinds)
+        dists2 = cacheDistances(M2,ptinds)
         for k,eps1 in enumerate(epslist1):
             print('{0} of {1} epsilons'.format(k+1,len(epslist1)))
             forwardconf[j,k] = continuityTest(dists1,dists2,ptinds,eps1,epslist2[k])

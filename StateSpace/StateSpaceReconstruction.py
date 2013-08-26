@@ -112,7 +112,7 @@ def evaluateSimilarity(int1,int2,N):
     N is a normalization factor.
 
     '''
-    if (float(int1)/int2 < 4./3 or float(int1)/int2 > 3./4) and float(int1)/N < 0.10 and float(int2)/N < 0.10:
+    if float(int1)/int2 < 4./3 and float(int1)/int2 > 3./4 and float(int1)/N < 0.10 and float(int2)/N < 0.10:
         return [int(np.mean([int1,int2]))]
     else:
         if int1 < int2:
@@ -122,7 +122,7 @@ def evaluateSimilarity(int1,int2,N):
             multiplier = int(float(int1)/int2)
             return [int(int2*multiplier),int2]
 
-def chooseLagSizeMultiple(ts1,ts2):
+def chooseLagSize(ts1,ts2):
     '''
     Choose lag sizes for the two time series ts1 and ts2, which
     are both 1D arrays of the same length, by calculating the 
@@ -138,36 +138,12 @@ def chooseLagSizeMultiple(ts1,ts2):
         newlags = sim*2 # list of length 2 with newlags[0] = newlags[1] = sim[0]
     else:
         newlags = sim
-    print('Original calculated lags: {0}'.format([lag1,lag2]))
-    print('New modified lags: {0}'.format(newlags))
-    accept = raw_input("Do you accept the new lags? (y or n) ") 
+    print('Original lags: {0}'.format([lag1,lag2]))
+    print('Modified lags: {0}'.format(newlags))
+    accept = raw_input("Do you accept the modified lags? (y or n) ") 
     if accept == 'n':
-        inlags = input("Enter a new length 2 list with the desired lags, such as [105,6900] or [23,23]. ")
-        if len(inlags) == len(newlags):
-            newlags = inlags
-        else:
-            newlags = input("Try again. ")
+        newlags = input("Enter a new length 2 list with the desired lags, such as [105,6900] or [23,23]. ")
     return newlags
-
-def chooseLagSizeBiggest(ts1,ts2):
-    '''
-    Choose lag sizes for the two time series ts1 and ts2, which
-    are both 1D arrays of the same length, by calculating the 
-    first zeros of the autocorrelations. Pick the largest lag.
-
-    '''
-    lag1 = lagsizeFromFirstZeroOfAutocorrelation(ts1)
-    lag2 = lagsizeFromFirstZeroOfAutocorrelation(ts2)
-    if lag1 >= lag2:
-        newlag = lag1
-    else:
-        newlag = lag2
-    print('Original calculated lags: {0}'.format([lag1,lag2]))
-    print('Proposed joint lag: {0}'.format(newlag))
-    accept = raw_input("Do you accept the new lag? (y or n) ") 
-    if accept == 'n':
-        newlag = input("Enter a new lag. ")
-    return newlag
 
 
 
