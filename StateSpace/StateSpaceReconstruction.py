@@ -86,73 +86,89 @@ def getAutocorrelation(ts,T):
 def lagsizeFromFirstZeroOfAutocorrelation(ts,T=None):
     '''
     Calculate autocorrelation of a 1D timeseries and 
-    return the first zero crossing. Check all lags from
-    1 to T. Default is T = len(ts)/10. 
+    return the first zero crossing in the first 30%
+    of the time series. An error is thrown if there
+    is no such zero.
 
     '''
     if T == None:
-        T = int(len(ts)/10.)
-    autocc = getAutocorrelation(ts,T)
-    return findFirstZero(autocc)
-
-def getAllLags(ts):
-    '''
-    Find all the first zeros of the autocorrelation functions
-    of the columns of ts, an mxn numpy array.
-
-    '''
-    lags = []
-    for j in range(ts.shape[1]):
-        lag = lagsizeFromFirstZeroOfAutocorrelation(ts[:,j],int(0.10*ts.shape[0]))
-        if lag == None:
-           lag = lagsizeFromFirstZeroOfAutocorrelation(ts[:,j],int(0.3*ts.shape[0]))
-           if lag == None:
-                raise ValueError('No zero in the first 0.30 of the time series for variable {0}'.format(j))
-        lags.append(lag)
-    return lags
-
-def evaluateSimilarity(arr):
-    '''
-    Given a 1D integer array, quantize the integers into 1 or 2 groups that are
-    divided by the mean.
-
-    '''
-    mu = np.mean(arr)
-    if np.all( np.abs(arr - mu) < np.std(arr) ): 
-        return [range(len(arr))]
+        autocorr = getAutocorrelation(ts,int(len(ts)*0.1))
+        fz = findFirstZero(autocorr)
+        if fz == None:
+            autocorr = getAutocorrelation(ts,int(len(ts)*0.4))
+            fz = findFirstZero(autocorr)
+            if fz == None:
+                raise ValueError('No zero in the autocorrelation for the first 40% of the time series.')
     else:
-        newarr = [np.array([j for j,a in enumerate(arr) if a < mu]), np.array([j for j,a in enumerate(arr) if a >= mu])]
-        return newarr
+        autocorr = getAutocorrelation(ts,T)
+        fz = findFirstZero(autocorr)
+        if fz == None:
+            raise ValueError('No zero in the autocorrelation for the first {0}% of the time series.'.format(int(T*100/len(ts))))
+    return fz
 
-def chooseLagSize(ts):
+def evaluateSimilarity(int1,int2,N):
     '''
-    Choose lag sizes for the columns of ts (mxn numpy array).
-    Decide whether the first zeros of the autocorrelations of
-    the columns of ts are similar or different. Ideally they 
-    are all the same, but in reality this won't always happen.
+    Given two integers, decide whether they are similar or not. 
+    N is a normalization factor.
 
     '''
-    lags = getAllLags(ts)
-    sim = evaluateSimilarity(lags)
+    if (float(int1)/int2 < 4./3 or float(int1)/int2 > 3./4) and float(int1)/N < 0.10 and float(int2)/N < 0.10:
+        return [int(np.mean([int1,int2]))]
+    else:
+        if int1 < int2:
+            multiplier = int(float(int2)/int1)
+            return [int1,int(int1*multiplier)]
+        else:
+            multiplier = int(float(int1)/int2)
+            return [int(int2*multiplier),int2]
+
+def chooseLagSizeMultiple(ts1,ts2):
+    '''
+    Choose lag sizes for the two time series ts1 and ts2, which
+    are both 1D arrays of the same length, by calculating the 
+    first zeros of the autocorrelations. Decide whether the lags 
+    are close enough to be averaged, or must be considered 
+    different values. 
+
+    '''
+    lag1 = lagsizeFromFirstZeroOfAutocorrelation(ts1)
+    lag2 = lagsizeFromFirstZeroOfAutocorrelation(ts2)
+    sim = evaluateSimilarity(lag1,lag2,len(ts1))
     if len(sim) == 1:
-        newlags = int(np.mean(lags))*np.ones(len(lags)).astype(int)
+        newlags = sim*2 # list of length 2 with newlags[0] = newlags[1] = sim[0]
     else:
-        newlags = np.zeros(len(lags)).astype(int)
-        for s in sim:
-            newlags[s] = int(np.mean(np.array(lags)[s]))
-        u = sorted(list(set(list(newlags))))
-        multiplier = int(float(u[1])/u[0])
-        newlags[newlags==u[1]] = multiplier*u[0]
-    print('Original calculated lags: {0}'.format(lags))
-    print('New binned and averaged lags: {0}'.format(newlags))
+        newlags = sim
+    print('Original calculated lags: {0}'.format([lag1,lag2]))
+    print('New modified lags: {0}'.format(newlags))
     accept = raw_input("Do you accept the new lags? (y or n) ") 
     if accept == 'n':
-        inlags = input("Enter a new numpy array of the same size, such as np.array([2,2,90,47]) for a 4 variable problem. ")
+        inlags = input("Enter a new length 2 list with the desired lags, such as [105,6900] or [23,23]. ")
         if len(inlags) == len(newlags):
             newlags = inlags
         else:
             newlags = input("Try again. ")
     return newlags
+
+def chooseLagSizeBiggest(ts1,ts2):
+    '''
+    Choose lag sizes for the two time series ts1 and ts2, which
+    are both 1D arrays of the same length, by calculating the 
+    first zeros of the autocorrelations. Pick the largest lag.
+
+    '''
+    lag1 = lagsizeFromFirstZeroOfAutocorrelation(ts1)
+    lag2 = lagsizeFromFirstZeroOfAutocorrelation(ts2)
+    if lag1 >= lag2:
+        newlag = lag1
+    else:
+        newlag = lag2
+    print('Original calculated lags: {0}'.format([lag1,lag2]))
+    print('Proposed joint lag: {0}'.format(newlag))
+    accept = raw_input("Do you accept the new lag? (y or n) ") 
+    if accept == 'n':
+        newlag = input("Enter a new lag. ")
+    return newlag
+
 
 
 

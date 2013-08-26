@@ -20,6 +20,17 @@ def plotOutput(forwardconf,inverseconf,mastereps,masterts,tslength,forwardtitle,
     plt.title(inversetitle)
     plt.show()
 
+def plotAutocorrelation(autocorr,title):
+    plt.figure()
+    plt.plot([1,len(autocorr)+1],[0,0],'k')
+    plt.hold('on')
+    plt.plot(range(1,len(autocorr)+1),autocorr)
+    plt.ylabel('autocorrelation')
+    plt.xlabel('lag index')
+    plt.title(title)
+    plt.show()
+
+
 if __name__ == '__main__':
     # import PecoraScripts as PS
     # masterts = np.arange(0.2,1.1,0.2)
@@ -34,5 +45,20 @@ if __name__ == '__main__':
     # plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['mastereps'],outdict['masterts'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'])    
     # outdict = fileops.loadPickle('DP_2400pts_504lag_zw.pickle')
     # plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['mastereps'],outdict['masterts'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'])
-    outdict = fileops.loadPickle('DP_2400pts_6900lag_zw_closeup.pickle')
-    plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['mastereps'],outdict['masterts'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'])
+    # outdict = fileops.loadPickle('DP_2400pts_6900lag_zw_closeup.pickle')
+    # plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['mastereps'],outdict['masterts'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'])
+
+    #autocorrelation pics
+    import PecoraScriptsModified as PS
+    import StateSpaceReconstruction as SSR
+    eqns,names,ts = PS.doublependulumTS(finaltime=1200.0)
+    compind1=2
+    compind2=3
+    # autocorr1 = SSR.getAutocorrelation(ts[:,compind1],int(ts.shape[0] / 3.))
+    # plotAutocorrelation(autocorr1,"length {0}".format(ts.shape[0]))
+    Mlens = ts.shape[0]*np.arange(0.4,1.1,0.2)
+    for L in Mlens:
+        autocorr1 = SSR.getAutocorrelation(ts[:L,compind1],int(0.4*L))
+        fz2 = SSR.lagsizeFromFirstZeroOfAutocorrelation(ts[:L,compind2])
+        print(fz2)
+        plotAutocorrelation(autocorr1,"length {0}".format(L))

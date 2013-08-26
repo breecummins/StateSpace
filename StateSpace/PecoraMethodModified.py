@@ -2,6 +2,7 @@ import numpy as np
 from scipy.misc import comb
 import random
 import sys
+import StateSpaceReconstruction as SSR
 
 def getBinomialMax(n,p):
     '''
@@ -104,41 +105,47 @@ def chooseEpsilons(M,mastereps):
     stdM = np.std(dists)
     return stdM*mastereps
 
-def convergenceWithContinuityTest(M1,M2,N,masterts=np.arange(0.2,1.1,0.2),mastereps=np.array([0.005,0.01,0.02,0.05,0.1,0.2])):
-    '''
-    Do Pecora method (continuity and inverse continuity) on the 
-    reconstructions M1 and M2, which are mxn numpy arrays of m 
-    points in n dimensions. 
-    The method is performed on N random points for increasing length
-    reconstructions, where the lengths are given by the proportions in 
-    masterts multiplied by the number of points in M1 (or M2). 
-    The method is also performed for varying continuity parameter epsilon,
-    since a priori an appropriate epsilon is unknown. The epsilon parameters
-    to test are given by the proportions in mastereps multiplied by the standard 
-    deviation of the distances of points in M1 and M2 from their respective 
-    mean values.
+def chooseBiggerLags(ts1,ts2,Mlens):
+    lags = []
+    for L in Mlens:
+        print("Time series length: {0}".format(L))
+        ls = SSR.chooseLagSizeBiggest(ts1[:L],ts2[:L])
+        lags.append(ls)
+    return lags
 
+def convergenceWithContinuityTestBiggestLag(ts1,ts2,embeddim,masterts=np.arange(0.2,1.1,0.2),mastereps=np.array([0.005,0.01,0.02,0.05,0.1,0.2]),lags=None):
+    '''
     We are checking for convergence patterns in masterts and in mastereps
     to establish a confidence level for continuity and inverse continuity
-    between M1 and M2. 
+    between reconstructions M1 and M2 built from timeseries ts1 and ts2. 
 
     '''
-    Mlens = (masterts*M1.shape[0]).astype(int)
+    Mlens = (masterts*len(ts1)).astype(int)
+    if lags == None:
+        lags = chooseBiggerLags(ts1,ts2,Mlens)
+    M1 = SSR.makeShadowManifold(ts1,embeddim,min(lags))
+    M2 = SSR.makeShadowManifold(ts2,embeddim,min(lags))
     epslist1 = chooseEpsilons(M2,mastereps) # M2 is range in forward continuity 
     epslist2 = chooseEpsilons(M1,mastereps) # M1 is range in inverse continuity
-    forwardconf = np.zeros((len(Mlens),len(epslist1)))
-    inverseconf = np.zeros((len(Mlens),len(epslist2)))
+    N = int(0.1*M1.shape[0])
+    forwardconf = np.zeros((len(Mlens),len(mastereps)))
+    inverseconf = np.zeros((len(Mlens),len(mastereps)))
     for j,L in enumerate(Mlens):
         print('-----------------------')
         print('{0} of {1} lengths'.format(j+1,len(Mlens)))
         print('-----------------------')
         ptinds = random.sample(range(L),N) # different points for each different reconstruction len
-        dists1 = cacheDistances(M1[:L,:],ptinds)
-        dists2 = cacheDistances(M2[:L,:],ptinds)
+        if lags[j] != min(lags):
+            M1L = SSR.makeShadowManifold(ts1[:L+(embeddim-1)*lags[j]],embeddim,lags[j])
+            M2L = SSR.makeShadowManifold(ts2[:L+(embeddim-1)*lags[j]],embeddim,lags[j])
+        else:
+            M1L = M1[:L,:]
+            M2L = M2[:L,:]
+        dists1 = cacheDistances(M1L,ptinds)
+        dists2 = cacheDistances(M2L,ptinds)
         for k,eps1 in enumerate(epslist1):
             print('{0} of {1} epsilons'.format(k+1,len(epslist1)))
             forwardconf[j,k] = continuityTest(dists1,dists2,ptinds,eps1,epslist2[k])
             inverseconf[j,k] = continuityTest(dists2,dists1,ptinds,epslist2[k],eps1)
     return forwardconf, inverseconf
-
 
