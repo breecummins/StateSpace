@@ -123,10 +123,13 @@ def convergenceWithContinuityTest(ts1,ts2,numlags,lags=None,masterts=np.arange(0
     Mlens = (np.round(len(ts1)*masterts)).astype(int)
     if lags == None:
         lags = chooseLags(ts1,ts2,Mlens)
+    M1 = SSR.makeShadowManifold(ts1,numlags,min([l[0] for l in lags]))
+    M2 = SSR.makeShadowManifold(ts2,numlags,min([l[1] for l in lags]))
+    epslist1 = chooseEpsilons(M2,mastereps) # M2 is range in forward continuity 
+    epslist2 = chooseEpsilons(M1,mastereps) # M1 is range in inverse continuity
+    N = int(np.round(0.1*M1.shape[0]))
     forwardconf = np.zeros((len(Mlens),len(mastereps)))
     inverseconf = np.zeros((len(Mlens),len(mastereps)))
-    M1 = None
-    M2 = None
     for j,L in enumerate(Mlens):
         print('-----------------------')
         print('{0} of {1} lengths'.format(j+1,len(Mlens)))
@@ -144,9 +147,6 @@ def convergenceWithContinuityTest(ts1,ts2,numlags,lags=None,masterts=np.arange(0
             print('M1 has shape {0} with lag {1}'.format(M1.shape,lags[j][0]))
             print('M2 has shape {0} with lag {1}'.format(M2.shape,lags[j][1]))
             raise ValueError('M1 and M2 must be the same shape. Debug.')
-        epslist1 = chooseEpsilons(M2,mastereps) # M2 is range in forward continuity 
-        epslist2 = chooseEpsilons(M1,mastereps) # M1 is range in inverse continuity
-        N = int(np.round(0.1*M1.shape[0]))
         ptinds = random.sample(range(M1.shape[0]),N) # different points for each different reconstruction len
         dists1 = cacheDistances(M1,ptinds)
         dists2 = cacheDistances(M2,ptinds)

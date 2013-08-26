@@ -49,7 +49,8 @@ if __name__ == '__main__':
     # plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['mastereps'],outdict['masterts'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'])
     basedir = '/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     fname = 'DP_1200time_biggestlag_zw.pickle'
-    outdict = fileops.loadPickle(basedir+fname)
+    # outdict = fileops.loadPickle(basedir+fname)
+    outdict = fileops.loadPickle(fname)
     plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['mastereps'],outdict['masterts'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'])
 
     # #autocorrelation pics
