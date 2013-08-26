@@ -134,17 +134,15 @@ def convergenceWithContinuityTestBiggestLag(ts1,ts2,embeddim,masterts=np.arange(
         print('-----------------------')
         print('{0} of {1} lengths'.format(j+1,len(Mlens)))
         print('-----------------------')
-        ptinds = random.sample(range(L),N) # different points for each different reconstruction len
         if lags[j] != min(lags):
             M1L = SSR.makeShadowManifold(ts1[:L+(embeddim-1)*lags[j]],embeddim,lags[j])
             M2L = SSR.makeShadowManifold(ts2[:L+(embeddim-1)*lags[j]],embeddim,lags[j])
-            print(L)
-            print(M1L.shape[0])
-            if M1L.shape[0] != L:
-                raise ValueError('Wrong reconstruction.')
         else:
             M1L = M1[:L,:]
             M2L = M2[:L,:]
+        print(L)
+        print(M1L.shape[0])
+        ptinds = random.sample(range(L),N) # different points for each different reconstruction len
         dists1 = cacheDistances(M1L,ptinds)
         dists2 = cacheDistances(M2L,ptinds)
         for k,eps1 in enumerate(epslist1):

@@ -32,7 +32,7 @@ def testDoublePendulum(masterts,mastereps,fname='',lags=None):
         return outdict
 
 if __name__ == '__main__':
-    masterts = np.arange(0.4,1.1,0.2)
+    masterts = np.arange(0.8,1.1,0.2)
     mastereps=np.array([0.05,0.075,0.1,0.15,0.2])
     # testLorenz(masterts,mastereps)
     testDoublePendulum(masterts,mastereps,fname='/home/bcummins/DP_1200time_biggestlag_zw.pickle',lags=[7121,3335,2992,6989])
