@@ -146,7 +146,7 @@ def convergenceWithContinuityTest(ts1,ts2,numlags,lags=None,masterts=np.arange(0
             raise ValueError('M1 and M2 must be the same shape. Debug.')
         epslist1 = chooseEpsilons(M2,mastereps) # M2 is range in forward continuity 
         epslist2 = chooseEpsilons(M1,mastereps) # M1 is range in inverse continuity
-        N = int(0.1*M1.shape[0])
+        N = int(np.round(0.1*M1.shape[0]))
         ptinds = random.sample(range(M1.shape[0]),N) # different points for each different reconstruction len
         dists1 = cacheDistances(M1,ptinds)
         dists2 = cacheDistances(M2,ptinds)

@@ -25,7 +25,7 @@ def testDoublePendulum(masterts,mastereps,fname='',lags=None):
     forwardconf, inverseconf = PM.convergenceWithContinuityTest(ts[:,compind1],ts[:,compind2],numlags,lags,masterts=masterts,mastereps=mastereps)
     forwardtitle = eqns + r', M{0} $\to$ M{1}'.format(names[compind1],names[compind2])
     inversetitle = eqns + r', M{1} $\to$ M{0}'.format(names[compind1],names[compind2])
-    outdict = dict([(x,locals()[x]) for x in ['forwardconf','inverseconf','forwardtitle','inversetitle','N','numlags','lagsize','ts','masterts','mastereps']])
+    outdict = dict([(x,locals()[x]) for x in ['forwardconf','inverseconf','forwardtitle','inversetitle','numlags','lags','ts','masterts','mastereps']])
     if fname:
         fileops.dumpPickle(outdict,fname)
     else:
