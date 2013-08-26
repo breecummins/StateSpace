@@ -138,6 +138,10 @@ def convergenceWithContinuityTestBiggestLag(ts1,ts2,embeddim,masterts=np.arange(
         if lags[j] != min(lags):
             M1L = SSR.makeShadowManifold(ts1[:L+(embeddim-1)*lags[j]],embeddim,lags[j])
             M2L = SSR.makeShadowManifold(ts2[:L+(embeddim-1)*lags[j]],embeddim,lags[j])
+            print(L)
+            print(M1L.shape[0])
+            if M1L.shape[0] != L:
+                raise ValueError('Wrong reconstruction.')
         else:
             M1L = M1[:L,:]
             M2L = M2[:L,:]
