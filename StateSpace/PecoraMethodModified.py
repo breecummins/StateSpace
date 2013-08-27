@@ -95,25 +95,17 @@ def cacheDistances(M,ptinds):
         dists.append(np.sqrt(((M - M[ind,:])**2).sum(axis=1)))
     return dists
  
-def chooseEpsilons(M,mastereps):
+def chooseEpsilons(M,epsprops):
     '''
     Estimate the standard deviation of the manifold M (sensu Pecora)
     and take fractions of it for different epsilons. The proportions
-    to take are given in mastereps, a numpy array.
+    to take are given in epsprops, a numpy array.
 
     '''
     meanM = np.mean(M,axis=0)
     dists = np.sqrt(((M - meanM)**2).sum(axis=1))
     stdM = np.std(dists)
-    return stdM*mastereps
-
-def chooseLags(ts1,ts2,Mlens):
-    lags = []
-    for L in Mlens:
-        print("Time series length: {0}".format(L))
-        ls = SSR.chooseLagSize(ts1[:L],ts2[:L])
-        lags.append(ls)
-    return lags
+    return stdM*epsprops
 
 def makeReconstructions(ts1,ts2,numlags,lag1,lag2):
     M1 = SSR.makeShadowManifold(ts1,numlags,lag1)
@@ -125,48 +117,117 @@ def makeReconstructions(ts1,ts2,numlags,lag1,lag2):
         M1 = M1[(lag2-lag1)*(numlags-1):,:]
     return M1,M2
 
-def convergenceWithContinuityTest(ts1,ts2,numlags,lags=None,masterts=np.arange(0.4,1.1,0.2),mastereps=np.array([0.005,0.01,0.02,0.05,0.1,0.2])):
+def convergenceWithContinuityTestMultipleLags(ts1,ts2,numlags,lags,tsprops=np.arange(0.4,1.1,0.2),epsprops=np.array([0.005,0.01,0.02,0.05,0.1,0.2])):
     '''
-    We are checking for convergence patterns in time series length and in mastereps
-    to establish a confidence level for continuity and inverse continuity
-    between reconstructions M1 and M2 built from timeseries ts1 and ts2. 
+    Perform Pecora's continuity tests between reconstructions M1 and M2 built from
+    time series ts1 and ts2 with parameters numlags (embedding dimension) and lags 
+    (lag sizes). The continuity test will be performed in the forward and reverse 
+    directions for increasing proportions of the time series (proportions given in 
+    tsprops) and for a collection of epsilons. The epsilons are given as proportions 
+    (in epsprops) of the standard deviation of each M1 and M2 for each length.
+
+    ts1 and ts2 are 1D numpy arrays, numlags is an integer, lags is a list of lists, 
+    and tsprops and epsprops are numpy arrays with values between 0 and 1 with default 
+    values in the function argument list. lags will be a list containing n 2-element 
+    lists where n = len(tsprops). Each sublist is of the form [lag1N, lag2N], where
+    lag1N is the appropriate lag for ts1[:N] and likewise for lag2N. It is an error
+    if the lengths of lags and tsprops do not match.
+
+    The output is two numpy arrays, one containing the results of the forward 
+    continuity test and the other of the inverse test. The rows correspond to different
+    time series lengths, and the columns to different epsilons.
+
+    If we have high confidence for some small epsilons and that confidence increases
+    with increasing time series length, then we conclude that we have circumstantial
+    evidence for a continuous function. 
 
     '''
-    Mlens = (np.round(len(ts1)*masterts)).astype(int)
-    if lags == None:
-        lags = chooseLags(ts1,ts2,Mlens)
-    # if lags = [[lag1,lag2]], then preconstruct manifolds
-    if len(lags) == 1 and len(Mlens) > 1: 
-        M1,M2 = makeReconstructions(ts1,ts2,numlags,lags[-1][0],lags[-1][1]) 
-    forwardconf = np.zeros((len(Mlens),len(mastereps)))
-    inverseconf = np.zeros((len(Mlens),len(mastereps)))
+    if len(lags) != len(tsprops):
+        raise ValueError("The lengths of lags and tsprops must be equal.")
+    Mlens = (np.round(len(ts1)*tsprops)).astype(int)
+    forwardconf = np.zeros((len(Mlens),len(epsprops)))
+    inverseconf = np.zeros((len(Mlens),len(epsprops)))
     for j,L in enumerate(Mlens):
         print('-----------------------')
         print('{0} of {1} lengths'.format(j+1,len(Mlens)))
         print('-----------------------')
-        if len(lags) == 1 and len(Mlens) > 1: 
-            lag = max(lags[0])
-            M1L = M1[:L-lag*(numlags-1),:]
-            M2L = M2[:L-lag*(numlags-1),:]
-        else:
-            if lags[j][0]*(numlags-1) >= L or lags[j][1]*(numlags-1) >= L:
+        if lags[j][0]*(numlags-1) >= L or lags[j][1]*(numlags-1) >= L:
                 print("Lag {0} is too big compared to timeseries length {1}.".format(max(lags[j]),L))
                 continue
-            M1L,M2L = makeReconstructions(ts1[:L],ts2[:L],numlags,lags[j][0],lags[j][1])
+        M1L,M2L = makeReconstructions(ts1[:L],ts2[:L],numlags,lags[j][0],lags[j][1])
         # choose 10% of points randomly in the reconstructions to test
         N = int(np.round(0.1*M1L.shape[0]))
         ptinds = random.sample(range(M1L.shape[0]),N) 
         dists1 = cacheDistances(M1L,ptinds)
         dists2 = cacheDistances(M2L,ptinds)
-        epslist1 = chooseEpsilons(M2L,mastereps) # M2 is range in forward continuity 
-        epslist2 = chooseEpsilons(M1L,mastereps) # M1 is range in inverse continuity
+        epslist1 = chooseEpsilons(M2L,epsprops) # M2 is range in forward continuity 
+        epslist2 = chooseEpsilons(M1L,epsprops) # M1 is range in inverse continuity
         for k,eps1 in enumerate(epslist1):
             print('{0} of {1} epsilons'.format(k+1,len(epslist1)))
-            # print('Forward')
             forwardconf[j,k] = continuityTest(dists1,dists2,ptinds,eps1,epslist2[k])
-            # print('Inverse')
             inverseconf[j,k] = continuityTest(dists2,dists1,ptinds,epslist2[k],eps1)
     return forwardconf, inverseconf
+
+def convergenceWithContinuityTestFixedLags(ts1,ts2,numlags,lag1,lag2,tsprops=np.arange(0.4,1.1,0.2),epsprops=np.array([0.005,0.01,0.02,0.05,0.1,0.2])):
+    '''
+    Perform Pecora's continuity tests between reconstructions M1 and M2 built from
+    time series ts1 and ts2 with parameters numlags (embedding dimension) and lag1 
+    and lag2 (lag sizes). The continuity test will be performed in the forward and 
+    reverse directions for increasing proportions of the time series (proportions 
+    given in tsprops) and for a collection of epsilons. The epsilons are given as 
+    proportions (in epsprops) of the standard deviation of each M1 and M2 for each 
+    length.
+
+    ts1 and ts2 are 1D numpy arrays, numlags, lag1, and lag2 are all integers, and 
+    tsprops and epsprops are numpy arrays with values between 0 and 1 with default 
+    values in the function argument list. 
+
+    The output is two numpy arrays, one containing the results of the forward 
+    continuity test and the other of the inverse test. The rows correspond to different
+    time series lengths, and the columns to different epsilons.
+
+    If we have high confidence for some small epsilons and that confidence increases
+    with increasing time series length, then we conclude that we have circumstantial
+    evidence for a continuous function. 
+
+    '''
+    Mlens = (np.round(len(ts1)*tsprops)).astype(int)
+    M1,M2 = makeReconstructions(ts1,ts2,numlags,lag1,lag2) 
+    forwardconf = np.zeros((len(Mlens),len(epsprops)))
+    inverseconf = np.zeros((len(Mlens),len(epsprops)))
+    reflag = max(lag1,lag2)
+    badL = np.nonzero(Mlens < reflag*(numlags-1) )[0]
+    if np.any( badL ):
+        for n in badL:
+            print("Lag {0} is too big compared to timeseries length {1}. Skipping it.".format(reflag,Mlens(n)))
+    for j,L in enumerate(Mlens):
+        print('-----------------------')
+        print('{0} of {1} lengths'.format(j+1,len(Mlens)))
+        print('-----------------------')
+        if j in badL:
+            continue
+        M1L = M1[:L-reflag*(numlags-1),:]
+        M2L = M2[:L-reflag*(numlags-1),:]
+        # choose 10% of points randomly in the reconstructions to test
+        N = int(np.round(0.1*M1L.shape[0]))
+        ptinds = random.sample(range(M1L.shape[0]),N) 
+        dists1 = cacheDistances(M1L,ptinds)
+        dists2 = cacheDistances(M2L,ptinds)
+        epslist1 = chooseEpsilons(M2L,epsprops) # M2 is range in forward continuity 
+        epslist2 = chooseEpsilons(M1L,epsprops) # M1 is range in inverse continuity
+        for k,eps1 in enumerate(epslist1):
+            print('{0} of {1} epsilons'.format(k+1,len(epslist1)))
+            forwardconf[j,k] = continuityTest(dists1,dists2,ptinds,eps1,epslist2[k])
+            inverseconf[j,k] = continuityTest(dists2,dists1,ptinds,epslist2[k],eps1)
+    return forwardconf, inverseconf
+
+def chooseLags(ts1,ts2,Mlens):
+    lags = []
+    for L in Mlens:
+        print("Time series length: {0}".format(L))
+        ls = SSR.chooseLagSize(ts1[:L],ts2[:L])
+        lags.append(ls)
+    return lags
 
 def testLagsWithDifferentChunks(ts,L,N):
     '''

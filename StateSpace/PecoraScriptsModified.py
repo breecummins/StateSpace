@@ -24,54 +24,59 @@ def doublependulummodifiedTS(finaltime=600.0,dt=0.025):
     names = ['x','y','z','w']
     return eqns,names,timeseries
 
-def testDoublePendulum(masterts,mastereps,fname='',lags=None):
+def testDoublePendulum(compinds,tsprops,epsprops,fname='',lags=None):
     eqns,names,ts = doublependulumTS(finaltime=1200.0)
-    compind1=2
-    compind2=3
     numlags = 5 #num dims
-    forwardconf, inverseconf = PM.convergenceWithContinuityTest(ts[:,compind1],ts[:,compind2],numlags,lags,masterts=masterts,mastereps=mastereps)
-    forwardtitle = eqns + r', M{0} $\to$ M{1}'.format(names[compind1],names[compind2])
-    inversetitle = eqns + r', M{1} $\to$ M{0}'.format(names[compind1],names[compind2])
-    outdict = dict([(x,locals()[x]) for x in ['forwardconf','inverseconf','forwardtitle','inversetitle','numlags','lags','ts','masterts','mastereps']])
+    if len(lags) == 1:
+        forwardconf, inverseconf = PM.convergenceWithContinuityTestFixedLags(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags[0][0],lags[0][1],tsprops=tsprops,epsprops=epsprops)
+    else:
+        forwardconf, inverseconf = PM.convergenceWithContinuityTestMultipleLags(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags,tsprops=tsprops,epsprops=epsprops)
+    forwardtitle = eqns + r', M{0} $\to$ M{1}'.format(names[compinds[0]],names[compinds[1]])
+    inversetitle = eqns + r', M{1} $\to$ M{0}'.format(names[compinds[0]],names[compinds[1]])
+    outdict = dict([(x,locals()[x]) for x in ['forwardconf','inverseconf','forwardtitle','inversetitle','numlags','lags','ts','tsprops','epsprops']])
     if fname:
         fileops.dumpPickle(outdict,fname)
     else:
         return outdict
 
-def testDoublePendulumModified(compinds,masterts,mastereps,fname='',lags=None):
+def testDoublePendulumModified(compinds,tsprops,epsprops,fname='',lags=None):
     eqns,names,ts = doublependulummodifiedTS(finaltime=1200.0)
     numlags = 5 #num dims
-    forwardconf, inverseconf = PM.convergenceWithContinuityTest(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags,masterts=masterts,mastereps=mastereps)
+    if len(lags) == 1:
+        forwardconf, inverseconf = PM.convergenceWithContinuityTestFixedLags(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags[0][0],lags[0][1],tsprops=tsprops,epsprops=epsprops)
+    else:
+        forwardconf, inverseconf = PM.convergenceWithContinuityTestMultipleLags(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags,tsprops=tsprops,epsprops=epsprops)
     forwardtitle = eqns + r', M{0} $\to$ M{1}'.format(names[compinds[0]],names[compinds[1]])
     inversetitle = eqns + r', M{1} $\to$ M{0}'.format(names[compinds[0]],names[compinds[1]])
-    outdict = dict([(x,locals()[x]) for x in ['forwardconf','inverseconf','forwardtitle','inversetitle','numlags','lags','ts','masterts','mastereps']])
+    outdict = dict([(x,locals()[x]) for x in ['forwardconf','inverseconf','forwardtitle','inversetitle','numlags','lags','ts','tsprops','epsprops']])
     if fname:
         fileops.dumpPickle(outdict,fname)
     else:
         return outdict
 
 if __name__ == '__main__':
-    masterts = np.arange(0.5,0.85,0.1)
-    mastereps=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
-    compinds = [0,1]
-    lags = [[100,100]]
-    basedir = '/home/bcummins/'
-    fname = 'DPMod_1200time_samefixedlags_xy.pickle'
-    testDoublePendulumModified(compinds,masterts,mastereps,fname=basedir+fname,lags = lags)
-    # outdict = testDoublePendulum(masterts,mastereps)
-    # eqns,names,ts = doublependulummodifiedTS(finaltime=1200.0)
-    # compind1=2
-    # for p in [0.1,0.2,0.4]:
-    #     L = int(round(p*ts.shape[0]))
-    #     for N in [20]:
-    #         lags = PM.testLagsWithDifferentChunks(ts[:,compind1],L,N)
-    #         print('z: {0} trials of length {1} in a length {2} timeseries.'.format(N,L,ts.shape[0]))
-    #         print( ( np.min(lags), np.max(lags), np.mean(lags) ) )
+    # tsprops = np.arange(0.5,0.85,0.1)
+    # epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
+    # compinds = [0,1]
+    # lags = [[100,100]]
+    # basedir = '/home/bcummins/'
+    # fname = 'DPMod_1200time_samefixedlags_xy.pickle'
+    # testDoublePendulumModified(compinds,tsprops,epsprops,fname=basedir+fname,lags = lags)
+    # outdict = testDoublePendulum(tsprops,epsprops)
+    
+    eqns,names,ts = doublependulummodifiedTS(finaltime=1200.0)
+    compind1=2
+    for p in [0.1,0.2,0.4,0.6,0.8]:
+        L = int(round(p*ts.shape[0]))
+        for N in [20]:
+            lags = PM.testLagsWithDifferentChunks(ts[:,compind1],L,N)
+            print('z: {0} trials of length {1} in a length {2} timeseries.'.format(N,L,ts.shape[0]))
+            print( ( np.min(lags), np.max(lags), np.mean(lags) ) )
 
-    # compind1=3
-    # for p in [0.1,0.2,0.4]:
-    #     L = int(round(p*ts.shape[0]))
-    #     for N in [20]:
-    #         lags = PM.testLagsWithDifferentChunks(ts[:,compind1],L,N)
-    #         print('w: {0} trials of length {1} in a length {2} timeseries.'.format(N,L,ts.shape[0]))
-    #         print( ( np.min(lags), np.max(lags), np.mean(lags) ) )
+    compind1=3
+    for p in [0.1,0.2,0.4,0.6,0.8]:
+        L = int(round(p*ts.shape[0]))
+        for N in [20]:
+            lags = PM.testLagsWithDifferentChunks(ts[:,compind1],L,N)
+            print('w: {0} trials of length {1} in a length {2} timeseries.'.format(N,L,ts.shape[0]))
+            print( ( np.min(lags), np.max(lags), np.mean(lags) ) )
