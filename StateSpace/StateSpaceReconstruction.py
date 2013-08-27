@@ -112,7 +112,7 @@ def evaluateSimilarity(int1,int2,N):
     N is a normalization factor.
 
     '''
-    if float(int1)/int2 < 4./3 and float(int1)/int2 > 3./4 and float(int1)/N < 0.10 and float(int2)/N < 0.10:
+    if float(int1)/int2 < 4./3 and float(int1)/int2 > 3./4:
         return [int(np.mean([int1,int2]))]
     else:
         if int1 < int2:

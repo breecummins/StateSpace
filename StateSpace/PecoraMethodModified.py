@@ -113,6 +113,16 @@ def chooseLags(ts1,ts2,Mlens):
         lags.append(ls)
     return lags
 
+def makeReconstructions(ts1,ts2,numlags,lag1,lag2):
+    M1 = SSR.makeShadowManifold(ts1,numlags,lag1)
+    M2 = SSR.makeShadowManifold(ts2,numlags,lag2)
+    # if the lags are different, remove noncontemporaneous points from the front of the M with more points (constructed with the smaller lag)
+    if M2.shape[0] > M1.shape[0]:
+        M2 = M2[(lag1-lag2)*(numlags-1):,:]
+    elif M1.shape[0] > M2.shape[0]:
+        M1 = M1[(lag2-lag1)*(numlags-1):,:]
+    return M1,M2
+
 def convergenceWithContinuityTest(ts1,ts2,numlags,lags=None,masterts=np.arange(0.4,1.1,0.2),mastereps=np.array([0.005,0.01,0.02,0.05,0.1,0.2])):
     '''
     We are checking for convergence patterns in time series length and in mastereps
@@ -123,8 +133,7 @@ def convergenceWithContinuityTest(ts1,ts2,numlags,lags=None,masterts=np.arange(0
     Mlens = (np.round(len(ts1)*masterts)).astype(int)
     if lags == None:
         lags = chooseLags(ts1,ts2,Mlens)
-    M1 = SSR.makeShadowManifold(ts1,numlags,min([l[0] for l in lags]))
-    M2 = SSR.makeShadowManifold(ts2,numlags,min([l[1] for l in lags]))
+    M1,M2 = makeReconstructions(ts1,ts2,numlags,lags[0][0],lags[0][1])
     epslist1 = chooseEpsilons(M2,mastereps) # M2 is range in forward continuity 
     epslist2 = chooseEpsilons(M1,mastereps) # M1 is range in inverse continuity
     forwardconf = np.zeros((len(Mlens),len(mastereps)))
@@ -133,26 +142,36 @@ def convergenceWithContinuityTest(ts1,ts2,numlags,lags=None,masterts=np.arange(0
         print('-----------------------')
         print('{0} of {1} lengths'.format(j+1,len(Mlens)))
         print('-----------------------')
-        if lags[j][0]*numlags >= L or lags[j][1]*numlags >= L:
-            print("Lag {0} is too big compared to timeseries length {1}.".format(max(lags[j]),L))
-            continue
-        M1 = SSR.makeShadowManifold(ts1[:L],numlags,lags[j][0])
-        M2 = SSR.makeShadowManifold(ts2[:L],numlags,lags[j][1])
-        if M2.shape[0] > M1.shape[0]:
-            M2 = M2[(lags[j][0]-lags[j][1])*(numlags-1):,:]
-        elif M1.shape[0] > M2.shape[0]:
-            M1 = M1[(lags[j][1]-lags[j][0])*(numlags-1):,:]
-        if M1.shape[0] != M2.shape[0]:
-            print('M1 has shape {0} with lag {1}'.format(M1.shape,lags[j][0]))
-            print('M2 has shape {0} with lag {1}'.format(M2.shape,lags[j][1]))
-            raise ValueError('M1 and M2 must be the same shape. Debug.')
-        N = int(np.round(0.1*M1.shape[0]))
-        ptinds = random.sample(range(M1.shape[0]),N) # different points for each different reconstruction len
-        dists1 = cacheDistances(M1,ptinds)
-        dists2 = cacheDistances(M2,ptinds)
+        # if lags = [[lag1,lag2]], then we use those lags for all lengths in Mlens
+        if len(lags) == 1 and len(Mlens) > 1: 
+            lag = min(lags[0])
+            M1L = M1[:L-lag*(numlags-1),:]
+            M2L = M2[:L-lag*(numlags-1),:]
+        # if lags is a list of lists, then new reconstructions are necessary
+        else:
+            if lags[j][0]*(numlags-1) >= L or lags[j][1]*(numlags-1) >= L:
+                print("Lag {0} is too big compared to timeseries length {1}.".format(max(lags[j]),L))
+                continue
+            M1L,M2L = makeReconstructions(ts1[:L],ts2[:L],numlags,lags[j][0],lags[j][1])
+        # choose 10% of points randomly in the reconstructions to test
+        N = int(np.round(0.1*M1L.shape[0]))
+        ptinds = random.sample(range(M1L.shape[0]),N) 
+        dists1 = cacheDistances(M1L,ptinds)
+        dists2 = cacheDistances(M2L,ptinds)
         for k,eps1 in enumerate(epslist1):
             print('{0} of {1} epsilons'.format(k+1,len(epslist1)))
             forwardconf[j,k] = continuityTest(dists1,dists2,ptinds,eps1,epslist2[k])
             inverseconf[j,k] = continuityTest(dists2,dists1,ptinds,epslist2[k],eps1)
     return forwardconf, inverseconf
 
+def testLagsWithDifferentChunks(ts,L,N):
+    '''
+    Get lag size from timeseries ts for chunks of 
+    length L starting at N different locations.
+
+    '''
+    lags = []
+    startlocs = random.sample(range(len(ts)-L),N)
+    for s in startlocs:
+        lags.append(SSR.lagsizeFromFirstZeroOfAutocorrelation(ts[s:s+L]))
+    return lags
