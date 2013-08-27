@@ -77,6 +77,7 @@ def continuityTest(dists1,dists2,ptinds,eps,startdelta):
     contstat = np.zeros(len(ptinds))
     for k in range(len(ptinds)):
         neps = countPtsWithinEps(dists2[k],eps)
+        # print("Probability of 1 correct mapping: {0}".format(np.round(float(neps) / len(dists1[k]),3)))
         if neps > 0: # if eps big enough, continue; else leave 0 in place
             delta = 2*startdelta
             out = False
@@ -85,6 +86,7 @@ def continuityTest(dists1,dists2,ptinds,eps,startdelta):
                 out = countDeltaPtsMappedToEps(dists1[k],dists2[k],delta,eps) 
             if out: #out can be 0, in which case we want to report 0 confidence
                 contstat[k] = getContinuityConfidence(neps,out,len(dists1[k]))
+            # print("Confidence: {0}".format(contstat[k]))
     return np.mean(contstat)
 
 def cacheDistances(M,ptinds):
@@ -133,21 +135,19 @@ def convergenceWithContinuityTest(ts1,ts2,numlags,lags=None,masterts=np.arange(0
     Mlens = (np.round(len(ts1)*masterts)).astype(int)
     if lags == None:
         lags = chooseLags(ts1,ts2,Mlens)
-    M1,M2 = makeReconstructions(ts1,ts2,numlags,lags[0][0],lags[0][1])
-    epslist1 = chooseEpsilons(M2,mastereps) # M2 is range in forward continuity 
-    epslist2 = chooseEpsilons(M1,mastereps) # M1 is range in inverse continuity
+    # if lags = [[lag1,lag2]], then preconstruct manifolds
+    if len(lags) == 1 and len(Mlens) > 1: 
+        M1,M2 = makeReconstructions(ts1,ts2,numlags,lags[-1][0],lags[-1][1]) 
     forwardconf = np.zeros((len(Mlens),len(mastereps)))
     inverseconf = np.zeros((len(Mlens),len(mastereps)))
     for j,L in enumerate(Mlens):
         print('-----------------------')
         print('{0} of {1} lengths'.format(j+1,len(Mlens)))
         print('-----------------------')
-        # if lags = [[lag1,lag2]], then we use those lags for all lengths in Mlens
         if len(lags) == 1 and len(Mlens) > 1: 
-            lag = min(lags[0])
+            lag = max(lags[0])
             M1L = M1[:L-lag*(numlags-1),:]
             M2L = M2[:L-lag*(numlags-1),:]
-        # if lags is a list of lists, then new reconstructions are necessary
         else:
             if lags[j][0]*(numlags-1) >= L or lags[j][1]*(numlags-1) >= L:
                 print("Lag {0} is too big compared to timeseries length {1}.".format(max(lags[j]),L))
@@ -158,9 +158,13 @@ def convergenceWithContinuityTest(ts1,ts2,numlags,lags=None,masterts=np.arange(0
         ptinds = random.sample(range(M1L.shape[0]),N) 
         dists1 = cacheDistances(M1L,ptinds)
         dists2 = cacheDistances(M2L,ptinds)
+        epslist1 = chooseEpsilons(M2L,mastereps) # M2 is range in forward continuity 
+        epslist2 = chooseEpsilons(M1L,mastereps) # M1 is range in inverse continuity
         for k,eps1 in enumerate(epslist1):
             print('{0} of {1} epsilons'.format(k+1,len(epslist1)))
+            # print('Forward')
             forwardconf[j,k] = continuityTest(dists1,dists2,ptinds,eps1,epslist2[k])
+            # print('Inverse')
             inverseconf[j,k] = continuityTest(dists2,dists1,ptinds,epslist2[k],eps1)
     return forwardconf, inverseconf
 
