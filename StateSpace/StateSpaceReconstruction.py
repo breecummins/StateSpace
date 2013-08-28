@@ -132,7 +132,7 @@ def getUserInput(lag1,lag2,newlags):
                     newlags = [int(newlags*multiplier),newlags]
             return 'n',newlags        
 
-def chooseLagSize(ts1,ts2):
+def chooseLagSize(ts1,ts2,T=None):
     '''
     Choose lag sizes for the two time series ts1 and ts2, which
     are both 1D arrays of the same length, by calculating the 
@@ -141,8 +141,8 @@ def chooseLagSize(ts1,ts2):
     different values. 
 
     '''
-    lag1 = lagsizeFromFirstZeroOfAutocorrelation(ts1)
-    lag2 = lagsizeFromFirstZeroOfAutocorrelation(ts2)
+    lag1 = lagsizeFromFirstZeroOfAutocorrelation(ts1,T)
+    lag2 = lagsizeFromFirstZeroOfAutocorrelation(ts2,T)
     sim = evaluateLagSimilarity(lag1,lag2)
     if len(sim) == 1:
         newlags = sim*2 # list of length 2 with newlags[0] = newlags[1] = sim[0]
@@ -153,16 +153,22 @@ def chooseLagSize(ts1,ts2):
         accept,newlags = getUserInput(lag1,lag2,newlags)
     return newlags
 
-def chooseLags(ts1,ts2,Mlens):
+def chooseLags(ts1,ts2,Mlens,Tp=None):
     lags = []
-    for L in Mlens:
-        print("Time series length: {0}".format(L))
-        ls = chooseLagSize(ts1[:L],ts2[:L])
-        lags.append(ls)
+    if Tp:
+        for L in Mlens:
+            print("Time series length: {0}".format(L))
+            ls = chooseLagSize(ts1[:L],ts2[:L],int(Tp*L))
+            lags.append(ls)
+    else:
+        for L in Mlens:
+            print("Time series length: {0}".format(L))
+            ls = chooseLagSize(ts1[:L],ts2[:L])
+            lags.append(ls)
     print('Accepted lags are {0}.'.format(lags))
     return lags
 
-def testLagsWithDifferentChunks(ts,L,N):
+def testLagsWithDifferentChunks(ts,L,N,T=None):
     '''
     Get lag size from timeseries ts for chunks of 
     length L starting at N different locations.
@@ -171,7 +177,7 @@ def testLagsWithDifferentChunks(ts,L,N):
     lags = []
     startlocs = random.sample(range(len(ts)-L),N)
     for s in startlocs:
-        lags.append(lagsizeFromFirstZeroOfAutocorrelation(ts[s:s+L]))
+        lags.append(lagsizeFromFirstZeroOfAutocorrelation(ts[s:s+L],T))
     return lags
 
 

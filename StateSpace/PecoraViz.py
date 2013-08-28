@@ -86,12 +86,34 @@ def plotAutoCorrWrapper():
         plotAutocorrelation(autocorr1,"z autocorr, length {0}".format(L))
         plotAutocorrelation(autocorr2,"w autocorr, length {0}".format(L))
 
+def plotConfForCstp():
+    from scipy.misc import comb
+    def calcConf(n,p):
+        k = np.floor( (n+1)*p )
+        return 1 - (1./comb(n,k))*p**(n-k)/(1-p)**(n-k)
+    ps = [1.e-6,1.e-5,1.e-4,1.e-3,1.e-2,5.e-2]
+    nums = range(1,5)
+    for p in ps:
+        conf = []
+        for n in nums:
+            conf.append(calcConf(n,p))
+        plt.figure()
+        plt.plot(nums,conf)
+        plt.ylabel(r'$\theta$')
+        plt.xlabel(r'$n_{\delta}$')
+        plt.title(r'$p$ = {0}'.format(p))
+    plt.show()
+
+
+
 if __name__ == '__main__':
-    basedir = '/Users/bree/SimulationResults/TimeSeries/PecoraMethod/workingstuff/'
-    fname = 'DPMod_1200time_samefixedlags_zw.pickle'
-    plotContinuityConfWrapper(basedir,fname)
-    fname = 'DPMod_1200time_samefixedlags_xy.pickle'
-    plotContinuityConfWrapper(basedir,fname,[0,0])
-    fname = 'DPMod_1200time_difffixedlags_xw.pickle'
-    plotContinuityConfWrapper(basedir,fname,[1,0])
+    # basedir = '/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
+    # fname = 'DPMod_1200time_slowerdelta_samefixedlags_zw.pickle'
+    # plotContinuityConfWrapper(basedir,fname)
+    # fname = 'DPMod_1200time_slowerdelta_samefixedlags_xy.pickle'
+    # plotContinuityConfWrapper(basedir,fname,[0,0])
+    # fname = 'DPMod_1200time_slowerdelta_difffixedlags_xw.pickle'
+    # plotContinuityConfWrapper(basedir,fname,[1,0])
+    ##############################
+    plotConfForCstp()
 

@@ -47,29 +47,31 @@ def testLagsAtDifferentLocationsAndLengths(finaltime=1200.0):
 
     '''
     eqns,names,ts = doublependulummodifiedTS(finaltime)
+    tsprops = [0.1,0.2,0.4,0.6,0.8] 
+    nums = [40]
     compind1=2
-    for p in [0.1,0.2,0.4,0.6,0.8]:
+    for p in tsprops:
         L = int(round(p*ts.shape[0]))
-        for N in [20]:
-            lags = SSR.testLagsWithDifferentChunks(ts[:,compind1],L,N)
+        for N in nums:
+            lags = SSR.testLagsWithDifferentChunks(ts[:,compind1],L,N,int(0.5*L))
             print('z: {0} trials of length {1} in a length {2} timeseries.'.format(N,L,ts.shape[0]))
             print( ( np.min(lags), np.max(lags), np.mean(lags) ) )
-    compind1=3
-    for p in [0.1,0.2,0.4,0.6,0.8]:
-        L = int(round(p*ts.shape[0]))
-        for N in [20]:
-            lags = SSR.testLagsWithDifferentChunks(ts[:,compind1],L,N)
-            print('w: {0} trials of length {1} in a length {2} timeseries.'.format(N,L,ts.shape[0]))
-            print( ( np.min(lags), np.max(lags), np.mean(lags) ) )
+    # compind1=3
+    # for p in tsprops:
+    #     L = int(round(p*ts.shape[0]))
+    #     for N in nums:
+    #         lags = SSR.testLagsWithDifferentChunks(ts[:,compind1],L,N)
+    #         print('w: {0} trials of length {1} in a length {2} timeseries.'.format(N,L,ts.shape[0]))
+    #         print( ( np.min(lags), np.max(lags), np.mean(lags) ) )
 
-def chooseLagsForSims(compinds,finaltime,tsprops):
+def chooseLagsForSims(compinds,finaltime,tsprops,Tp=None):
     '''
     Only for modified double pendulum.
 
     '''
     eqns,names,ts = doublependulummodifiedTS(finaltime)
     Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
-    lags = SSR.chooseLags(ts[:,compinds[0]],ts[:,compinds[1]],Mlens)
+    lags = SSR.chooseLags(ts[:,compinds[0]],ts[:,compinds[1]],Mlens,Tp)
     return lags
 
 def getTS(finaltime):
@@ -117,7 +119,7 @@ def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     fname = 'DPMod_1200time_slowerdelta_samefixedlags_xy.pickle'
     continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
-def remoteRun():
+def remoteRun(finaltime):
     '''
     Only for modified double pendulum.
 
@@ -127,22 +129,23 @@ def remoteRun():
     print('------------------------------------')
     print('z and w')
     print('------------------------------------')
-    localRun_zw(basedir)
+    localRun_zw(basedir,finaltime)
     print('------------------------------------')
     print('x and w')
     print('------------------------------------')
-    localRun_xw(basedir)
+    localRun_xw(basedir,finaltime)
     print('------------------------------------')
     print('x and y')
     print('------------------------------------')
-    localRun_xy(basedir)
+    localRun_xy(basedir,finaltime)
 
 if __name__ == '__main__':
-    remoteRun()
+    # remoteRun()
     # ###################
-    # compinds = [0,3]
-    # finaltime = 1200.0
+    # compinds = [2,3]
+    # finaltime = 2400.0
     # tsprops = np.arange(0.2,0.95,0.1)
-    # lags = chooseLagsForSims(compinds,finaltime,tsprops)
+    # lags = chooseLagsForSims(compinds,finaltime,tsprops,0.5)
     # ###################
     # localRun_zw()
+    testLagsAtDifferentLocationsAndLengths()
