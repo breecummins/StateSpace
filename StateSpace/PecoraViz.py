@@ -72,19 +72,19 @@ def plotAutocorrelation(autocorr,title):
     plt.title(title)
     plt.show()
 
-def plotAutoCorrWrapper():
+def plotAutoCorrWrapper(finaltime=1200.0):
     import PecoraScriptsModified as PS
     import StateSpaceReconstruction as SSR
     #autocorrelation pics
-    eqns,names,ts = PS.doublependulummodifiedTS(finaltime=1200.0)
+    eqns,names,ts = PS.doublependulummodifiedTS(finaltime)
     compind1=2
-    compind2=3
-    Mlens = ts.shape[0]*np.arange(0.2,1.1,0.2)
+    # compind2=3
+    Mlens = ts.shape[0]*np.arange(0.5,1.1,0.5)
     for L in Mlens:
         autocorr1 = SSR.getAutocorrelation(ts[:L,compind1],int(0.5*L))
-        autocorr2 = SSR.getAutocorrelation(ts[:L,compind2],int(0.5*L))
+        # autocorr2 = SSR.getAutocorrelation(ts[:L,compind2],int(0.5*L))
         plotAutocorrelation(autocorr1,"z autocorr, length {0}".format(L))
-        plotAutocorrelation(autocorr2,"w autocorr, length {0}".format(L))
+        # plotAutocorrelation(autocorr2,"w autocorr, length {0}".format(L))
 
 def plotConfForCstp():
     from scipy.misc import comb
@@ -114,6 +114,7 @@ if __name__ == '__main__':
     # plotContinuityConfWrapper(basedir,fname,[0,0])
     # fname = 'DPMod_1200time_slowerdelta_difffixedlags_xw.pickle'
     # plotContinuityConfWrapper(basedir,fname,[1,0])
+    # ##############################
+    # plotConfForCstp()
     ##############################
-    plotConfForCstp()
-
+    plotAutoCorrWrapper(2400.0)

@@ -80,7 +80,7 @@ def getTS(finaltime):
 
     '''
     eqns,names,ts = doublependulummodifiedTS(finaltime)
-    tsprops = np.arange(0.5,0.85,0.1)
+    tsprops = np.arange(0.3,0.85,0.1)
     return eqns,names,ts,tsprops
 
 def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
@@ -92,7 +92,7 @@ def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     epsprops=np.array([0.005,0.0075,0.01,0.0125,0.015,0.02,0.04]) #for z and w
     compinds = [2,3]
     lags = [[5600,5600]]
-    fname = 'DPMod_1200time_slowerdelta_samefixedlags_zw.pickle'
+    fname = 'DPMod_2400time_slowerdelta_samefixedlags_zw.pickle'
     continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
@@ -104,7 +104,7 @@ def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
     compinds = [0,3]
     lags = [[100,5600]]
-    fname = 'DPMod_1200time_slowerdelta_difffixedlags_xw.pickle'
+    fname = 'DPMod_2400time_slowerdelta_difffixedlags_xw.pickle'
     continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
@@ -116,7 +116,7 @@ def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
     compinds = [0,1]
     lags = [[100,100]]
-    fname = 'DPMod_1200time_slowerdelta_samefixedlags_xy.pickle'
+    fname = 'DPMod_2400time_slowerdelta_samefixedlags_xy.pickle'
     continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def remoteRun(finaltime):
@@ -140,7 +140,7 @@ def remoteRun(finaltime):
     localRun_xy(basedir,finaltime)
 
 if __name__ == '__main__':
-    # remoteRun()
+    # remoteRun(2400.0)
     # ###################
     # compinds = [2,3]
     # finaltime = 2400.0
@@ -148,4 +148,4 @@ if __name__ == '__main__':
     # lags = chooseLagsForSims(compinds,finaltime,tsprops,0.5)
     # ###################
     # localRun_zw()
-    testLagsAtDifferentLocationsAndLengths()
+    testLagsAtDifferentLocationsAndLengths(2400.0)
