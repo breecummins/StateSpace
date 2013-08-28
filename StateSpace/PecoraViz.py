@@ -42,6 +42,26 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
         plt.title(inversetitle)
     plt.show()
 
+def plotContinuityConfWrapper(basedir,fname,logs=[1,1]):
+    outdict = fileops.loadPickle(basedir+fname)
+    np.set_printoptions(linewidth=125)
+    print("Epsilon as proportions of (changing) standard deviations: {0}.".format(outdict['epsprops']))
+    print("Forward continuity confidence: ")
+    print(outdict['forwardconf'])
+    print("Inverse continuity confidence: ")
+    print(outdict['inverseconf'])
+    print("Real epsilon values for M1: ")
+    for e in outdict['epsM1']: 
+        print(e)
+    print("Real epsilon values for M2: ")
+    for e in outdict['epsM2']: 
+        print(e)
+    print("Forward probability of one point mapping into M2 epsilon: ")
+    print(outdict['forwardprobs'])
+    print("Inverse probability of one point mapping into M1 epsilon: ")
+    print(outdict['inverseprobs'])    
+    plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['epsprops'],outdict['tsprops'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'],logs)
+
 def plotAutocorrelation(autocorr,title):
     plt.figure()
     plt.plot([1,len(autocorr)+1],[0,0],'k')
@@ -52,40 +72,22 @@ def plotAutocorrelation(autocorr,title):
     plt.title(title)
     plt.show()
 
-
-if __name__ == '__main__':
+def plotAutoCorrWrapper():
     import PecoraScriptsModified as PS
     import StateSpaceReconstruction as SSR
-    tsprops = np.arange(0.5,0.85,0.1)
-    epsprops=np.array([0.005,0.0075,0.01,0.0125,0.015,0.02,0.04]) #for z and w
-    # epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
-    # epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
-    # # outdict = PS.testLorenz(tsprops,epsprops)
-    # outdict = PS.testDoublePendulum(tsprops,epsprops)
-    # outdict = fileops.loadPickle('DP_600pts_28lag_zw.pickle')
-    # outdict = fileops.loadPickle('DP_1200pts_117lag_zw.pickle')
-    # outdict = fileops.loadPickle('DP_1200pts_307lag_zw.pickle')
-    # outdict = fileops.loadPickle('DP_2400pts_504lag_zw.pickle')
-    # outdict = fileops.loadPickle('DP_2400pts_6900lag_zw_closeup.pickle')
+    #autocorrelation pics
+    eqns,names,ts = PS.doublependulummodifiedTS(finaltime=1200.0)
+    compind1=2
+    compind2=3
+    Mlens = ts.shape[0]*np.arange(0.2,1.1,0.2)
+    for L in Mlens:
+        autocorr1 = SSR.getAutocorrelation(ts[:L,compind1],int(0.5*L))
+        autocorr2 = SSR.getAutocorrelation(ts[:L,compind2],int(0.5*L))
+        plotAutocorrelation(autocorr1,"z autocorr, length {0}".format(L))
+        plotAutocorrelation(autocorr2,"w autocorr, length {0}".format(L))
+
+if __name__ == '__main__':
     basedir = '/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     fname = 'DPMod_1200time_samefixedlags_zw.pickle'
-    # PS.testDoublePendulumModified([2,3],tsprops,epsprops,fname = basedir+fname,lags = [[5600,5600]])
-    outdict = fileops.loadPickle(basedir+fname)
-    logs = [1,1]
-    print(outdict['epsprops'])
-    print(outdict['forwardconf'])
-    print(outdict['inverseconf'])
-    plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['epsprops'],outdict['tsprops'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'],logs)
+    plotContinuityConfWrapper(basedir,fname)
 
-    # #autocorrelation pics
-    # eqns,names,ts = PS.doublependulummodifiedTS(finaltime=1200.0)
-    # compind1=2
-    # compind2=3
-    # # autocorr1 = SSR.getAutocorrelation(ts[:,compind1],int(ts.shape[0] / 3.))
-    # # plotAutocorrelation(autocorr1,"length {0}".format(ts.shape[0]))
-    # Mlens = ts.shape[0]*np.arange(0.2,1.1,0.2)
-    # for L in Mlens:
-    #     autocorr1 = SSR.getAutocorrelation(ts[:L,compind1],int(0.5*L))
-    #     autocorr2 = SSR.getAutocorrelation(ts[:L,compind2],int(0.5*L))
-    #     plotAutocorrelation(autocorr1,"z autocorr, length {0}".format(L))
-    #     plotAutocorrelation(autocorr2,"w autocorr, length {0}".format(L))

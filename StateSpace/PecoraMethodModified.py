@@ -75,8 +75,11 @@ def continuityTest(dists1,dists2,ptinds,eps,startdelta):
 
     '''
     contstat = np.zeros(len(ptinds))
+    # record individual probabilities - not directly needed for the method, needed for interpretation
+    probs = np.zeros(len(ptinds))
     for k in range(len(ptinds)):
         neps = countPtsWithinEps(dists2[k],eps)
+        probs[k] = float(neps) / len(dists1[k])
         # print("Probability of 1 correct mapping: {0}".format(np.round(float(neps) / len(dists1[k]),3)))
         if neps > 0: # if eps big enough, continue; else leave 0 in place
             delta = 2*startdelta
@@ -87,7 +90,7 @@ def continuityTest(dists1,dists2,ptinds,eps,startdelta):
             if out: #out can be 0, in which case we want to report 0 confidence
                 contstat[k] = getContinuityConfidence(neps,out,len(dists1[k]))
             # print("Confidence: {0}".format(contstat[k]))
-    return np.mean(contstat)
+    return np.mean(contstat), np.mean(probs)
 
 def cacheDistances(M,ptinds):
     dists = []
@@ -147,12 +150,16 @@ def convergenceWithContinuityTestMultipleLags(ts1,ts2,numlags,lags,tsprops=np.ar
     Mlens = (np.round(len(ts1)*tsprops)).astype(int)
     forwardconf = np.zeros((len(Mlens),len(epsprops)))
     inverseconf = np.zeros((len(Mlens),len(epsprops)))
+    forwardprobs = np.zeros((len(Mlens),len(epsprops)))
+    inverseprobs = np.zeros((len(Mlens),len(epsprops)))
+    epsvalsM1 = []
+    epsvalsM2 = []
     for j,L in enumerate(Mlens):
         print('-----------------------')
         print('{0} of {1} lengths'.format(j+1,len(Mlens)))
         print('-----------------------')
         if lags[j][0]*(numlags-1) >= L or lags[j][1]*(numlags-1) >= L:
-                print("Lag {0} is too big compared to timeseries length {1}.".format(max(lags[j]),L))
+                print("Lag {0} is too big compared to timeseries length {1}. Skipping it.".format(max(lags[j]),L))
                 continue
         M1L,M2L = makeReconstructions(ts1[:L],ts2[:L],numlags,lags[j][0],lags[j][1])
         # choose 10% of points randomly in the reconstructions to test
@@ -162,11 +169,13 @@ def convergenceWithContinuityTestMultipleLags(ts1,ts2,numlags,lags,tsprops=np.ar
         dists2 = cacheDistances(M2L,ptinds)
         epslist1 = chooseEpsilons(M2L,epsprops) # M2 is range in forward continuity 
         epslist2 = chooseEpsilons(M1L,epsprops) # M1 is range in inverse continuity
+        epsvalsM1.append(epslist2)
+        epsvalsM2.append(epslist1)
         for k,eps1 in enumerate(epslist1):
             print('{0} of {1} epsilons'.format(k+1,len(epslist1)))
-            forwardconf[j,k] = continuityTest(dists1,dists2,ptinds,eps1,epslist2[k])
-            inverseconf[j,k] = continuityTest(dists2,dists1,ptinds,epslist2[k],eps1)
-    return forwardconf, inverseconf
+            forwardconf[j,k],forwardprobs[j,k] = continuityTest(dists1,dists2,ptinds,eps1,epslist2[k])
+            inverseconf[j,k],inverseprobs[j,k] = continuityTest(dists2,dists1,ptinds,epslist2[k],eps1)
+    return forwardconf, inverseconf,epsvalsM1,epsvalsM2,forwardprobs,inverseprobs
 
 def convergenceWithContinuityTestFixedLags(ts1,ts2,numlags,lag1,lag2,tsprops=np.arange(0.4,1.1,0.2),epsprops=np.array([0.005,0.01,0.02,0.05,0.1,0.2])):
     '''
@@ -193,13 +202,17 @@ def convergenceWithContinuityTestFixedLags(ts1,ts2,numlags,lag1,lag2,tsprops=np.
     '''
     Mlens = (np.round(len(ts1)*tsprops)).astype(int)
     M1,M2 = makeReconstructions(ts1,ts2,numlags,lag1,lag2) 
-    forwardconf = np.zeros((len(Mlens),len(epsprops)))
-    inverseconf = np.zeros((len(Mlens),len(epsprops)))
     reflag = max(lag1,lag2)
     badL = np.nonzero(Mlens < reflag*(numlags-1) )[0]
     if np.any( badL ):
         for n in badL:
             print("Lag {0} is too big compared to timeseries length {1}. Skipping it.".format(reflag,Mlens(n)))
+    forwardconf = np.zeros((len(Mlens),len(epsprops)))
+    inverseconf = np.zeros((len(Mlens),len(epsprops)))
+    forwardprobs = np.zeros((len(Mlens),len(epsprops)))
+    inverseprobs = np.zeros((len(Mlens),len(epsprops)))
+    epsvalsM1 = []
+    epsvalsM2 = []
     for j,L in enumerate(Mlens):
         print('-----------------------')
         print('{0} of {1} lengths'.format(j+1,len(Mlens)))
@@ -215,28 +228,11 @@ def convergenceWithContinuityTestFixedLags(ts1,ts2,numlags,lag1,lag2,tsprops=np.
         dists2 = cacheDistances(M2L,ptinds)
         epslist1 = chooseEpsilons(M2L,epsprops) # M2 is range in forward continuity 
         epslist2 = chooseEpsilons(M1L,epsprops) # M1 is range in inverse continuity
+        epsvalsM1.append(epslist2)
+        epsvalsM2.append(epslist1)
         for k,eps1 in enumerate(epslist1):
             print('{0} of {1} epsilons'.format(k+1,len(epslist1)))
-            forwardconf[j,k] = continuityTest(dists1,dists2,ptinds,eps1,epslist2[k])
-            inverseconf[j,k] = continuityTest(dists2,dists1,ptinds,epslist2[k],eps1)
-    return forwardconf, inverseconf
+            forwardconf[j,k],forwardprobs[j,k] = continuityTest(dists1,dists2,ptinds,eps1,epslist2[k])
+            inverseconf[j,k],inverseprobs[j,k] = continuityTest(dists2,dists1,ptinds,epslist2[k],eps1)
+    return forwardconf, inverseconf,epsvalsM1,epsvalsM2,forwardprobs,inverseprobs
 
-def chooseLags(ts1,ts2,Mlens):
-    lags = []
-    for L in Mlens:
-        print("Time series length: {0}".format(L))
-        ls = SSR.chooseLagSize(ts1[:L],ts2[:L])
-        lags.append(ls)
-    return lags
-
-def testLagsWithDifferentChunks(ts,L,N):
-    '''
-    Get lag size from timeseries ts for chunks of 
-    length L starting at N different locations.
-
-    '''
-    lags = []
-    startlocs = random.sample(range(len(ts)-L),N)
-    for s in startlocs:
-        lags.append(SSR.lagsizeFromFirstZeroOfAutocorrelation(ts[s:s+L]))
-    return lags

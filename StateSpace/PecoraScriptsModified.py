@@ -24,59 +24,125 @@ def doublependulummodifiedTS(finaltime=600.0,dt=0.025):
     names = ['x','y','z','w']
     return eqns,names,timeseries
 
-def testDoublePendulum(compinds,tsprops,epsprops,fname='',lags=None):
-    eqns,names,ts = doublependulumTS(finaltime=1200.0)
-    numlags = 5 #num dims
+def continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname='',numlags=5):
+    '''
+    Will work with any of the equations, Lorenz, double pendulum, or modified double pendulum.
+
+    '''
     if len(lags) == 1:
-        forwardconf, inverseconf = PM.convergenceWithContinuityTestFixedLags(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags[0][0],lags[0][1],tsprops=tsprops,epsprops=epsprops)
+        forwardconf, inverseconf, epsM1, epsM2, forwardprobs, inverseprobs = PM.convergenceWithContinuityTestFixedLags(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags[0][0],lags[0][1],tsprops=tsprops,epsprops=epsprops)
     else:
-        forwardconf, inverseconf = PM.convergenceWithContinuityTestMultipleLags(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags,tsprops=tsprops,epsprops=epsprops)
+        forwardconf, inverseconf, epsM1, epsM2, forwardprobs, inverseprobs = PM.convergenceWithContinuityTestMultipleLags(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags,tsprops=tsprops,epsprops=epsprops)
     forwardtitle = eqns + r', M{0} $\to$ M{1}'.format(names[compinds[0]],names[compinds[1]])
     inversetitle = eqns + r', M{1} $\to$ M{0}'.format(names[compinds[0]],names[compinds[1]])
-    outdict = dict([(x,locals()[x]) for x in ['forwardconf','inverseconf','forwardtitle','inversetitle','numlags','lags','ts','tsprops','epsprops']])
+    outdict = dict([(x,locals()[x]) for x in ['forwardconf','inverseconf','forwardtitle','inversetitle','numlags','lags','ts','tsprops','epsprops','epsM1','epsM2','forwardprobs','inverseprobs']])
     if fname:
         fileops.dumpPickle(outdict,fname)
     else:
         return outdict
 
-def testDoublePendulumModified(compinds,tsprops,epsprops,fname='',lags=None):
-    eqns,names,ts = doublependulummodifiedTS(finaltime=1200.0)
-    numlags = 5 #num dims
-    if len(lags) == 1:
-        forwardconf, inverseconf = PM.convergenceWithContinuityTestFixedLags(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags[0][0],lags[0][1],tsprops=tsprops,epsprops=epsprops)
-    else:
-        forwardconf, inverseconf = PM.convergenceWithContinuityTestMultipleLags(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags,tsprops=tsprops,epsprops=epsprops)
-    forwardtitle = eqns + r', M{0} $\to$ M{1}'.format(names[compinds[0]],names[compinds[1]])
-    inversetitle = eqns + r', M{1} $\to$ M{0}'.format(names[compinds[0]],names[compinds[1]])
-    outdict = dict([(x,locals()[x]) for x in ['forwardconf','inverseconf','forwardtitle','inversetitle','numlags','lags','ts','tsprops','epsprops']])
-    if fname:
-        fileops.dumpPickle(outdict,fname)
-    else:
-        return outdict
+def testLagsAtDifferentLocationsAndLengths(finaltime=1200.0):
+    '''
+    Only for modified double pendulum.
 
-if __name__ == '__main__':
-    # tsprops = np.arange(0.5,0.85,0.1)
-    # epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
-    # compinds = [0,1]
-    # lags = [[100,100]]
-    # basedir = '/home/bcummins/'
-    # fname = 'DPMod_1200time_samefixedlags_xy.pickle'
-    # testDoublePendulumModified(compinds,tsprops,epsprops,fname=basedir+fname,lags = lags)
-    # outdict = testDoublePendulum(tsprops,epsprops)
-    
-    eqns,names,ts = doublependulummodifiedTS(finaltime=1200.0)
+    '''
+    eqns,names,ts = doublependulummodifiedTS(finaltime)
     compind1=2
     for p in [0.1,0.2,0.4,0.6,0.8]:
         L = int(round(p*ts.shape[0]))
         for N in [20]:
-            lags = PM.testLagsWithDifferentChunks(ts[:,compind1],L,N)
+            lags = SSR.testLagsWithDifferentChunks(ts[:,compind1],L,N)
             print('z: {0} trials of length {1} in a length {2} timeseries.'.format(N,L,ts.shape[0]))
             print( ( np.min(lags), np.max(lags), np.mean(lags) ) )
-
     compind1=3
     for p in [0.1,0.2,0.4,0.6,0.8]:
         L = int(round(p*ts.shape[0]))
         for N in [20]:
-            lags = PM.testLagsWithDifferentChunks(ts[:,compind1],L,N)
+            lags = SSR.testLagsWithDifferentChunks(ts[:,compind1],L,N)
             print('w: {0} trials of length {1} in a length {2} timeseries.'.format(N,L,ts.shape[0]))
             print( ( np.min(lags), np.max(lags), np.mean(lags) ) )
+
+def chooseLagsForSims(compinds,finaltime,tsprops):
+    '''
+    Only for modified double pendulum.
+
+    '''
+    eqns,names,ts = doublependulummodifiedTS(finaltime)
+    Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
+    lags = SSR.chooseLags(ts[:,compinds[0]],ts[:,compinds[1]],Mlens)
+    return lags
+
+def getTS(finaltime):
+    '''
+    Only for modified double pendulum.
+
+    '''
+    eqns,names,ts = doublependulummodifiedTS(finaltime)
+    tsprops = np.arange(0.5,0.85,0.1)
+    return eqns,names,ts,tsprops
+
+def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+    '''
+    Only for modified double pendulum.
+
+    '''
+    eqns,names,ts,tsprops = getTS(finaltime)
+    epsprops=np.array([0.005,0.0075,0.01,0.0125,0.015,0.02,0.04]) #for z and w
+    compinds = [2,3]
+    lags = [[5600,5600]]
+    fname = 'DPMod_1200time_samefixedlags_zw.pickle'
+    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+
+def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+    '''
+    Only for modified double pendulum.
+
+    '''
+    eqns,names,ts,tsprops = getTS(finaltime)
+    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
+    compinds = [0,3]
+    lags = [[100,5600]]
+    fname = 'DPMod_1200time_difffixedlags_xw.pickle'
+    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+
+def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+    '''
+    Only for modified double pendulum.
+
+    '''
+    eqns,names,ts,tsprops = getTS(finaltime)
+    epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
+    compinds = [0,1]
+    lags = [[100,100]]
+    fname = 'DPMod_1200time_samefixedlags_xy.pickle'
+    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+
+def remoteRun():
+    '''
+    Only for modified double pendulum.
+
+    '''
+    print('Beginning batch run for modified double pendulum equations....')
+    basedir = '/home/bcummins/'
+    print('------------------------------------')
+    print('z and w')
+    print('------------------------------------')
+    localRun_zw(basedir)
+    print('------------------------------------')
+    print('x and w')
+    print('------------------------------------')
+    localRun_xw(basedir)
+    print('------------------------------------')
+    print('x and y')
+    print('------------------------------------')
+    localRun_xy(basedir)
+
+if __name__ == '__main__':
+    # remoteRun()
+    # ###################
+    # compinds = [0,3]
+    # finaltime = 1200.0
+    # tsprops = np.arange(0.2,0.95,0.1)
+    # lags = chooseLagsForSims(compinds,finaltime,tsprops)
+    ###################
+    localRun_zw()
