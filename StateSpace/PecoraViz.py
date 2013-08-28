@@ -87,7 +87,11 @@ def plotAutoCorrWrapper():
         plotAutocorrelation(autocorr2,"w autocorr, length {0}".format(L))
 
 if __name__ == '__main__':
-    basedir = '/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
+    basedir = '/Users/bree/SimulationResults/TimeSeries/PecoraMethod/workingstuff/'
     fname = 'DPMod_1200time_samefixedlags_zw.pickle'
     plotContinuityConfWrapper(basedir,fname)
+    fname = 'DPMod_1200time_samefixedlags_xy.pickle'
+    plotContinuityConfWrapper(basedir,fname,[0,0])
+    fname = 'DPMod_1200time_difffixedlags_xw.pickle'
+    plotContinuityConfWrapper(basedir,fname,[1,0])
 

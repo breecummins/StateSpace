@@ -82,10 +82,10 @@ def continuityTest(dists1,dists2,ptinds,eps,startdelta):
         probs[k] = float(neps) / len(dists1[k])
         # print("Probability of 1 correct mapping: {0}".format(np.round(float(neps) / len(dists1[k]),3)))
         if neps > 0: # if eps big enough, continue; else leave 0 in place
-            delta = 2*startdelta
+            delta = (4./3.)*startdelta
             out = False
             while out is False:
-                delta = delta*0.5
+                delta = delta*(3./4.)
                 out = countDeltaPtsMappedToEps(dists1[k],dists2[k],delta,eps) 
             if out: #out can be 0, in which case we want to report 0 confidence
                 contstat[k] = getContinuityConfidence(neps,out,len(dists1[k]))

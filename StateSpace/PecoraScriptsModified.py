@@ -90,7 +90,7 @@ def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     epsprops=np.array([0.005,0.0075,0.01,0.0125,0.015,0.02,0.04]) #for z and w
     compinds = [2,3]
     lags = [[5600,5600]]
-    fname = 'DPMod_1200time_samefixedlags_zw.pickle'
+    fname = 'DPMod_1200time_slowerdelta_samefixedlags_zw.pickle'
     continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
@@ -102,7 +102,7 @@ def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
     compinds = [0,3]
     lags = [[100,5600]]
-    fname = 'DPMod_1200time_difffixedlags_xw.pickle'
+    fname = 'DPMod_1200time_slowerdelta_difffixedlags_xw.pickle'
     continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
@@ -114,7 +114,7 @@ def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
     compinds = [0,1]
     lags = [[100,100]]
-    fname = 'DPMod_1200time_samefixedlags_xy.pickle'
+    fname = 'DPMod_1200time_slowerdelta_samefixedlags_xy.pickle'
     continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def remoteRun():
@@ -138,11 +138,11 @@ def remoteRun():
     localRun_xy(basedir)
 
 if __name__ == '__main__':
-    # remoteRun()
+    remoteRun()
     # ###################
     # compinds = [0,3]
     # finaltime = 1200.0
     # tsprops = np.arange(0.2,0.95,0.1)
     # lags = chooseLagsForSims(compinds,finaltime,tsprops)
-    ###################
-    localRun_zw()
+    # ###################
+    # localRun_zw()
