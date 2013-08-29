@@ -97,7 +97,7 @@ def getTS(finaltime):
 
     '''
     eqns,names,ts = doublependulummodifiedTS(finaltime)
-    tsprops = np.arange(0.3,0.85,0.1)
+    tsprops = np.arange(0.5,0.85,0.1)
     return eqns,names,ts,tsprops
 
 def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
