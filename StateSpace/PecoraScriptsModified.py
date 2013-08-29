@@ -27,7 +27,7 @@ def doublependulummodifiedTS(finaltime=600.0,dt=0.025):
 def doublependulummodifiedTS_withnoise(finaltime=600.0,dt=0.025):
     from DoublePendulumModified import solvePendulum
     timeseries = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt)
-    for j in timeseries.shape[1]:
+    for j in range(timeseries.shape[1]):
         s = np.std(timeseries[:,j])
         timeseries[:,j] += -0.05*s + 0.1*s*np.random.random(timeseries[:,j].shape)
     eqns = 'Double pendulum with noise'
