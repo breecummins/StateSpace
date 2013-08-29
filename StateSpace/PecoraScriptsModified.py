@@ -91,6 +91,71 @@ def testLagsAtDifferentLocationsAndLengths(finaltime=1200.0):
     #         print('w: {0} trials of length {1} in a length {2} timeseries.'.format(N,L,ts.shape[0]))
     #         print( ( np.min(lags), np.max(lags), np.mean(lags) ) )
 
+def chooseLagsForSimsDP(compinds,finaltime,tsprops,Tp=None):
+    '''
+    Only for double pendulum.
+
+    '''
+    eqns,names,ts = doublependulumTS(finaltime)
+    Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
+    lags = SSR.chooseLags(ts[:,compinds[0]],ts[:,compinds[1]],Mlens,Tp)
+    return lags
+
+def getTSDP(finaltime):
+    '''
+    Only for double pendulum.
+
+    '''
+    eqns,names,ts = doublependulumTS(finaltime)
+    tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200
+    return eqns,names,ts,tsprops
+
+def localRun_zw_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DP/',finaltime=1200.0):
+    '''
+    Only for double pendulum.
+
+    '''
+    eqns,names,ts,tsprops = getTSDP(finaltime)
+    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for z and w
+    compinds = [2,3]
+    lags = [[3105,115]] #fixed lags
+    # lags = [[int(0.15*t*ts.shape[0]),115] for t in tsprops] #changing lags
+    fname = 'DP_1200time_difffixedlags_zw.pickle'
+    #changing eps
+    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
+    #fixed eps
+    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
+
+def localRun_xw_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DP/',finaltime=1200.0):
+    '''
+    Only for double pendulum.
+
+    '''
+    eqns,names,ts,tsprops = getTSDP(finaltime)
+    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
+    compinds = [0,3]
+    lags = [[115,115]] #fixed lags
+    fname = 'DP_1200time_samefixedlags_xw.pickle'
+    #changing eps
+    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    #fixed eps
+    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+
+def localRun_xy_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DP/',finaltime=1200.0):
+    '''
+    Only for double pendulum.
+
+    '''
+    eqns,names,ts,tsprops = getTSDP(finaltime)
+    epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
+    compinds = [0,1]
+    lags = [[100,100]] #fixed lags
+    fname = 'DP_1200time_samefixedlags_xy.pickle'
+    #changing eps
+    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    #fixed eps
+    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+
 def chooseLagsForSims(compinds,finaltime,tsprops,Tp=None):
     '''
     Only for modified double pendulum.
@@ -111,7 +176,7 @@ def getTS(finaltime):
     # tsprops = np.arange(0.3,0.85,0.1) # for finaltime = 2400
     return eqns,names,ts,tsprops
 
-def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPModified/',finaltime=1200.0):
     '''
     Only for modified double pendulum.
 
@@ -127,7 +192,7 @@ def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     #fixed eps
     # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
 
-def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPModified/',finaltime=1200.0):
     '''
     Only for modified double pendulum.
 
@@ -143,7 +208,7 @@ def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     #fixed eps
     # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
-def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPModified/',finaltime=1200.0):
     '''
     Only for modified double pendulum.
 
@@ -168,7 +233,7 @@ def getTS_withnoise(finaltime):
     # tsprops = np.arange(0.3,0.85,0.1) # for finaltime = 2400
     return eqns,names,ts,tsprops
 
-def localRun_zw_withnoise(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+def localRun_zw_withnoise(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPModified/withnoise/',finaltime=1200.0):
     '''
     Only for modified double pendulum with noise.
 
@@ -184,7 +249,7 @@ def localRun_zw_withnoise(basedir='/Users/bree/SimulationResults/TimeSeries/Peco
     #fixed eps
     continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
 
-def localRun_xw_withnoise(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+def localRun_xw_withnoise(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPModified/withnoise/',finaltime=1200.0):
     '''
     Only for modified double pendulum with noise.
 
@@ -200,7 +265,7 @@ def localRun_xw_withnoise(basedir='/Users/bree/SimulationResults/TimeSeries/Peco
     #fixed eps
     continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
-def localRun_xy_withnoise(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+def localRun_xy_withnoise(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPModified/withnoise/',finaltime=1200.0):
     '''
     Only for modified double pendulum with noise.
 
@@ -237,7 +302,7 @@ def remoteRun(finaltime):
 
 def remoteRun_withnoise(finaltime):
     '''
-    Only for modified double pendulum.
+    Only for modified double pendulum with noise.
 
     '''
     print('Beginning batch run for modified double pendulum equations with noise....')
@@ -255,14 +320,35 @@ def remoteRun_withnoise(finaltime):
     print('------------------------------------')
     localRun_xy_withnoise(basedir,finaltime)
 
+def remoteRun_DP(finaltime):
+    '''
+    Only for double pendulum.
+
+    '''
+    print('Beginning batch run for double pendulum equations....')
+    basedir = '/home/bcummins/'
+    print('------------------------------------')
+    print('z and w')
+    print('------------------------------------')
+    localRun_zw_DP(basedir,finaltime)
+    print('------------------------------------')
+    print('x and w')
+    print('------------------------------------')
+    localRun_xw_DP(basedir,finaltime)
+    print('------------------------------------')
+    print('x and y')
+    print('------------------------------------')
+    localRun_xy_DP(basedir,finaltime)
+
 if __name__ == '__main__':
-    remoteRun_withnoise(1200.0)
+    remoteRun_DP(finaltime)
+    # remoteRun_withnoise(1200.0)
     # remoteRun(1200.0)
     # ###################
     # compinds = [2,3]
-    # finaltime = 2400.0
+    # finaltime = 1200.0
     # tsprops = np.arange(0.2,0.95,0.1)
-    # lags = chooseLagsForSims(compinds,finaltime,tsprops,0.5)
+    # lags = chooseLagsForSimsDP(compinds,finaltime,tsprops,0.5)
     # ###################
     # localRun_zw()
     # testLagsAtDifferentLocationsAndLengths(2400.0)

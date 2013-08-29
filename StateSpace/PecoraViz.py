@@ -108,11 +108,11 @@ def plotConfForCstp():
 
 if __name__ == '__main__':
     basedir = '/Users/bree/SimulationResults/TimeSeries/PecoraMethod/withnoise/'
-    fname = 'DPMod_1200time_withnoise_samefixedlags_zw.pickle'
+    fname = 'DPMod_1200time_withnoise_samefixedlags_fixedeps_zw.pickle'
     plotContinuityConfWrapper(basedir,fname)
-    fname = 'DPMod_1200time_withnoise_samefixedlags_xy.pickle'
+    fname = 'DPMod_1200time_withnoise_samefixedlags_fixedeps_xy.pickle'
     plotContinuityConfWrapper(basedir,fname,[0,0])
-    fname = 'DPMod_1200time_withnoise_difffixedlags_xw.pickle'
+    fname = 'DPMod_1200time_withnoise_difffixedlags_fixedeps_xw.pickle'
     plotContinuityConfWrapper(basedir,fname,[1,0])
     # ##############################
     # plotConfForCstp()
