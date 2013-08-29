@@ -120,11 +120,11 @@ def localRun_zw_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMetho
     compinds = [2,3]
     lags = [[3105,115]] #fixed lags
     # lags = [[int(0.15*t*ts.shape[0]),115] for t in tsprops] #changing lags
-    fname = 'DP_1200time_difffixedlags_zw.pickle'
+    fname = 'DP_1200time_difffixedlags_fixedeps_zw.pickle'
     #changing eps
-    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
+    # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
     #fixed eps
-    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
+    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
 
 def localRun_xw_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DP/',finaltime=1200.0):
     '''
@@ -135,11 +135,11 @@ def localRun_xw_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMetho
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
     compinds = [0,3]
     lags = [[115,115]] #fixed lags
-    fname = 'DP_1200time_samefixedlags_xw.pickle'
+    fname = 'DP_1200time_samefixedlags_fixedeps_xw.pickle'
     #changing eps
-    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
     #fixed eps
-    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def localRun_xy_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DP/',finaltime=1200.0):
     '''
@@ -150,11 +150,11 @@ def localRun_xy_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMetho
     epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
     compinds = [0,1]
     lags = [[100,100]] #fixed lags
-    fname = 'DP_1200time_samefixedlags_xy.pickle'
+    fname = 'DP_1200time_samefixedlags_fixedeps_xy.pickle'
     #changing eps
-    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
     #fixed eps
-    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def chooseLagsForSims(compinds,finaltime,tsprops,Tp=None):
     '''
