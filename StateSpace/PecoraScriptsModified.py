@@ -41,6 +41,23 @@ def continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname='',numl
     else:
         return outdict
 
+def continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname='',numlags=5):
+    '''
+    Will work with any of the equations, Lorenz, double pendulum, or modified double pendulum.
+
+    '''
+    if len(lags) == 1:
+        forwardconf, inverseconf, epsM1, epsM2, forwardprobs, inverseprobs = PM.convergenceWithContinuityTestFixedLagsFixedEps(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags[0][0],lags[0][1],tsprops=tsprops,epsprops=epsprops)
+    else:
+        forwardconf, inverseconf, epsM1, epsM2, forwardprobs, inverseprobs = PM.convergenceWithContinuityTestMultipleLagsFixedEps(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags,tsprops=tsprops,epsprops=epsprops)
+    forwardtitle = eqns + r', M{0} $\to$ M{1}'.format(names[compinds[0]],names[compinds[1]])
+    inversetitle = eqns + r', M{1} $\to$ M{0}'.format(names[compinds[0]],names[compinds[1]])
+    outdict = dict([(x,locals()[x]) for x in ['forwardconf','inverseconf','forwardtitle','inversetitle','numlags','lags','ts','tsprops','epsprops','epsM1','epsM2','forwardprobs','inverseprobs']])
+    if fname:
+        fileops.dumpPickle(outdict,fname)
+    else:
+        return outdict
+
 def testLagsAtDifferentLocationsAndLengths(finaltime=1200.0):
     '''
     Only for modified double pendulum.
@@ -91,10 +108,11 @@ def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     eqns,names,ts,tsprops = getTS(finaltime)
     epsprops=np.array([0.005,0.0075,0.01,0.0125,0.015,0.02,0.04]) #for z and w
     compinds = [2,3]
-    #lags = [[5600,5600]]
-    lags = [[int(0.15*t*ts.shape[0])]*2 for t in tsprops]
-    fname = 'DPMod_2400time_slowerdelta_15percentchanginglags_zw.pickle'
-    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    lags = [[5600,5600]]
+    # lags = [[int(0.15*t*ts.shape[0])]*2 for t in tsprops]
+    fname = 'DPMod_1200time_slowerdelta_samefixedlags_fixedeps_zw.pickle'
+    # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
     '''
@@ -104,10 +122,11 @@ def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     eqns,names,ts,tsprops = getTS(finaltime)
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
     compinds = [0,3]
-    # lags = [[100,5600]]
-    lags = [[100,int(0.15*t*ts.shape[0])] for t in tsprops]
-    fname = 'DPMod_2400time_slowerdelta_15percentchanginglagwfixedlagx_xw.pickle'
-    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    lags = [[100,5600]]
+    # lags = [[100,int(0.15*t*ts.shape[0])] for t in tsprops]
+    fname = 'DPMod_1200time_slowerdelta_difffixedlags_fixedeps_xw.pickle'
+    # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
     '''
@@ -118,8 +137,9 @@ def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
     compinds = [0,1]
     lags = [[100,100]]
-    fname = 'DPMod_2400time_slowerdelta_samefixedlags_xy.pickle'
-    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    fname = 'DPMod_1200time_slowerdelta_samefixedlags_fixedeps_xy.pickle'
+    # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def remoteRun(finaltime):
     '''
@@ -136,13 +156,13 @@ def remoteRun(finaltime):
     print('x and w')
     print('------------------------------------')
     localRun_xw(basedir,finaltime)
-    # print('------------------------------------')
-    # print('x and y')
-    # print('------------------------------------')
-    # localRun_xy(basedir,finaltime)
+    print('------------------------------------')
+    print('x and y')
+    print('------------------------------------')
+    localRun_xy(basedir,finaltime)
 
 if __name__ == '__main__':
-    remoteRun(2400.0)
+    remoteRun(1200.0)
     # ###################
     # compinds = [2,3]
     # finaltime = 2400.0
