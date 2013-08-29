@@ -97,7 +97,8 @@ def getTS(finaltime):
 
     '''
     eqns,names,ts = doublependulummodifiedTS(finaltime)
-    tsprops = np.arange(0.5,0.85,0.1)
+    tsprops = np.arange(0.5,0.85,0.1) # for finaltime = 1200
+    # tsprops = np.arange(0.3,0.85,0.1) # for finaltime = 2400
     return eqns,names,ts,tsprops
 
 def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
@@ -108,11 +109,13 @@ def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     eqns,names,ts,tsprops = getTS(finaltime)
     epsprops=np.array([0.005,0.0075,0.01,0.0125,0.015,0.02,0.04]) #for z and w
     compinds = [2,3]
-    lags = [[5600,5600]]
-    # lags = [[int(0.15*t*ts.shape[0])]*2 for t in tsprops]
+    lags = [[5600,5600]] #fixed lags
+    # lags = [[int(0.15*t*ts.shape[0])]*2 for t in tsprops] #changing lags
     fname = 'DPMod_1200time_slowerdelta_samefixedlags_fixedeps_zw.pickle'
-    # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
-    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    #changing eps
+    # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
+    #fixed eps
+    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
 
 def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
     '''
@@ -122,10 +125,12 @@ def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     eqns,names,ts,tsprops = getTS(finaltime)
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
     compinds = [0,3]
-    lags = [[100,5600]]
-    # lags = [[100,int(0.15*t*ts.shape[0])] for t in tsprops]
+    lags = [[100,5600]] #fixed lags
+    # lags = [[100,int(0.15*t*ts.shape[0])] for t in tsprops] #changing lags
     fname = 'DPMod_1200time_slowerdelta_difffixedlags_fixedeps_xw.pickle'
+    #changing eps
     # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    #fixed eps
     continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
@@ -136,9 +141,11 @@ def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     eqns,names,ts,tsprops = getTS(finaltime)
     epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
     compinds = [0,1]
-    lags = [[100,100]]
+    lags = [[100,100]] #fixed lags
     fname = 'DPMod_1200time_slowerdelta_samefixedlags_fixedeps_xy.pickle'
+    #changing eps
     # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    #fixed eps
     continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def remoteRun(finaltime):

@@ -206,7 +206,7 @@ def convergenceWithContinuityTestFixedLags(ts1,ts2,numlags,lag1,lag2,tsprops=np.
     badL = np.nonzero(Mlens < reflag*(numlags-1) )[0]
     if np.any( badL ):
         for n in badL:
-            print("Lag {0} is too big compared to timeseries length {1}. Skipping it.".format(reflag,Mlens[n])))
+            print("Lag {0} is too big compared to timeseries length {1}. Skipping it.".format(reflag,Mlens[n]))
     forwardconf = np.zeros((len(Mlens),len(epsprops)))
     inverseconf = np.zeros((len(Mlens),len(epsprops)))
     forwardprobs = np.zeros((len(Mlens),len(epsprops)))
