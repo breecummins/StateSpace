@@ -20,7 +20,17 @@ def doublependulumTS(finaltime=600.0,dt=0.025):
 def doublependulummodifiedTS(finaltime=600.0,dt=0.025):
     from DoublePendulumModified import solvePendulum
     timeseries = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt)
-    eqns = 'Double pendulum'
+    eqns = 'Double pendulum modified'
+    names = ['x','y','z','w']
+    return eqns,names,timeseries
+
+def doublependulummodifiedTS_withnoise(finaltime=600.0,dt=0.025):
+    from DoublePendulumModified import solvePendulum
+    timeseries = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt)
+    for j in timeseries.shape[1]:
+        s = np.std(timeseries[:,j])
+        timeseries[:,j] += -0.05*s + 0.1*s*np.random.random(timeseries[:,j].shape)
+    eqns = 'Double pendulum with noise'
     names = ['x','y','z','w']
     return eqns,names,timeseries
 
@@ -101,17 +111,28 @@ def getTS(finaltime):
     # tsprops = np.arange(0.3,0.85,0.1) # for finaltime = 2400
     return eqns,names,ts,tsprops
 
-def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+def getTS_withnoise(finaltime):
     '''
-    Only for modified double pendulum.
+    Only for modified double pendulum with noise.
 
     '''
-    eqns,names,ts,tsprops = getTS(finaltime)
+    eqns,names,ts = doublependulummodifiedTS_withnoise(finaltime)
+    tsprops = np.arange(0.5,0.85,0.1) # for finaltime = 1200
+    # tsprops = np.arange(0.3,0.85,0.1) # for finaltime = 2400
+    return eqns,names,ts,tsprops
+
+def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+    '''
+    Only for modified double pendulum, with or without noise.
+
+    '''
+    # eqns,names,ts,tsprops = getTS(finaltime)
+    eqns,names,ts,tsprops = getTS_withnoise(finaltime)
     epsprops=np.array([0.005,0.0075,0.01,0.0125,0.015,0.02,0.04]) #for z and w
     compinds = [2,3]
     lags = [[5600,5600]] #fixed lags
     # lags = [[int(0.15*t*ts.shape[0])]*2 for t in tsprops] #changing lags
-    fname = 'DPMod_1200time_startwithbiggerdelta_samefixedlags_zw.pickle'
+    fname = 'DPMod_1200time_withnoise_samefixedlags_zw.pickle'
     #changing eps
     continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
     #fixed eps
@@ -119,15 +140,16 @@ def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
 
 def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
     '''
-    Only for modified double pendulum.
+    Only for modified double pendulum, with or without noise..
 
     '''
-    eqns,names,ts,tsprops = getTS(finaltime)
+    # eqns,names,ts,tsprops = getTS(finaltime)
+    eqns,names,ts,tsprops = getTS_withnoise(finaltime)
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
     compinds = [0,3]
     lags = [[100,5600]] #fixed lags
     # lags = [[100,int(0.15*t*ts.shape[0])] for t in tsprops] #changing lags
-    fname = 'DPMod_1200time_startwithbiggerdelta_difffixedlags_xw.pickle'
+    fname = 'DPMod_1200time_withnoise_difffixedlags_xw.pickle'
     #changing eps
     continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
     #fixed eps
@@ -135,14 +157,15 @@ def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
 
 def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
     '''
-    Only for modified double pendulum.
+    Only for modified double pendulum, with or without noise..
 
     '''
-    eqns,names,ts,tsprops = getTS(finaltime)
+    # eqns,names,ts,tsprops = getTS(finaltime)
+    eqns,names,ts,tsprops = getTS_withnoise(finaltime)
     epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
     compinds = [0,1]
     lags = [[100,100]] #fixed lags
-    fname = 'DPMod_1200time_startwithbiggerdelta_samefixedlags_xy.pickle'
+    fname = 'DPMod_1200time_withnoise_samefixedlags_xy.pickle'
     #changing eps
     continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
     #fixed eps
