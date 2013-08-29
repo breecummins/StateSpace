@@ -111,6 +111,53 @@ def getTS(finaltime):
     # tsprops = np.arange(0.3,0.85,0.1) # for finaltime = 2400
     return eqns,names,ts,tsprops
 
+def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+    '''
+    Only for modified double pendulum.
+
+    '''
+    eqns,names,ts,tsprops = getTS(finaltime)
+    epsprops=np.array([0.005,0.0075,0.01,0.0125,0.015,0.02,0.04]) #for z and w
+    compinds = [2,3]
+    lags = [[5600,5600]] #fixed lags
+    # lags = [[int(0.15*t*ts.shape[0])]*2 for t in tsprops] #changing lags
+    fname = 'DPMod_1200time_samefixedlags_zw.pickle'
+    #changing eps
+    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
+    #fixed eps
+    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
+
+def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+    '''
+    Only for modified double pendulum.
+
+    '''
+    eqns,names,ts,tsprops = getTS(finaltime)
+    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
+    compinds = [0,3]
+    lags = [[100,5600]] #fixed lags
+    # lags = [[100,int(0.15*t*ts.shape[0])] for t in tsprops] #changing lags
+    fname = 'DPMod_1200time_difffixedlags_xw.pickle'
+    #changing eps
+    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    #fixed eps
+    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+
+def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+    '''
+    Only for modified double pendulum.
+
+    '''
+    eqns,names,ts,tsprops = getTS(finaltime)
+    epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
+    compinds = [0,1]
+    lags = [[100,100]] #fixed lags
+    fname = 'DPMod_1200time_samefixedlags_xy.pickle'
+    #changing eps
+    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    #fixed eps
+    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+
 def getTS_withnoise(finaltime):
     '''
     Only for modified double pendulum with noise.
@@ -121,14 +168,13 @@ def getTS_withnoise(finaltime):
     # tsprops = np.arange(0.3,0.85,0.1) # for finaltime = 2400
     return eqns,names,ts,tsprops
 
-def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+def localRun_zw_withnoise(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
     '''
-    Only for modified double pendulum, with or without noise.
+    Only for modified double pendulum with noise.
 
     '''
-    # eqns,names,ts,tsprops = getTS(finaltime)
     eqns,names,ts,tsprops = getTS_withnoise(finaltime)
-    epsprops=np.array([0.005,0.0075,0.01,0.0125,0.015,0.02,0.04]) #for z and w
+    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.5]) #for z and w
     compinds = [2,3]
     lags = [[5600,5600]] #fixed lags
     # lags = [[int(0.15*t*ts.shape[0])]*2 for t in tsprops] #changing lags
@@ -138,14 +184,13 @@ def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     #fixed eps
     # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
 
-def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+def localRun_xw_withnoise(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
     '''
-    Only for modified double pendulum, with or without noise..
+    Only for modified double pendulum with noise.
 
     '''
-    # eqns,names,ts,tsprops = getTS(finaltime)
     eqns,names,ts,tsprops = getTS_withnoise(finaltime)
-    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
+    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.5,0.6]) #for x and w
     compinds = [0,3]
     lags = [[100,5600]] #fixed lags
     # lags = [[100,int(0.15*t*ts.shape[0])] for t in tsprops] #changing lags
@@ -155,14 +200,13 @@ def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     #fixed eps
     # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
-def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
+def localRun_xy_withnoise(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
     '''
-    Only for modified double pendulum, with or without noise..
+    Only for modified double pendulum with noise.
 
     '''
-    # eqns,names,ts,tsprops = getTS(finaltime)
     eqns,names,ts,tsprops = getTS_withnoise(finaltime)
-    epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
+    epsprops=np.array([0.001,0.005,0.01,0.05,0.1,0.2,0.5]) #for x and y
     compinds = [0,1]
     lags = [[100,100]] #fixed lags
     fname = 'DPMod_1200time_withnoise_samefixedlags_xy.pickle'
@@ -191,8 +235,29 @@ def remoteRun(finaltime):
     print('------------------------------------')
     localRun_xy(basedir,finaltime)
 
+def remoteRun_withnoise(finaltime):
+    '''
+    Only for modified double pendulum.
+
+    '''
+    print('Beginning batch run for modified double pendulum equations with noise....')
+    basedir = '/home/bcummins/'
+    print('------------------------------------')
+    print('z and w')
+    print('------------------------------------')
+    localRun_zw_withnoise(basedir,finaltime)
+    print('------------------------------------')
+    print('x and w')
+    print('------------------------------------')
+    localRun_xw_withnoise(basedir,finaltime)
+    print('------------------------------------')
+    print('x and y')
+    print('------------------------------------')
+    localRun_xy_withnoise(basedir,finaltime)
+
 if __name__ == '__main__':
-    remoteRun(1200.0)
+    remoteRun_withnoise(1200.0)
+    # remoteRun(1200.0)
     # ###################
     # compinds = [2,3]
     # finaltime = 2400.0
