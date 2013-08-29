@@ -111,11 +111,11 @@ def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     compinds = [2,3]
     lags = [[5600,5600]] #fixed lags
     # lags = [[int(0.15*t*ts.shape[0])]*2 for t in tsprops] #changing lags
-    fname = 'DPMod_1200time_slowerdelta_samefixedlags_fixedeps_zw.pickle'
+    fname = 'DPMod_1200time_startwithbiggerdelta_samefixedlags_zw.pickle'
     #changing eps
-    # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
+    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
     #fixed eps
-    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
+    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
 
 def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
     '''
@@ -127,11 +127,11 @@ def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     compinds = [0,3]
     lags = [[100,5600]] #fixed lags
     # lags = [[100,int(0.15*t*ts.shape[0])] for t in tsprops] #changing lags
-    fname = 'DPMod_1200time_slowerdelta_difffixedlags_fixedeps_xw.pickle'
+    fname = 'DPMod_1200time_startwithbiggerdelta_difffixedlags_xw.pickle'
     #changing eps
-    # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
     #fixed eps
-    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/',finaltime=1200.0):
     '''
@@ -142,11 +142,11 @@ def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
     compinds = [0,1]
     lags = [[100,100]] #fixed lags
-    fname = 'DPMod_1200time_slowerdelta_samefixedlags_fixedeps_xy.pickle'
+    fname = 'DPMod_1200time_startwithbiggerdelta_samefixedlags_xy.pickle'
     #changing eps
-    # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
     #fixed eps
-    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def remoteRun(finaltime):
     '''
