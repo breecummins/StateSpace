@@ -92,7 +92,7 @@ def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     epsprops=np.array([0.005,0.0075,0.01,0.0125,0.015,0.02,0.04]) #for z and w
     compinds = [2,3]
     #lags = [[5600,5600]]
-    lags = [[0.15*t*ts.shape[0]]*2 for t in tsprops]
+    lags = [[int(0.15*t*ts.shape[0])]*2 for t in tsprops]
     fname = 'DPMod_2400time_slowerdelta_15percentchanginglags_zw.pickle'
     continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
@@ -105,7 +105,7 @@ def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
     compinds = [0,3]
     # lags = [[100,5600]]
-    lags = [[100,0.15*t*ts.shape[0]] for t in tsprops]
+    lags = [[100,int(0.15*t*ts.shape[0])] for t in tsprops]
     fname = 'DPMod_2400time_slowerdelta_15percentchanginglagwfixedlagx_xw.pickle'
     continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
