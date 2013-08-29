@@ -341,7 +341,7 @@ def remoteRun_DP(finaltime):
     localRun_xy_DP(basedir,finaltime)
 
 if __name__ == '__main__':
-    remoteRun_DP(finaltime)
+    remoteRun_DP(1200.0)
     # remoteRun_withnoise(1200.0)
     # remoteRun(1200.0)
     # ###################
