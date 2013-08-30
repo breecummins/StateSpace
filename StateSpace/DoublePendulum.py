@@ -1,7 +1,7 @@
 import numpy as np
 import rk4
 
-def solvePendulum(init,T,dt=0.1,mu=4.0,beta=2.0,A=2.0):
+def solvePendulum(init,T,dt=0.1,mu=4.0,beta=1.2,A=2.0):
     times = np.arange(0,T,dt)
     x = np.zeros((len(times),len(init)))
     x[0,:] = init

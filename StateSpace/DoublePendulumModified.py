@@ -1,7 +1,7 @@
 import numpy as np
 import rk4
 
-def solvePendulum(init,T,dt=0.1,mu=4.0,beta=2.0,A=2.0):
+def solvePendulum(init,T,dt=0.1,mu=4.0,beta=1.2,A=2.0):
     times = np.arange(0,T,dt)
     x = np.zeros((len(times),len(init)))
     x[0,:] = init
@@ -22,10 +22,9 @@ if __name__ == '__main__':
     import StateSpaceReconstruction as SSR
     dt = 0.025
     finaltime = 600.0
-    for beta in [1.2,2.05]:
-        x = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt=dt,beta=beta)
-        SSRPlots.plotManifold(x[:,(0,1,3)],show=0,titlestr='x, y, w',style='g-')
-        SSRPlots.plotManifold(x[:,(0,1,2)],show=1,titlestr='x, y, z',style='r-')
+    x = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt=dt)
+    SSRPlots.plotManifold(x[:,(0,1,3)],show=0,titlestr='x, y, w',style='g-')
+    SSRPlots.plotManifold(x[:,(0,1,2)],show=1,titlestr='x, y, z',style='r-')
     # numlags = 3
     # lagsize0 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,0])
     # lagsize1 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,1])
