@@ -199,7 +199,7 @@ def getTS_changedbeta(finaltime):
 
     '''
     eqns,names,ts = doublependulummodifiedTS_changedbeta(finaltime)
-    tsprops = np.arange(0.5,0.85,0.1) # for finaltime = 1200
+    tsprops = np.arange(0.2,1.1,0.2) # for finaltime = 1200
     # tsprops = np.arange(0.3,0.85,0.1) # for finaltime = 2400
     return eqns,names,ts,tsprops
 
@@ -210,7 +210,8 @@ def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/D
     '''
     # eqns,names,ts,tsprops = getTS(finaltime)
     eqns,names,ts,tsprops = getTS_changedbeta(finaltime)
-    epsprops=np.array([0.005,0.0075,0.01,0.0125,0.015,0.02,0.04]) #for z and w
+    # epsprops=np.array([0.005,0.0075,0.01,0.0125,0.015,0.02,0.04]) #for z and w, old beta
+    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for z and w
     compinds = [2,3]
     # lags = [[5600,5600]] #fixed lags for old params
     lags = [[104,104]] #fixed lags for beta = 1.2
