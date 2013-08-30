@@ -20,17 +20,19 @@ def doublePendulum(t,x,mu=0.0,beta=0.0,A=0.0):
 if __name__ == '__main__':
     import StateSpaceReconstructionPlots as SSRPlots
     import StateSpaceReconstruction as SSR
-    import PecoraViz as PV
     dt = 0.025
-    finaltime = 1200.0
-    x = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt=dt)
-    numlags = 3
-    lagsize0 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,0])
-    lagsize1 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,1])
-    lagsize2 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,2])
-    lagsize3 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,3])
-    print((lagsize0,lagsize1,lagsize2,lagsize3))
-    SSRPlots.plotShadowManifold(x[:,2],numlags,lagsize2,show=0,hold=0,style='r-',titlestr='Mz, lagsize {0} from z'.format(lagsize2))
-    SSRPlots.plotShadowManifold(x[:,3],numlags,lagsize3,show=1,hold=0,style='g-',titlestr='Mw, lagsize {0} from w'.format(lagsize3))
+    finaltime = 600.0
+    for beta in [1.2,2.05]:
+        x = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt=dt,beta=beta)
+        SSRPlots.plotManifold(x[:,(0,1,3)],show=0,titlestr='x, y, w',style='g-')
+        SSRPlots.plotManifold(x[:,(0,1,2)],show=1,titlestr='x, y, z',style='r-')
+    # numlags = 3
+    # lagsize0 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,0])
+    # lagsize1 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,1])
+    # lagsize2 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,2])
+    # lagsize3 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,3])
+    # print((lagsize0,lagsize1,lagsize2,lagsize3))
+    # SSRPlots.plotShadowManifold(x[:,2],numlags,lagsize2,show=0,hold=0,style='r-',titlestr='Mz, lagsize {0} from z'.format(lagsize2))
+    # SSRPlots.plotShadowManifold(x[:,3],numlags,lagsize3,show=1,hold=0,style='g-',titlestr='Mw, lagsize {0} from w'.format(lagsize3))
 
 

@@ -34,9 +34,10 @@ if __name__ == '__main__':
     # acc3 = SSR.getAutocorrelation(x[:,3],int(x.shape[0] / 10.))
     # SSRPlots.plots(np.arange(1,len(acc3)+1),np.array(acc3),show=0,titlestr='w autocc')
     finaltime = 2400.0
+    finaltime = 600.0
     x = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt=dt)
-    ac = SSR.getAutocorrelation(x[:,2],int(x.shape[0] / 3.))
-    SSRPlots.plots(np.arange(1,len(ac)+1),np.array(ac),show=1,titlestr='z autocorr')
+    # ac = SSR.getAutocorrelation(x[:,2],int(x.shape[0] / 3.))
+    # SSRPlots.plots(np.arange(1,len(ac)+1),np.array(ac),show=1,titlestr='z autocorr')
     # numlags = 3
     # lagsize = int(0.8/dt) #because dt=0.1 with lagsize 8 works well with smooth manifold
     # lagsize0 = SSR.lagsizeFromFirstZeroOfAutocorrelation(x[:,0])
@@ -58,8 +59,8 @@ if __name__ == '__main__':
     # SSRPlots.plots(np.arange(1,len(acc3)+1),np.array(acc3),show=1,titlestr='w autocc')
     # times = np.arange(0,finaltime,dt)
     # SSRPlots.plotManifold(x[:,:3],show=0,titlestr='x, y, z')
-    # SSRPlots.plotManifold(x[:,(0,1,3)],show=0,titlestr='x, y, w',style='g-')
-    # SSRPlots.plotManifold(x[:,(0,1,2)],show=0,titlestr='x, y, z',style='r-')
+    SSRPlots.plotManifold(x[:,(0,1,3)],show=0,titlestr='x, y, w',style='g-')
+    SSRPlots.plotManifold(x[:,(0,1,2)],show=1,titlestr='x, y, z',style='r-')
     # SSRPlots.plotShadowManifold(x[:,2],numlags,lagsize2,show=0,hold=0,style='r-',titlestr='Mz, lagsize {0} from z'.format(lagsize2))
     # SSRPlots.plotShadowManifold(x[:,3],numlags,lagsize2,show=0,hold=0,style='g-',titlestr='Mw, lagsize {0} from z'.format(lagsize2))
     # SSRPlots.plotShadowManifold(x[:,2],numlags,lagsize3,show=0,hold=0,style='r-',titlestr='Mz, lagsize {0} from w'.format(lagsize3))

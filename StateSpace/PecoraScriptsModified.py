@@ -24,6 +24,13 @@ def doublependulummodifiedTS(finaltime=600.0,dt=0.025):
     names = ['x','y','z','w']
     return eqns,names,timeseries
 
+def doublependulummodifiedTS_changedbeta(finaltime=600.0,dt=0.025):
+    from DoublePendulumModified import solvePendulum
+    timeseries = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt,beta=1.2)
+    eqns = 'Double pendulum modified'
+    names = ['x','y','z','w']
+    return eqns,names,timeseries
+
 def doublependulummodifiedTS_withnoise(finaltime=600.0,dt=0.025):
     from DoublePendulumModified import solvePendulum
     timeseries = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt)
@@ -166,6 +173,16 @@ def chooseLagsForSims(compinds,finaltime,tsprops,Tp=None):
     lags = SSR.chooseLags(ts[:,compinds[0]],ts[:,compinds[1]],Mlens,Tp)
     return lags
 
+def chooseLagsForSims_changedbeta(compinds,finaltime,tsprops,Tp=None):
+    '''
+    Only for modified double pendulum.
+
+    '''
+    eqns,names,ts = doublependulummodifiedTS_changedbeta(finaltime)
+    Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
+    lags = SSR.chooseLags(ts[:,compinds[0]],ts[:,compinds[1]],Mlens,Tp)
+    return lags
+
 def getTS(finaltime):
     '''
     Only for modified double pendulum.
@@ -176,52 +193,68 @@ def getTS(finaltime):
     # tsprops = np.arange(0.3,0.85,0.1) # for finaltime = 2400
     return eqns,names,ts,tsprops
 
+def getTS_changedbeta(finaltime):
+    '''
+    Only for modified double pendulum.
+
+    '''
+    eqns,names,ts = doublependulummodifiedTS_changedbeta(finaltime)
+    tsprops = np.arange(0.5,0.85,0.1) # for finaltime = 1200
+    # tsprops = np.arange(0.3,0.85,0.1) # for finaltime = 2400
+    return eqns,names,ts,tsprops
+
 def localRun_zw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPModified/',finaltime=1200.0):
     '''
     Only for modified double pendulum.
 
     '''
-    eqns,names,ts,tsprops = getTS(finaltime)
+    # eqns,names,ts,tsprops = getTS(finaltime)
+    eqns,names,ts,tsprops = getTS_changedbeta(finaltime)
     epsprops=np.array([0.005,0.0075,0.01,0.0125,0.015,0.02,0.04]) #for z and w
     compinds = [2,3]
-    lags = [[5600,5600]] #fixed lags
+    # lags = [[5600,5600]] #fixed lags for old params
+    lags = [[104,104]] #fixed lags for beta = 1.2
     # lags = [[int(0.15*t*ts.shape[0])]*2 for t in tsprops] #changing lags
-    fname = 'DPMod_1200time_samefixedlags_zw.pickle'
+    fname = 'DPMod_1200time_samefixedlags_fixedeps_beta1-2_zw.pickle'
     #changing eps
-    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
+    # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
     #fixed eps
-    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
+    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
 
 def localRun_xw(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPModified/',finaltime=1200.0):
     '''
     Only for modified double pendulum.
 
     '''
-    eqns,names,ts,tsprops = getTS(finaltime)
+    # eqns,names,ts,tsprops = getTS(finaltime)
+    eqns,names,ts,tsprops = getTS_changedbeta(finaltime)
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
     compinds = [0,3]
-    lags = [[100,5600]] #fixed lags
+    # lags = [[100,5600]] #fixed lags for old params
+    lags = [[104,104]] #fixed lags for beta = 1.2
     # lags = [[100,int(0.15*t*ts.shape[0])] for t in tsprops] #changing lags
-    fname = 'DPMod_1200time_difffixedlags_xw.pickle'
+    fname = 'DPMod_1200time_difffixedlags_fixedeps_beta1-2_xw.pickle'
     #changing eps
-    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
     #fixed eps
-    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def localRun_xy(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPModified/',finaltime=1200.0):
     '''
     Only for modified double pendulum.
 
     '''
-    eqns,names,ts,tsprops = getTS(finaltime)
+    # eqns,names,ts,tsprops = getTS(finaltime)
+    eqns,names,ts,tsprops = getTS_changedbeta(finaltime)
     epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
     compinds = [0,1]
-    lags = [[100,100]] #fixed lags
-    fname = 'DPMod_1200time_samefixedlags_xy.pickle'
+    # lags = [[100,100]] #fixed lags for old params
+    lags = [[104,104]] #fixed lags for beta = 1.2
+    fname = 'DPMod_1200time_samefixedlags_fixedeps_beta1-2_xy.pickle'
     #changing eps
-    continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
     #fixed eps
-    # continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
+    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def getTS_withnoise(finaltime):
     '''
@@ -341,14 +374,14 @@ def remoteRun_DP(finaltime):
     localRun_xy_DP(basedir,finaltime)
 
 if __name__ == '__main__':
-    remoteRun_DP(1200.0)
+    # remoteRun_DP(1200.0)
     # remoteRun_withnoise(1200.0)
-    # remoteRun(1200.0)
+    remoteRun(1200.0)
     # ###################
-    # compinds = [2,3]
+    # compinds = [1,2]
     # finaltime = 1200.0
     # tsprops = np.arange(0.2,0.95,0.1)
-    # lags = chooseLagsForSimsDP(compinds,finaltime,tsprops,0.5)
+    # lags = chooseLagsForSims_changedbeta(compinds,finaltime,tsprops,0.5)
     # ###################
     # localRun_zw()
     # testLagsAtDifferentLocationsAndLengths(2400.0)
