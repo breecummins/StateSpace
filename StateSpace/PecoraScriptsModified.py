@@ -1,4 +1,5 @@
 import numpy as np
+import random
 import PecoraMethodModified as PM
 import StateSpaceReconstruction as SSR
 import fileops
@@ -40,6 +41,15 @@ def doublependulummodifiedTS_withnoise(finaltime=600.0,dt=0.025):
     eqns = 'Double pendulum with noise'
     names = ['x','y','z','w']
     return eqns,names,timeseries
+
+def twoLinesScrambled(skip=1):
+    times = np.arange(0,2.0,0.01)
+    line1 = 0.1*times
+    line2 = -0.7*times
+    if skip > 0:
+        newinds = random.sample(range(0,len(line2),skip),int(len(line2)/skip))
+        line2[::skip] = line2[newinds]
+    return line1,line2
 
 def continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname='',numlags=5):
     '''
@@ -117,7 +127,7 @@ def getTSDP(finaltime):
     tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200
     return eqns,names,ts,tsprops
 
-def localRun_zw_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DP/',finaltime=1200.0):
+def localRun_zw_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPchangedbeta/',finaltime=1200.0):
     '''
     Only for double pendulum.
 
@@ -125,15 +135,15 @@ def localRun_zw_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMetho
     eqns,names,ts,tsprops = getTSDP(finaltime)
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for z and w
     compinds = [2,3]
-    lags = [[3105,115]] #fixed lags
+    lags = [[100,100]] #fixed lags
     # lags = [[int(0.15*t*ts.shape[0]),115] for t in tsprops] #changing lags
-    fname = 'DP_1200time_difffixedlags_fixedeps_zw.pickle'
+    fname = 'DP_1200time_samefixedlags_fixedeps_zw.pickle'
     #changing eps
     # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
     #fixed eps
     continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
 
-def localRun_xw_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DP/',finaltime=1200.0):
+def localRun_xw_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPchangedbeta/',finaltime=1200.0):
     '''
     Only for double pendulum.
 
@@ -141,14 +151,14 @@ def localRun_xw_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMetho
     eqns,names,ts,tsprops = getTSDP(finaltime)
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
     compinds = [0,3]
-    lags = [[115,115]] #fixed lags
+    lags = [[100,100]] #fixed lags
     fname = 'DP_1200time_samefixedlags_fixedeps_xw.pickle'
     #changing eps
     # continuityTesting(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
     #fixed eps
     continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
-def localRun_xy_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DP/',finaltime=1200.0):
+def localRun_xy_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPchangedbeta/',finaltime=1200.0):
     '''
     Only for double pendulum.
 
@@ -354,6 +364,25 @@ def remoteRun_withnoise(finaltime):
     print('------------------------------------')
     localRun_xy_withnoise(basedir,finaltime)
 
+def localRun_DP(finaltime):
+    '''
+    Only for double pendulum.
+
+    '''
+    print('Beginning batch run for double pendulum equations....')
+    print('------------------------------------')
+    print('z and w')
+    print('------------------------------------')
+    localRun_zw_DP(finaltime=finaltime)
+    print('------------------------------------')
+    print('x and w')
+    print('------------------------------------')
+    localRun_xw_DP(finaltime=finaltime)
+    print('------------------------------------')
+    print('x and y')
+    print('------------------------------------')
+    localRun_xy_DP(finaltime=finaltime)
+
 def remoteRun_DP(finaltime):
     '''
     Only for double pendulum.
@@ -374,10 +403,47 @@ def remoteRun_DP(finaltime):
     print('------------------------------------')
     localRun_xy_DP(basedir,finaltime)
 
+def test2Lines():
+    import PecoraViz as PV
+    def makeOutput(line1,line2,summary):
+        ts = np.array([line1,line2]).transpose()
+        d = continuityTestingFixedEps('Two lines',['x','y'],ts,[0,1],np.arange(0.2,1.1,0.2),np.array([0.001,0.005,0.01,0.05,0.1,0.2,0.3,0.4,0.5]),[[1,1]],numlags=3)
+        print('---------------------------------------------------------')
+        print(summary)
+        print('---------------------------------------------------------')
+        print("Epsilon as proportions of (changing) standard deviations: {0}.".format(d['epsprops']))
+        print("Forward continuity confidence: ")
+        print(d['forwardconf'])
+        print("Inverse continuity confidence: ")
+        print(d['inverseconf'])
+        PV.plotOutput(d['forwardconf'],d['inverseconf'],d['epsprops'],d['tsprops'],len(line1),d['forwardtitle'],d['inversetitle'],logs = [0,0])
+    summary = "Two lines, complete scrambling."
+    line1,line2 = twoLinesScrambled(1)
+    makeOutput(line1,line2,summary)
+    summary = "Two lines, one-half scrambling."
+    line1,line2 = twoLinesScrambled(2)
+    makeOutput(line1,line2,summary)
+    summary = "Two lines, one-quarter scrambling."
+    line1,line2 = twoLinesScrambled(4)
+    makeOutput(line1,line2,summary)
+    summary = "Two lines, one-eighth scrambling."
+    line1,line2 = twoLinesScrambled(8)
+    makeOutput(line1,line2,summary)
+    summary = "Two lines, one-twentieth scrambling."
+    line1,line2 = twoLinesScrambled(20)
+    makeOutput(line1,line2,summary)
+    summary = "Two lines, one-fifieth scrambling."
+    line1,line2 = twoLinesScrambled(50)
+    makeOutput(line1,line2,summary)
+    summary = "Two lines, no scrambling."
+    line1,line2 = twoLinesScrambled(0)
+    makeOutput(line1,line2,summary)
+
+
 if __name__ == '__main__':
-    # remoteRun_DP(1200.0)
+    remoteRun_DP(1200.0)
     # remoteRun_withnoise(1200.0)
-    remoteRun(1200.0)
+    # remoteRun(1200.0)
     # ###################
     # compinds = [1,2]
     # finaltime = 1200.0
@@ -386,3 +452,12 @@ if __name__ == '__main__':
     # ###################
     # localRun_zw()
     # testLagsAtDifferentLocationsAndLengths(2400.0)
+    # ###################
+    # test2Lines()
+    # ###################
+    # compinds = [1,2]
+    # finaltime = 1200.0
+    # tsprops = np.arange(0.2,0.95,0.1)
+    # lags = chooseLagsForSimsDP(compinds,finaltime,tsprops)
+    # ###################
+    # localRun_DP(1200.0)
