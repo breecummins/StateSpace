@@ -22,50 +22,56 @@ def doublependulumTS(finaltime=600.0,dt=0.025):
     names = ['x','y','z','w']
     return eqns,names,timeseries
 
-def getTSDP(finaltime):
+def runDP(epsprops,compinds,fname,lags=[[100,100]],basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPpaperexample/',finaltime=1200.0):
     eqns,names,ts = doublependulumTS(finaltime)
     tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200
-    return eqns,names,ts,tsprops
-
-def localRun_zw_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPpaperexample/',finaltime=1200.0):
-    eqns,names,ts,tsprops = getTSDP(finaltime)
-    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for z and w
-    compinds = [2,3]
-    lags = [[100,100]] #fixed lags
-    fname = 'DP_1200time_samefixedlags_fixedeps_zw.pickle'
     continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname) 
-
-def localRun_xw_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPpaperexample/',finaltime=1200.0):
-    eqns,names,ts,tsprops = getTSDP(finaltime)
-    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
-    compinds = [0,3]
-    lags = [[100,100]] #fixed lags
-    fname = 'DP_1200time_samefixedlags_fixedeps_xw.pickle'
-    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
-
-def localRun_xy_DP(basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPpaperexample/',finaltime=1200.0):
-    eqns,names,ts,tsprops = getTSDP(finaltime)
-    epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
-    compinds = [0,1]
-    lags = [[100,100]] #fixed lags
-    fname = 'DP_1200time_samefixedlags_fixedeps_xy.pickle'
-    continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname=basedir+fname)
 
 def remoteRun_DP(finaltime):
     print('Beginning batch run for double pendulum equations....')
     basedir = '/home/bcummins/'
     print('------------------------------------')
+    print('x and y')
+    print('------------------------------------')
+    epsprops=np.array([0.00001,0.00005,0.0001,0.0005,0.001,0.005,0.0075]) #for x and y
+    compinds = [0,1]
+    fname = 'DP_1200time_samefixedlags_fixedeps_xy.pickle'
+    runDP(epsprops,compinds,fname,basedir=basedir,finaltime=finaltime)
+    print('------------------------------------')
     print('z and w')
     print('------------------------------------')
-    localRun_zw_DP(basedir,finaltime)
+    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for z and w
+    compinds = [2,3]
+    fname = 'DP_1200time_samefixedlags_fixedeps_zw.pickle'
+    runDP(epsprops,compinds,fname,basedir=basedir,finaltime=finaltime)
     print('------------------------------------')
     print('x and w')
     print('------------------------------------')
-    localRun_xw_DP(basedir,finaltime)
+    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
+    compinds = [0,3]
+    fname = 'DP_1200time_samefixedlags_fixedeps_xw.pickle'
+    runDP(epsprops,compinds,fname,basedir=basedir,finaltime=finaltime)
     print('------------------------------------')
-    print('x and y')
+    print('y and w')
     print('------------------------------------')
-    localRun_xy_DP(basedir,finaltime)
+    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
+    compinds = [1,3]
+    fname = 'DP_1200time_samefixedlags_fixedeps_yw.pickle'
+    runDP(epsprops,compinds,fname,basedir=basedir,finaltime=finaltime)
+    print('------------------------------------')
+    print('x and z')
+    print('------------------------------------')
+    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
+    compinds = [0,2]
+    fname = 'DP_1200time_samefixedlags_fixedeps_xz.pickle'
+    runDP(epsprops,compinds,fname,basedir=basedir,finaltime=finaltime)
+    print('------------------------------------')
+    print('y and z')
+    print('------------------------------------')
+    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) #for x and w
+    compinds = [1,2]
+    fname = 'DP_1200time_samefixedlags_fixedeps_yz.pickle'
+    runDP(epsprops,compinds,fname,basedir=basedir,finaltime=finaltime)
 
 if __name__ == '__main__':
     remoteRun_DP(1200.0)
