@@ -42,10 +42,12 @@ def doublependulummodifiedTS_withnoise(finaltime=600.0,dt=0.025):
     names = ['x','y','z','w']
     return eqns,names,timeseries
 
-def twoLinesScrambled(skip=1):
+def twoLinesScrambledNoisy(skip=0,noise=0):
     times = np.arange(0,2.0,0.01)
     line1 = 0.1*times
     line2 = -0.7*times
+    std = np.std(line2)
+    line2 = line2 - noise*std + 2*noise*std*np.random.random(line2.shape)
     if skip > 0:
         newinds = random.sample(range(0,len(line2),skip),int(len(line2)/skip))
         line2[::skip] = line2[newinds]
@@ -403,7 +405,7 @@ def remoteRun_DP(finaltime):
     print('------------------------------------')
     localRun_xy_DP(basedir,finaltime)
 
-def test2Lines():
+def test2LinesScrambled():
     import PecoraViz as PV
     def makeOutput(line1,line2,summary):
         ts = np.array([line1,line2]).transpose()
@@ -418,30 +420,66 @@ def test2Lines():
         print(d['inverseconf'])
         PV.plotOutput(d['forwardconf'],d['inverseconf'],d['epsprops'],d['tsprops'],len(line1),d['forwardtitle'],d['inversetitle'],logs = [0,0])
     summary = "Two lines, complete scrambling."
-    line1,line2 = twoLinesScrambled(1)
+    line1,line2 = twoLinesScrambledNoisy(1)
     makeOutput(line1,line2,summary)
     summary = "Two lines, one-half scrambling."
-    line1,line2 = twoLinesScrambled(2)
+    line1,line2 = twoLinesScrambledNoisy(2)
     makeOutput(line1,line2,summary)
     summary = "Two lines, one-quarter scrambling."
-    line1,line2 = twoLinesScrambled(4)
+    line1,line2 = twoLinesScrambledNoisy(4)
     makeOutput(line1,line2,summary)
     summary = "Two lines, one-eighth scrambling."
-    line1,line2 = twoLinesScrambled(8)
+    line1,line2 = twoLinesScrambledNoisy(8)
     makeOutput(line1,line2,summary)
     summary = "Two lines, one-twentieth scrambling."
-    line1,line2 = twoLinesScrambled(20)
+    line1,line2 = twoLinesScrambledNoisy(20)
     makeOutput(line1,line2,summary)
     summary = "Two lines, one-fifieth scrambling."
-    line1,line2 = twoLinesScrambled(50)
+    line1,line2 = twoLinesScrambledNoisy(50)
     makeOutput(line1,line2,summary)
     summary = "Two lines, no scrambling."
-    line1,line2 = twoLinesScrambled(0)
+    line1,line2 = twoLinesScrambledNoisy(0)
     makeOutput(line1,line2,summary)
 
+def test2LinesNoisy():
+    import PecoraViz as PV
+    np.set_printoptions(linewidth=125)
+    def makeOutput(line1,line2,summary):
+        ts = np.array([line1,line2]).transpose()
+        d = continuityTestingFixedEps('Two lines',['x','y'],ts,[0,1],np.arange(0.2,1.1,0.2),np.array([0.001,0.005,0.01,0.05,0.1,0.2,0.3,0.4,0.5]),[[1,1]],numlags=3)
+        print('---------------------------------------------------------')
+        print(summary)
+        print('---------------------------------------------------------')
+        print("Epsilon as proportions of (changing) standard deviations: {0}.".format(d['epsprops']))
+        print("Forward continuity confidence: ")
+        print(d['forwardconf'])
+        print("Inverse continuity confidence: ")
+        print(d['inverseconf'])
+        PV.plotOutput(d['forwardconf'],d['inverseconf'],d['epsprops'],d['tsprops'],len(line1),d['forwardtitle'],d['inversetitle'],logs = [0,0])
+    summary = "Two lines, no noise."
+    line1,line2 = twoLinesScrambledNoisy(0,0)
+    makeOutput(line1,line2,summary)
+    summary = "Two lines, 0.001*std noise."
+    line1,line2 = twoLinesScrambledNoisy(0,0.001)
+    makeOutput(line1,line2,summary)
+    summary = "Two lines, 0.01*std noise."
+    line1,line2 = twoLinesScrambledNoisy(0,0.01)
+    makeOutput(line1,line2,summary)
+    summary = "Two lines, 0.1*std noise."
+    line1,line2 = twoLinesScrambledNoisy(0,0.1)
+    makeOutput(line1,line2,summary)
+    summary = "Two lines, 0.25*std noise."
+    line1,line2 = twoLinesScrambledNoisy(0,0.25)
+    makeOutput(line1,line2,summary)
+    summary = "Two lines, 0.5*std noise."
+    line1,line2 = twoLinesScrambledNoisy(0,0.5)
+    makeOutput(line1,line2,summary)
+    summary = "Two lines, 1.0*std noise."
+    line1,line2 = twoLinesScrambledNoisy(0,1)
+    makeOutput(line1,line2,summary)
 
 if __name__ == '__main__':
-    remoteRun_DP(1200.0)
+    # remoteRun_DP(1200.0)
     # remoteRun_withnoise(1200.0)
     # remoteRun(1200.0)
     # ###################
@@ -452,8 +490,9 @@ if __name__ == '__main__':
     # ###################
     # localRun_zw()
     # testLagsAtDifferentLocationsAndLengths(2400.0)
-    # ###################
-    # test2Lines()
+    ###################
+    test2LinesNoisy()
+    test2LinesScrambled()
     # ###################
     # compinds = [1,2]
     # finaltime = 1200.0

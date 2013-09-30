@@ -107,21 +107,21 @@ def plotConfForCstp():
 
 
 if __name__ == '__main__':
-    # basedir = '/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DP/'
-    # fname = 'DP_1200time_difffixedlags_fixedeps_zw.pickle'
-    # plotContinuityConfWrapper(basedir,fname)
-    # fname = 'DP_1200time_samefixedlags_fixedeps_xy.pickle'
-    # plotContinuityConfWrapper(basedir,fname,[0,0])
-    # fname = 'DP_1200time_samefixedlags_fixedeps_xw.pickle'
-    # plotContinuityConfWrapper(basedir,fname,[1,0])
-    ################################
-    basedir = '/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPModified/changedbeta/'
-    fname = 'DPMod_1200time_samefixedlags_fixedeps_beta1-2_zw.pickle'
+    basedir = '/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPchangedbeta/'
+    fname = 'DP_1200time_samefixedlags_fixedeps_zw.pickle'
     plotContinuityConfWrapper(basedir,fname)
-    fname = 'DPMod_1200time_samefixedlags_fixedeps_beta1-2_xy.pickle'
+    fname = 'DP_1200time_samefixedlags_fixedeps_xy.pickle'
     plotContinuityConfWrapper(basedir,fname,[0,0])
-    fname = 'DPMod_1200time_difffixedlags_fixedeps_beta1-2_xw.pickle'
+    fname = 'DP_1200time_samefixedlags_fixedeps_xw.pickle'
     plotContinuityConfWrapper(basedir,fname,[1,0])
+    # ################################
+    # basedir = '/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPModified/changedbeta/'
+    # fname = 'DPMod_1200time_samefixedlags_fixedeps_beta1-2_zw.pickle'
+    # plotContinuityConfWrapper(basedir,fname)
+    # fname = 'DPMod_1200time_samefixedlags_fixedeps_beta1-2_xy.pickle'
+    # plotContinuityConfWrapper(basedir,fname,[0,0])
+    # fname = 'DPMod_1200time_difffixedlags_fixedeps_beta1-2_xw.pickle'
+    # plotContinuityConfWrapper(basedir,fname,[1,0])
     # ##############################
     # plotConfForCstp()
     ##############################
