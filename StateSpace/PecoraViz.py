@@ -5,13 +5,15 @@ mpl.rcParams.update({'font.size': 18})
 import fileops
 
 def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,inversetitle,logs = [1,1]):
-    Mlens = (tsprops*tslength).astype(int)
+    # Mlens = (tsprops*tslength).astype(int)
     if logs[0]:
         if np.any(forwardconf):
             plt.figure()
             plt.semilogy(epsprops,forwardconf.transpose())
-            plt.legend([str(m) for m in Mlens],loc=0)
-            plt.ylabel(r'$\theta_{C^0}$')
+            plt.ylim([0,1])
+            # plt.legend([str(m) for m in Mlens],loc=0)
+            plt.legend([str(m*100)+'%' for m in tsprops],loc=0)
+            plt.ylabel(r'$\Theta$',rotation='horizontal')
             plt.xlabel(r'$\epsilon$')
             plt.title(forwardtitle)
         else:
@@ -19,16 +21,20 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
     else:   
         plt.figure()
         plt.plot(epsprops,forwardconf.transpose())
-        plt.legend([str(m) for m in Mlens],loc=0)
-        plt.ylabel(r'$\theta_{C^0}$')
+        plt.ylim([0,1])
+        # plt.legend([str(m) for m in Mlens],loc=0)
+        plt.legend([str(m*100)+'%' for m in tsprops],loc=0)
+        plt.ylabel(r'$\Theta$',rotation='horizontal')
         plt.xlabel(r'$\epsilon$')
         plt.title(forwardtitle)
     if logs[1]:
         if np.any(inverseconf):
             plt.figure()
             plt.semilogy(epsprops,inverseconf.transpose())
-            plt.legend([str(m) for m in Mlens],loc=0)
-            plt.ylabel(r'$\theta_{I^0}$')
+            plt.ylim([0,1])
+            # plt.legend([str(m) for m in Mlens],loc=0)
+            plt.legend([str(m*100)+'%' for m in tsprops],loc=0)
+            plt.ylabel(r'$\Theta$',rotation='horizontal')
             plt.xlabel(r'$\epsilon$')
             plt.title(inversetitle)
         else:
@@ -36,8 +42,10 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
     else:   
         plt.figure()
         plt.plot(epsprops,inverseconf.transpose())
-        plt.legend([str(m) for m in Mlens],loc=0)
-        plt.ylabel(r'$\theta_{I^0}$')
+        plt.ylim([0,1])
+        # plt.legend([str(m) for m in Mlens],loc=0)
+        plt.legend([str(m*100)+'%' for m in tsprops],loc=0)
+        plt.ylabel(r'$\Theta$',rotation='horizontal')
         plt.xlabel(r'$\epsilon$')
         plt.title(inversetitle)
     plt.show()
