@@ -12,7 +12,7 @@ def chooseLagsForSims(finaltime,tsprops=None,Tp=150):
     lags = SSR.chooseLags(ts,Mlens,Tp)
     return lags
 
-def continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname='',numlags=5):
+def continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,numlags=8,fname=''):
     forwardconf, inverseconf, epsM1, epsM2, forwardprobs, inverseprobs = PM.convergenceWithContinuityTestFixedLagsFixedEps(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags[0][0],lags[0][1],tsprops=tsprops,epsprops=epsprops)
     forwardtitle = eqns + r', M{0} $\to$ M{1}'.format(names[compinds[0]],names[compinds[1]])
     inversetitle = eqns + r', M{1} $\to$ M{0}'.format(names[compinds[0]],names[compinds[1]])
@@ -52,8 +52,8 @@ def remoteRun_Diamond(finaltime=1200.0):
         runDiamond(epsprops,compinds,fname,[lags[k]],basedir=basedir,finaltime=finaltime)
 
 if __name__ == '__main__':
-    # remoteRun_Diamond(1200.0)
-    chooseLagsForSims(1200.0)
+    remoteRun_Diamond(1200.0)
+    # chooseLagsForSims(1200.0)
     # #below, choose lags from autocorrelation
     # import PecoraViz as PV
     # eqns,names,ts = diamondTS(1200.0)
