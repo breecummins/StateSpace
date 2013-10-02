@@ -4,12 +4,12 @@ import PecoraMethodModified as PM
 import StateSpaceReconstruction as SSR
 import fileops
 
-def chooseLagsForSims(compinds,finaltime,tsprops=None,Tp=None):
+def chooseLagsForSims(finaltime,tsprops=None,Tp=150):
     if tsprops == None:
         tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200        
     eqns,names,ts = diamondTS(finaltime)
     Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
-    lags = SSR.chooseLags(ts[:,compinds[0]],ts[:,compinds[1]],Mlens,Tp)
+    lags = SSR.chooseLags(ts,Mlens,Tp)
     return lags
 
 def continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname='',numlags=5):
@@ -41,8 +41,8 @@ def remoteRun_Diamond(finaltime=1200.0):
     names = ['x','y','z','w','s','u','v','p']
     compind1 = [0,0,0,0,1,1,1,1,4,4,4,5,5,7,7,7]
     compind2 = [4,5,6,7,4,5,6,7,5,6,7,6,7,6,3,2]
-    basefname = 'Diamond_1200time_lagsof60and120_'
-    lags= [[120,60],[120,60],[120,60],[120,120],[120,60],[120,60],[120,60],[120,120],[60,60],[60,60],[60,120],[60,60],[60,120],[120,120],[120,120],[120,120]]
+    basefname = 'Diamond_1200time_mixedlags_'
+    lags= [[100,60],[100,70],[100,30],[100,120],[100,60],[100,70],[100,30],[100,120],[60,70],[60,30],[60,120],[70,30],[70,120],[120,30],[120,100],[120,115]]
     for k,c1 in enumerate(compind1):
         print('------------------------------------')
         print(names[c1] + ' and ' + names[compind2[k]])
@@ -52,8 +52,8 @@ def remoteRun_Diamond(finaltime=1200.0):
         runDiamond(epsprops,compinds,fname,[lags[k]],basedir=basedir,finaltime=finaltime)
 
 if __name__ == '__main__':
-    remoteRun_Diamond(1200.0)
-    # chooseLagsForSims([0,3],1200.0)
+    # remoteRun_Diamond(1200.0)
+    chooseLagsForSims(1200.0)
     # #below, choose lags from autocorrelation
     # import PecoraViz as PV
     # eqns,names,ts = diamondTS(1200.0)

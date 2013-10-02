@@ -91,81 +91,16 @@ def lagsizeFromFirstZeroOfAutocorrelation(ts,T=None):
             raise ValueError('No zero in the autocorrelation for the first {0}% of the time series.'.format(int(T*100/len(ts))))
     return fz
 
-def evaluateLagSimilarity(int1,int2):
-    '''
-    Given two integers, decide whether they are similar or not. 
-
-    '''
-    if float(int1)/int2 < 4./3 and float(int1)/int2 > 3./4:
-        return [int(np.mean([int1,int2]))]
-    else:
-        if int1 < int2:
-            multiplier = int(float(int2)/int1)
-            return [int1,int(int1*multiplier)]
-        else:
-            multiplier = int(float(int1)/int2)
-            return [int(int2*multiplier),int2]
-
-def getUserInput(lag1,lag2,newlags):
-    print('Original lags: {0}'.format([lag1,lag2]))
-    print('Modified lags: {0}'.format(newlags))
-    accept = raw_input("Do you accept the modified lags? (y or n) ") 
-    if accept == 'y':
-        return 'y',newlags
-    else:
-        if newlags[0] == newlags[1]:
-            sim = 1
-        else:
-            sim = 0
-        newlags = input("Enter a new length 2 list with the desired lags, such as [105,6900] or [23,23], OR enter a scalar that represents the smallest lag, such as 105 or 23. The other lag will either be the same or an integer multiple of the small lag. ")
-        if isinstance(newlags,list):
-            return 'y',newlags
-        else:
-            if sim:
-                newlags = [newlags,newlags]
-            else:
-                if lag1 < lag2:
-                    multiplier = int(float(lag2)/newlags)
-                    newlags = [newlags,int(newlags*multiplier)]
-                else:
-                    multiplier = int(float(lag1)/newlags)
-                    newlags = [int(newlags*multiplier),newlags]
-            return 'n',newlags        
-
-def chooseLagSize(ts1,ts2,T=None):
-    '''
-    Choose lag sizes for the two time series ts1 and ts2, which
-    are both 1D arrays of the same length, by calculating the 
-    first zeros of the autocorrelations. Decide whether the lags 
-    are close enough to be averaged, or must be considered 
-    different values. 
-
-    '''
-    lag1 = lagsizeFromFirstZeroOfAutocorrelation(ts1,T)
-    lag2 = lagsizeFromFirstZeroOfAutocorrelation(ts2,T)
-    sim = evaluateLagSimilarity(lag1,lag2)
-    if len(sim) == 1:
-        newlags = sim*2 # list of length 2 with newlags[0] = newlags[1] = sim[0]
-    else:
-        newlags = sim
-    accept,newlags = getUserInput(lag1,lag2,newlags)
-    while accept == 'n':
-        accept,newlags = getUserInput(lag1,lag2,newlags)
-    return newlags
-
-def chooseLags(ts1,ts2,Mlens,Tp=None):
-    lags = []
-    if Tp:
-        for L in Mlens:
-            print("Time series length: {0}".format(L))
-            ls = chooseLagSize(ts1[:L],ts2[:L],int(Tp*L))
-            lags.append(ls)
-    else:
-        for L in Mlens:
-            print("Time series length: {0}".format(L))
-            ls = chooseLagSize(ts1[:L],ts2[:L])
-            lags.append(ls)
-    print('Accepted lags are {0}.'.format(lags))
+def chooseLags(ts,Mlens,Tp=None):
+    if len(ts.shape) == 1:
+        N = 1
+    elif len(ts.shape) == 2:
+        N = ts.shape[1]
+    lags = [[] for _ in range(len(Mlens))]
+    for k,L in enumerate(Mlens):
+        for j in range(N):
+            lags[k].append(lagsizeFromFirstZeroOfAutocorrelation(ts[:L,j],Tp))
+        print("Time series length: {0}, lags = {1}.".format(L,lags[k]))
     return lags
 
 def testLagsWithDifferentChunks(ts,L,N,T=None):

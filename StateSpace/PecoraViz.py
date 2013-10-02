@@ -4,7 +4,7 @@ import matplotlib as mpl
 mpl.rcParams.update({'font.size': 18})
 import fileops
 
-def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,inversetitle,logs = [1,1]):
+def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,inversetitle,logs = [1,1],forwardfname='',inversefname=''):
     # Mlens = (tsprops*tslength).astype(int)
     if logs[0]:
         if np.any(forwardconf):
@@ -12,10 +12,12 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
             plt.semilogy(epsprops,forwardconf.transpose())
             plt.ylim([0,1])
             # plt.legend([str(m) for m in Mlens],loc=0)
-            plt.legend([str(m*100)+'%' for m in tsprops],loc=0)
+            plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
             plt.ylabel(r'$\Theta$',rotation='horizontal')
             plt.xlabel(r'$\epsilon$')
             plt.title(forwardtitle)
+            if forwardfname:
+                plt.savefig(forwardfname)
         else:
             print("Data has no positive values in the forward direction.")
     else:   
@@ -23,20 +25,24 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
         plt.plot(epsprops,forwardconf.transpose())
         plt.ylim([0,1])
         # plt.legend([str(m) for m in Mlens],loc=0)
-        plt.legend([str(m*100)+'%' for m in tsprops],loc=0)
+        plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
         plt.ylabel(r'$\Theta$',rotation='horizontal')
         plt.xlabel(r'$\epsilon$')
         plt.title(forwardtitle)
+        if forwardfname:
+            plt.savefig(forwardfname)
     if logs[1]:
         if np.any(inverseconf):
             plt.figure()
             plt.semilogy(epsprops,inverseconf.transpose())
             plt.ylim([0,1])
             # plt.legend([str(m) for m in Mlens],loc=0)
-            plt.legend([str(m*100)+'%' for m in tsprops],loc=0)
+            plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
             plt.ylabel(r'$\Theta$',rotation='horizontal')
             plt.xlabel(r'$\epsilon$')
             plt.title(inversetitle)
+            if inversefname:
+                plt.savefig(inversefname)
         else:
             print("Data has no positive values in the inverse direction.")
     else:   
@@ -44,11 +50,21 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
         plt.plot(epsprops,inverseconf.transpose())
         plt.ylim([0,1])
         # plt.legend([str(m) for m in Mlens],loc=0)
-        plt.legend([str(m*100)+'%' for m in tsprops],loc=0)
+        plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
         plt.ylabel(r'$\Theta$',rotation='horizontal')
         plt.xlabel(r'$\epsilon$')
         plt.title(inversetitle)
-    plt.show()
+        if inversefname:
+            plt.savefig(inversefname)
+
+def plotContinuityConfWrapper_SaveFigs(basedir,fname,logs=[0,0]):
+    outdict = fileops.loadPickle(basedir+fname)
+    base = basedir+fname[:-7] #get rid of .pickle at end of fname
+    var1 = base[-2]
+    var2 = base[-1]
+    forwardfname = base + '_M' + var1 + 'toM' + var2 + '.png'
+    inversefname = base + '_M' + var2 + 'toM' + var1 + '.png'    
+    plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['epsprops'],outdict['tsprops'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'],logs,forwardfname,inversefname)
 
 def plotContinuityConfWrapper(basedir,fname,logs=[1,1]):
     outdict = fileops.loadPickle(basedir+fname)
@@ -69,6 +85,7 @@ def plotContinuityConfWrapper(basedir,fname,logs=[1,1]):
     print("Inverse probability of one point mapping into M1 epsilon: ")
     print(outdict['inverseprobs'])    
     plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['epsprops'],outdict['tsprops'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'],logs)
+    plt.show()
 
 def plotAutocorrelation(autocorr,title):
     plt.figure()

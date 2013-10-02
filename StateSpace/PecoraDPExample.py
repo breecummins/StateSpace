@@ -5,6 +5,14 @@ import StateSpaceReconstruction as SSR
 import fileops
 import PecoraViz as PV
 
+def chooseLagsForSims(finaltime,tsprops=None,Tp=150):
+    if tsprops == None:
+        tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200        
+    eqns,names,ts = doublependulumTS(finaltime)
+    Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
+    lags = SSR.chooseLags(ts,Mlens,Tp)
+    return lags
+
 def continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,fname='',numlags=5):
     forwardconf, inverseconf, epsM1, epsM2, forwardprobs, inverseprobs = PM.convergenceWithContinuityTestFixedLagsFixedEps(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags[0][0],lags[0][1],tsprops=tsprops,epsprops=epsprops)
     forwardtitle = eqns + r', M{0} $\to$ M{1}'.format(names[compinds[0]],names[compinds[1]])
@@ -74,5 +82,5 @@ def remoteRun_DP(finaltime):
     runDP(epsprops,compinds,fname,basedir=basedir,finaltime=finaltime)
 
 if __name__ == '__main__':
-    remoteRun_DP(1200.0)
-    # PV.plotContinuityConfWrapper(basedir,fname)
+    # remoteRun_DP(1200.0)
+    chooseLagsForSims(1200.0)
