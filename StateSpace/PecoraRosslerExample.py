@@ -66,5 +66,5 @@ def runRossler(finaltime=1200.0,remote=1,varchange=1):
         continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,[lags[k]],fname=basedir+fname)
 
 if __name__ == '__main__':
-    runRossler()
-    # chooseLagsForSims(1200.0)
+    # runRossler()
+    chooseLagsForSims(1200.0)
