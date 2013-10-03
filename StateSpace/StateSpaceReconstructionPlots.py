@@ -30,16 +30,23 @@ def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False
             plt.plot(timeseries,style)
         else:
             plt.scatter(timeseries,style)
+        plt.ylabel(r'$x_0$')
     elif len(s) == 2 and s[1] == 2:
         if not scatter:
             plt.plot(timeseries[:,0],timeseries[:,1],style)
         else:
             plt.scatter(timeseries[:,0],timeseries[:,1],style)
+        plt.xlabel(r'$x_0$')
+        plt.ylabel(r'$x_1$')
     elif len(s) == 2 and s[1] == 3:
         if not scatter:
             ax.plot(timeseries[:,0],timeseries[:,1],timeseries[:,2],style)
+            # ax.set_zlim3d(0,2)
         else:
             ax.scatter(timeseries[:,0],timeseries[:,1],timeseries[:,2],style)
+        plt.xlabel(r'$x_0$')
+        plt.ylabel(r'$x_1$')
+        ax.set_zlabel(r'$x_2$')
     else:
         print('A timeseries of dimension ' + str(timeseries.shape) + ' cannot be plotted')
         raise(SystemExit)
