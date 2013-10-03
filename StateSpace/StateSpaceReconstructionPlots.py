@@ -95,6 +95,16 @@ def plotEstShadowManifoldUs3(ts1,ts2,numlags,lagsize,proj,wgtfunc=Weights.makeEx
     plotShadowManifold(ts2,numlags,lagsize,0,0,'k-')
     plotShadowManifold(est2,numlags,lagsize,1,1,'g-')
 
+def plotAutocorrelation(autocorr,title):
+    plt.figure()
+    plt.plot([1,len(autocorr)+1],[0,0],'k')
+    plt.hold('on')
+    plt.plot(range(1,len(autocorr)+1),autocorr)
+    plt.ylabel('autocorrelation')
+    plt.xlabel('lag index')
+    plt.title(title)
+    plt.show()
+
 def plots(x,y,show=1,hold=0,stylestr=['b-'],leglabels=None,legloc=4,titlestr=None,xstr=None,ystr=None,fname=None):
     if not hold:
         fig = plt.figure()

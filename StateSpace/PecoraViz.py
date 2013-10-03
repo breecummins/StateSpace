@@ -87,19 +87,10 @@ def plotContinuityConfWrapper(basedir,fname,logs=[1,1]):
     plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['epsprops'],outdict['tsprops'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'],logs)
     plt.show()
 
-def plotAutocorrelation(autocorr,title):
-    plt.figure()
-    plt.plot([1,len(autocorr)+1],[0,0],'k')
-    plt.hold('on')
-    plt.plot(range(1,len(autocorr)+1),autocorr)
-    plt.ylabel('autocorrelation')
-    plt.xlabel('lag index')
-    plt.title(title)
-    plt.show()
-
 def plotAutoCorrWrapper(finaltime=1200.0):
     import PecoraScriptsModified as PS
     import StateSpaceReconstruction as SSR
+    import StateSpaceReconstructionPlots as SSRPlots
     #autocorrelation pics
     eqns,names,ts = PS.doublependulummodifiedTS(finaltime)
     compind1=2
@@ -108,8 +99,8 @@ def plotAutoCorrWrapper(finaltime=1200.0):
     for L in Mlens:
         autocorr1 = SSR.getAutocorrelation(ts[:L,compind1],int(0.5*L))
         # autocorr2 = SSR.getAutocorrelation(ts[:L,compind2],int(0.5*L))
-        plotAutocorrelation(autocorr1,"z autocorr, length {0}".format(L))
-        # plotAutocorrelation(autocorr2,"w autocorr, length {0}".format(L))
+        SSRPlots.plotAutocorrelation(autocorr1,"z autocorr, length {0}".format(L))
+        # SSRPlots.plotAutocorrelation(autocorr2,"w autocorr, length {0}".format(L))
 
 def plotConfForCstp():
     from scipy.misc import comb
