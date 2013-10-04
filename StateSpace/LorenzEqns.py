@@ -1,7 +1,7 @@
 import rk4
 import numpy as np
 
-def solveLorenz(init,finaltime,dt=0.01,sigma=10.,rho=28.,beta=8/3.):
+def solveLorenz(init,finaltime,dt=0.025,sigma=10.,rho=28.,beta=8/3.):
     '''
     init = [x[0],y[0],z[0]] are the initial conditions
     dt is the time step
@@ -21,7 +21,7 @@ def lorenz(t,x,sigma=0.,rho=0.,beta=0.):
     dx[2] = x[0]*x[1] - beta*x[2]
     return dx
 
-def solveLorenzVarChange(init,finaltime,dt=0.01,sigma=10.,rho=28.,beta=8/3.):
+def solveLorenzVarChange(init,finaltime,dt=0.025,sigma=10.,rho=28.,beta=8/3.):
     '''
     init = [x[0],y[0],z[0]] are the initial conditions
     dt is the time step
@@ -41,7 +41,7 @@ def lorenzVarChange(t,x,sigma=0.,rho=0.,beta=0.):
     dx[2] = sigma*(x[1]-x[0]) + x[0]*x[1] - beta*(x[2]-x[0])
     return dx
 
-def solveRotatedLorenz(init,finaltime,dt=0.01,sigma=10.,rho=28.,beta=8/3.):
+def solveRotatedLorenz(init,finaltime,dt=0.025,sigma=10.,rho=28.,beta=8/3.):
     '''
     init = [x[0],y[0],z[0]] are the initial conditions
     dt is the time step
@@ -63,8 +63,8 @@ def rotatedLorenz(t,x,sigma=0.,rho=0.,beta=0.):
 
 if __name__ == '__main__':
     import StateSpaceReconstructionPlots as SSRPlots
-    dt = 0.01
-    finaltime = 80.0
+    dt = 0.025
+    finaltime = 100.0
     # timeseries = solveLorenzVarChange([1.0,0.5,-0.5],finaltime,dt)
     # numlags = 3
     # lagsize = int(0.08/dt) #because lagsize=8 is good with dt = 0.01
@@ -79,8 +79,7 @@ if __name__ == '__main__':
     ##############################
     timeseries = solveRotatedLorenz([1.0,0.5,0.5],finaltime,dt)
     numlags = 3
-    lagsize = int(0.08/dt) #because lagsize=8 is good with dt = 0.01
     SSRPlots.plotManifold(timeseries,show=0)
-    SSRPlots.plotShadowManifold(timeseries[:,0],3,8,show=0,hold=0,style='r-')
-    SSRPlots.plotShadowManifold(timeseries[:,1],3,8,show=0,hold=0,style='g-')
-    SSRPlots.plotShadowManifold(timeseries[:,2],3,8,show=1,hold=0,style='k-')
+    SSRPlots.plotShadowManifold(timeseries[:,0],3,10,show=0,hold=0,style='r-')
+    SSRPlots.plotShadowManifold(timeseries[:,1],3,10,show=0,hold=0,style='g-')
+    SSRPlots.plotShadowManifold(timeseries[:,2],3,10,show=1,hold=0,style='k-')

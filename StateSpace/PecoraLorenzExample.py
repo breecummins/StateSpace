@@ -52,8 +52,8 @@ def runLorenz(finaltime=1200.0,remote=1,rotated=1):
     compind2 = [1,2,2]
     if rotated:
         eqns,names,ts = rotatedLorenzTS(finaltime)
-        basefname = 'RotatedLorenz_1200time_mixedlags_biggereps_'
-        lags= [[10,10],[10,120],[10,120]]
+        basefname = 'RotatedLorenz_1200time_samelags_biggereps_'
+        lags= [[10,10],[10,10],[10,10]]
     else:
         eqns,names,ts = lorenzTS(finaltime)
         basefname = 'Lorenz_1200time_mixedlags_125_100_biggereps_'
