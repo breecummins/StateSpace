@@ -4,13 +4,15 @@ import PecoraMethodModified as PM
 import StateSpaceReconstruction as SSR
 import fileops
 
-def chooseLagsForSims(finaltime,tsprops=None,Tp=200,varchange=0,driven=1):
+def chooseLagsForSims(finaltime,tsprops=None,Tp=200,varchange=0,driven=0,rotated=1):
     if tsprops == None:
         tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200 
     if varchange:       
         eqns,names,ts = rosslerVarChangeTS(finaltime)
     elif driven:
         eqns,names,ts = drivenRosslerTS(finaltime)
+    elif rotated:
+        eqns,names,ts = rotatedRosslerTS(finaltime)
     else:
         eqns,names,ts = rosslerTS(finaltime)
     Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
@@ -41,6 +43,13 @@ def drivenRosslerTS(finaltime=1200.0,dt=0.025):
     names = ['s','u','v']
     return eqns,names,timeseries
 
+def rotatedRosslerTS(finaltime=1200.0,dt=0.025):
+    from Rossler import solveRotatedRossler
+    timeseries = solveRotatedRossler([5.0,4.0,3.0],finaltime,dt)
+    eqns = 'Rotated Rossler'
+    names = ['s','u','v']
+    return eqns,names,timeseries
+
 def rosslerVarChangeTS(finaltime=1200.0,dt=0.025):
     from Rossler import solveRosslerVarChange
     timeseries = solveRosslerVarChange([5.0,4.0,3.0],finaltime,dt)
@@ -48,7 +57,7 @@ def rosslerVarChangeTS(finaltime=1200.0,dt=0.025):
     names = ['s','u','v']
     return eqns,names,timeseries
 
-def runRossler(finaltime=1200.0,remote=1,varchange=0,driven=1):
+def runRossler(finaltime=1200.0,remote=1,varchange=0,driven=0,rotated=1):
     print('Beginning batch run for Rossler equations....')
     if remote:
         basedir = '/home/bcummins/'
@@ -65,6 +74,10 @@ def runRossler(finaltime=1200.0,remote=1,varchange=0,driven=1):
     elif driven:
         eqns,names,ts = drivenRosslerTS(finaltime)
         basefname = 'DrivenRossler_1200time_samelags_'
+        lags= [[60,60],[60,60],[60,60]]
+    elif rotated:
+        eqns,names,ts = rotatedRosslerTS(finaltime)
+        basefname = 'RotatedRossler_1200time_samelags_'
         lags= [[60,60],[60,60],[60,60]]
     else:
         eqns,names,ts = rosslerTS(finaltime)

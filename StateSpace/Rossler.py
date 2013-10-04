@@ -66,6 +66,21 @@ def drivenRossler(t,x,a=0.0,b=0.0,c=0.0,d=0.0):
     dx[2] = x[0]-x[1]-x[2] + b + (x[2]-x[0])*(x[0]-c)
     return dx
 
+def solveRotatedRossler(init,T,dt=0.01,a=0.2,b=0.2,c=5.7):
+    times = np.arange(0,T,dt)
+    x = np.zeros((len(times),len(init)))
+    x[0,:] = init
+    for k,t in enumerate(times[:-1]):
+        x[k+1,:] = rk4.solverp(t,x[k,:],dt,rotatedRossler,a=a,b=b,c=c)
+    return x
+
+def rotatedRossler(t,x,a=0.0,b=0.0,c=0.0):
+    dx = np.zeros(x.shape)
+    dx[0] = 0.5*( (a-1-c)*x[0] + (-a+1-c)*x[1] + (1+a+c)*x[2] +2*b + 0.5*(-(x[0] - x[2])**2 + x[1]**2))
+    dx[1] = (1/2.)*(-(c+2)*x[0] - c*x[1] + c*x[2] + 2*b + 0.5*(-(x[0] - x[2])**2 + x[1]**2))
+    dx[2] = 0.5*((a-3)*x[0] + (1-a)*x[1] + (1+a)*x[2])
+    return dx
+
 def solveDiamondVarChange(init,T,dt=0.01,mu=4.0,beta=1.2,A=2.0,a=0.2,b=0.2,c=5.7,d=0.2,B=1.25):
     times = np.arange(0,T,dt)
     x = np.zeros((len(times),len(init)))
@@ -153,9 +168,15 @@ if __name__ == '__main__':
     # SSRPlots.plotShadowManifold(x[:,2], 3, 60, show=0, titlestr='var change, s, lag 60')
     # SSRPlots.plotManifold(x[:,2:5],show=0,titlestr='Rossler phase space')
     # SSRPlots.plotManifold(x[:,[0,1,5]],show=1,titlestr='x,y,p')
+    # #########################
+    # x = solveDrivenRossler([5.0,4.0,3.0],600.0)
+    # SSRPlots.plotShadowManifold(x[:,2], 3, 60, show=0, titlestr='var change, v, lag 60')
+    # SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=0, titlestr='var change, u, lag 60')
+    # SSRPlots.plotShadowManifold(x[:,0], 3, 60, show=0, titlestr='var change, s, lag 60')
+    # SSRPlots.plotManifold(x,show=1,titlestr='Rossler phase space')
     #########################
-    x = solveDrivenRossler([5.0,4.0,3.0],600.0)
-    SSRPlots.plotShadowManifold(x[:,2], 3, 60, show=0, titlestr='var change, v, lag 60')
-    SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=0, titlestr='var change, u, lag 60')
-    SSRPlots.plotShadowManifold(x[:,0], 3, 60, show=0, titlestr='var change, s, lag 60')
+    x = solveRotatedRossler([1.0,1.0,1.0],600.0)
+    SSRPlots.plotShadowManifold(x[:,2], 3, 60, show=0, titlestr='rotated v, lag 60')
+    SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=0, titlestr='rotated u, lag 60')
+    SSRPlots.plotShadowManifold(x[:,0], 3, 60, show=0, titlestr='rotated s, lag 60')
     SSRPlots.plotManifold(x,show=1,titlestr='Rossler phase space')
