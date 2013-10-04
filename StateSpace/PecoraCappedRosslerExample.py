@@ -47,18 +47,18 @@ def runCappedRossler(finaltime=1200.0,remote=1,rotated=1):
         basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/Diamondpaperexample/'
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) 
     names = ['x','y','s','u','v','p']
-    compind1 = [2,2]
-    compind2 = [3,4]
+    compind1 = [0,0,0,0,1,1,1,1,2,2,2,3,3,4]
+    compind2 = [2,3,4,5,2,3,4,5,3,4,5,4,5,5]
     tsprops = np.arange(0.3,0.95,0.1) 
     numlags = 6
     if rotated:
         eqns,names,ts = cappedRotatedRosslerTS(finaltime)
-        basefname = 'CappedRotatedRossler_1200time_samelags_'
-        lags= [[60,60],[60,60]]
+        basefname = 'CappedRotatedRossler_1200time_mixedlags_'
+        lags= [[100,50],[100,60],[100,60],[100,200],[100,50],[100,60],[100,60],[100,200],[50,60],[50,60],[50,200],[60,60],[60,200],[60,200]]
     else:
         eqns,names,ts = cappedRosslerTS(finaltime)
-        basefname = 'CappedRossler_1200time_samelags_'
-        lags= [[60,60],[60,60]]
+        basefname = 'CappedRossler_1200time_mixedlags_'
+        lags= [[100,60],[100,60],[100,60],[100,100],[100,60],[100,60],[100,60],[100,100],[60,60],[60,60],[60,100],[60,60],[60,100],[60,100]]
     for k,c1 in enumerate(compind1):
         print('------------------------------------')
         print(names[c1] + ' and ' + names[compind2[k]])
@@ -69,7 +69,8 @@ def runCappedRossler(finaltime=1200.0,remote=1,rotated=1):
 
 if __name__ == '__main__':
     runCappedRossler()
-    # chooseLagsForSims(600.0)
+    runCappedRossler(rotated=0)
+    # chooseLagsForSims(1200.0,rotated=0)
     # #below, choose lags from autocorrelation
     # import StateSpaceReconstructionPlots as SSRPlots
     # eqns,names,ts = diamondVarChangeTS(1200.0)
