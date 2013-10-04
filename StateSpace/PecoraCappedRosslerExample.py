@@ -4,10 +4,13 @@ import PecoraMethodModified as PM
 import StateSpaceReconstruction as SSR
 import fileops
 
-def chooseLagsForSims(finaltime,tsprops=None,Tp=300,varchange=1):
+def chooseLagsForSims(finaltime,tsprops=None,Tp=300,rotated=1):
     if tsprops == None:
-        tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200  
-    eqns,names,ts = cappedRosslerTS(finaltime)
+        tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200
+    if rotated:  
+        eqns,names,ts = cappedRotatedRosslerTS(finaltime)
+    else:
+        eqns,names,ts = cappedRosslerTS(finaltime)
     Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
     lags = SSR.chooseLags(ts,Mlens,Tp)
     return lags
@@ -29,7 +32,14 @@ def cappedRosslerTS(finaltime=1200.0,dt=0.025):
     names = ['x','y','s','u','v','p']
     return eqns,names,timeseries
 
-def runCappedRossler(finaltime=600.0,remote=1):
+def cappedRotatedRosslerTS(finaltime=1200.0,dt=0.025):
+    from Rossler import solveCappedPendulumRotatedRossler
+    timeseries = solveCappedPendulumRotatedRossler([1.0,2.0,5.0,4.0,3.0,0.75],finaltime,dt)
+    eqns = 'Capped Rotated Rossler'
+    names = ['x','y','s','u','v','p']
+    return eqns,names,timeseries
+
+def runCappedRossler(finaltime=1200.0,remote=1,rotated=1):
     print('Beginning batch run for capped pendulum-Rossler equations....')
     if remote:
         basedir = '/home/bcummins/'
@@ -41,9 +51,14 @@ def runCappedRossler(finaltime=600.0,remote=1):
     compind2 = [3,4]
     tsprops = np.arange(0.3,0.95,0.1) 
     numlags = 6
-    eqns,names,ts = cappedRosslerTS(finaltime)
-    basefname = 'CappedRossler_0600time_mixedlags_'
-    lags= [[100,60],[100,60]]
+    if rotated:
+        eqns,names,ts = cappedRotatedRosslerTS(finaltime)
+        basefname = 'CappedRotatedRossler_1200time_samelags_'
+        lags= [[60,60],[60,60]]
+    else:
+        eqns,names,ts = cappedRosslerTS(finaltime)
+        basefname = 'CappedRossler_1200time_samelags_'
+        lags= [[60,60],[60,60]]
     for k,c1 in enumerate(compind1):
         print('------------------------------------')
         print(names[c1] + ' and ' + names[compind2[k]])
@@ -53,7 +68,7 @@ def runCappedRossler(finaltime=600.0,remote=1):
         continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,numlags,fname=basedir+fname) 
 
 if __name__ == '__main__':
-    runCappedRossler(remote=0)
+    runCappedRossler()
     # chooseLagsForSims(600.0)
     # #below, choose lags from autocorrelation
     # import StateSpaceReconstructionPlots as SSRPlots

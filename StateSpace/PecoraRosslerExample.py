@@ -57,7 +57,7 @@ def rosslerVarChangeTS(finaltime=1200.0,dt=0.025):
     names = ['s','u','v']
     return eqns,names,timeseries
 
-def runRossler(finaltime=1200.0,remote=1,varchange=0,driven=0,rotated=1):
+def runRossler(finaltime=1200.0,remote=1,varchange=0,driven=1,rotated=0):
     print('Beginning batch run for Rossler equations....')
     if remote:
         basedir = '/home/bcummins/'
@@ -73,7 +73,7 @@ def runRossler(finaltime=1200.0,remote=1,varchange=0,driven=0,rotated=1):
         lags= [[60,60],[60,60],[60,60]]
     elif driven:
         eqns,names,ts = drivenRosslerTS(finaltime)
-        basefname = 'DrivenRossler_1200time_samelags_'
+        basefname = 'DrivenHarderRossler_1200time_samelags_'
         lags= [[60,60],[60,60],[60,60]]
     elif rotated:
         eqns,names,ts = rotatedRosslerTS(finaltime)
