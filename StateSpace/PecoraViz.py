@@ -15,7 +15,7 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
             plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
             plt.ylabel(r'$\Theta$',rotation='horizontal')
             plt.xlabel(r'$\epsilon$')
-            plt.title(forwardtitle)
+            plt.title(forwardtitle,fontsize=14)
             if forwardfname:
                 plt.savefig(forwardfname)
         else:
@@ -28,7 +28,7 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
         plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
         plt.ylabel(r'$\Theta$',rotation='horizontal')
         plt.xlabel(r'$\epsilon$')
-        plt.title(forwardtitle)
+        plt.title(forwardtitle,fontsize=14)
         if forwardfname:
             plt.savefig(forwardfname)
     if logs[1]:
@@ -40,7 +40,7 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
             plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
             plt.ylabel(r'$\Theta$',rotation='horizontal')
             plt.xlabel(r'$\epsilon$')
-            plt.title(inversetitle)
+            plt.title(inversetitle,fontsize=14)
             if inversefname:
                 plt.savefig(inversefname)
         else:
@@ -53,7 +53,7 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
         plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
         plt.ylabel(r'$\Theta$',rotation='horizontal')
         plt.xlabel(r'$\epsilon$')
-        plt.title(inversetitle)
+        plt.title(inversetitle,fontsize=14)
         if inversefname:
             plt.savefig(inversefname)
 

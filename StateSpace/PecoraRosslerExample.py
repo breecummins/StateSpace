@@ -4,11 +4,13 @@ import PecoraMethodModified as PM
 import StateSpaceReconstruction as SSR
 import fileops
 
-def chooseLagsForSims(finaltime,tsprops=None,Tp=200,varchange=1):
+def chooseLagsForSims(finaltime,tsprops=None,Tp=200,varchange=0,driven=1):
     if tsprops == None:
         tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200 
     if varchange:       
         eqns,names,ts = rosslerVarChangeTS(finaltime)
+    elif driven:
+        eqns,names,ts = drivenRosslerTS(finaltime)
     else:
         eqns,names,ts = rosslerTS(finaltime)
     Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
@@ -32,6 +34,13 @@ def rosslerTS(finaltime=1200.0,dt=0.025):
     names = ['s','u','v']
     return eqns,names,timeseries
 
+def drivenRosslerTS(finaltime=1200.0,dt=0.025):
+    from Rossler import solveDrivenRossler
+    timeseries = solveDrivenRossler([5.0,4.0,3.0],finaltime,dt)
+    eqns = 'Driven Rossler'
+    names = ['s','u','v']
+    return eqns,names,timeseries
+
 def rosslerVarChangeTS(finaltime=1200.0,dt=0.025):
     from Rossler import solveRosslerVarChange
     timeseries = solveRosslerVarChange([5.0,4.0,3.0],finaltime,dt)
@@ -39,7 +48,7 @@ def rosslerVarChangeTS(finaltime=1200.0,dt=0.025):
     names = ['s','u','v']
     return eqns,names,timeseries
 
-def runRossler(finaltime=1200.0,remote=1,varchange=1):
+def runRossler(finaltime=1200.0,remote=1,varchange=0,driven=1):
     print('Beginning batch run for Rossler equations....')
     if remote:
         basedir = '/home/bcummins/'
@@ -52,6 +61,10 @@ def runRossler(finaltime=1200.0,remote=1,varchange=1):
     if varchange:
         eqns,names,ts = rosslerVarChangeTS(finaltime)
         basefname = 'RosslerVarChange_1200time_samelags_'
+        lags= [[60,60],[60,60],[60,60]]
+    elif driven:
+        eqns,names,ts = drivenRosslerTS(finaltime)
+        basefname = 'DrivenRossler_1200time_samelags_'
         lags= [[60,60],[60,60],[60,60]]
     else:
         eqns,names,ts = rosslerTS(finaltime)
@@ -66,5 +79,5 @@ def runRossler(finaltime=1200.0,remote=1,varchange=1):
         continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,[lags[k]],fname=basedir+fname)
 
 if __name__ == '__main__':
-    # runRossler()
-    chooseLagsForSims(1200.0)
+    runRossler()
+    # chooseLagsForSims(1200.0)
