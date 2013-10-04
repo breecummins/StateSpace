@@ -186,15 +186,22 @@ if __name__ == '__main__':
     # SSRPlots.plotShadowManifold(x[:,2], 3, 60, show=0, titlestr='var change, s, lag 60')
     # SSRPlots.plotManifold(x[:,2:5],show=0,titlestr='Rossler phase space')
     # SSRPlots.plotManifold(x[:,[0,1,5]],show=1,titlestr='x,y,p')
-    #########################
-    x = solveDrivenRossler([5.0,4.0,3.0],600.0)
-    SSRPlots.plotShadowManifold(x[:,2], 3, 60, show=0, titlestr='var change, v, lag 60')
-    SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=0, titlestr='var change, u, lag 60')
-    SSRPlots.plotShadowManifold(x[:,0], 3, 60, show=0, titlestr='var change, s, lag 60')
-    SSRPlots.plotManifold(x,show=1,titlestr='Rossler phase space')
+    # #########################
+    # x = solveDrivenRossler([5.0,4.0,3.0],600.0)
+    # SSRPlots.plotShadowManifold(x[:,2], 3, 60, show=0, titlestr='var change, v, lag 60')
+    # SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=0, titlestr='var change, u, lag 60')
+    # SSRPlots.plotShadowManifold(x[:,0], 3, 60, show=0, titlestr='var change, s, lag 60')
+    # SSRPlots.plotManifold(x,show=1,titlestr='Rossler phase space')
     # #########################
     # x = solveRotatedRossler([1.0,1.0,1.0],600.0)
     # SSRPlots.plotShadowManifold(x[:,2], 3, 60, show=0, titlestr='rotated v, lag 60')
     # SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=0, titlestr='rotated u, lag 60')
     # SSRPlots.plotShadowManifold(x[:,0], 3, 60, show=0, titlestr='rotated s, lag 60')
     # SSRPlots.plotManifold(x,show=1,titlestr='Rossler phase space')
+    #########################
+    x = solveCappedPendulumRotatedRossler([1.0,2.0,5.0,4.0,3.0,0.75],600.0)
+    SSRPlots.plotShadowManifold(x[:,4], 3, 60, show=0, titlestr='var change, v, lag 60')
+    SSRPlots.plotShadowManifold(x[:,3], 3, 60, show=0, titlestr='var change, u, lag 60')
+    SSRPlots.plotShadowManifold(x[:,2], 3, 60, show=0, titlestr='var change, s, lag 60')
+    SSRPlots.plotManifold(x[:,2:5],show=0,titlestr='Rossler phase space')
+    SSRPlots.plotManifold(x[:,[0,1,5]],show=1,titlestr='x,y,p')

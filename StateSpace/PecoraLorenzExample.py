@@ -4,10 +4,13 @@ import PecoraMethodModified as PM
 import StateSpaceReconstruction as SSR
 import fileops
 
-def chooseLagsForSims(finaltime,tsprops=None,Tp=1000):
+def chooseLagsForSims(finaltime,tsprops=None,Tp=1000,rotated=1):
     if tsprops == None:
-        tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200        
-    eqns,names,ts = lorenzTS(finaltime)
+        tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200  
+    if rotated:      
+        eqns,names,ts = rotatedLorenzTS(finaltime)
+    else:
+        eqns,names,ts = lorenzTS(finaltime)
     Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
     lags = SSR.chooseLags(ts,Mlens,Tp)
     return lags
@@ -29,20 +32,32 @@ def lorenzTS(finaltime=1200.0,dt=0.025):
     names = ['s','u','v']
     return eqns,names,timeseries
 
-def runLorenz(finaltime=1200.0,remote=1):
+def rotatedLorenzTS(finaltime=1200.0,dt=0.025):
+    from LorenzEqns import solveRotatedLorenz
+    timeseries = solveRotatedLorenz([1.0,0.5,0.5],finaltime,dt)
+    eqns = 'Rotated Lorenz'
+    names = ['s','u','v']
+    return eqns,names,timeseries
+
+def runLorenz(finaltime=1200.0,remote=1,rotated=1):
     print('Beginning batch run for Lorenz equations....')
     if remote:
         basedir = '/home/bcummins/'
     else:
         basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/LorenzExample/'
-    eqns,names,ts = lorenzTS(finaltime)
     numlags = 3
     tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200
     epsprops=np.arange(0.1,1.0,0.1) 
     compind1 = [0,0,1]
     compind2 = [1,2,2]
-    basefname = 'Lorenz_0800time_mixedlags_125_100_biggereps_'
-    lags= [[125,125],[125,100],[125,100]]
+    if rotated:
+        eqns,names,ts = rotatedLorenzTS(finaltime)
+        basefname = 'RotatedLorenz_1200time_mixedlags_biggereps_'
+        lags= [[10,10],[10,120],[10,120]]
+    else:
+        eqns,names,ts = lorenzTS(finaltime)
+        basefname = 'Lorenz_1200time_mixedlags_125_100_biggereps_'
+        lags= [[125,125],[125,100],[125,100]]
     for k,c1 in enumerate(compind1):
         print('------------------------------------')
         print(names[c1] + ' and ' + names[compind2[k]])
@@ -52,14 +67,14 @@ def runLorenz(finaltime=1200.0,remote=1):
         continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,[lags[k]],numlags,fname=basedir+fname)
 
 if __name__ == '__main__':
-    runLorenz(800.0,0)
+    runLorenz()
     # chooseLagsForSims(1200.0)
     # ################################
     # import StateSpaceReconstructionPlots as SSRPlots
-    # eqs,ns,ts = lorenzTS()
-    # autocorr = SSR.getAutocorrelation(ts[:,0],500)
+    # eqs,ns,ts = rotatedLorenzTS(400.)
+    # autocorr = SSR.getAutocorrelation(ts[:,0],200)
     # SSRPlots.plotAutocorrelation(autocorr,'x')
-    # autocorr = SSR.getAutocorrelation(ts[:,1],500)
+    # autocorr = SSR.getAutocorrelation(ts[:,1],200)
     # SSRPlots.plotAutocorrelation(autocorr,'y')
-    # autocorr = SSR.getAutocorrelation(ts[:,2],500)
-    # SSRPlots.plotAutocorrelation(autocorr,'w')
+    # autocorr = SSR.getAutocorrelation(ts[:,2],200)
+    # SSRPlots.plotAutocorrelation(autocorr,'z')
