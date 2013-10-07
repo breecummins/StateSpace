@@ -20,7 +20,7 @@ def chooseLagsForSims(finaltime,tsprops=None,Tp=200,varchange=0,driven=0,rotated
     return lags
 
 def continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,numlags=3,fname=''):
-    forwardconf, inverseconf, epsM1, epsM2, forwardprobs, inverseprobs = PM.convergenceWithContinuityTestFixedLagsFixedEps(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags[0][0],lags[0][1],tsprops=tsprops,epsprops=epsprops)
+    forwardconf, inverseconf, epsM1, epsM2, forwardprobs, inverseprobs = PM.convergenceWithContinuityTestFixedLagsFixedEps(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags[0],lags[1],tsprops=tsprops,epsprops=epsprops)
     forwardtitle = eqns + r', M{0} $\to$ M{1}'.format(names[compinds[0]],names[compinds[1]])
     inversetitle = eqns + r', M{1} $\to$ M{0}'.format(names[compinds[0]],names[compinds[1]])
     outdict = dict([(x,locals()[x]) for x in ['forwardconf','inverseconf','forwardtitle','inversetitle','numlags','lags','ts','tsprops','epsprops','epsM1','epsM2','forwardprobs','inverseprobs']])
@@ -89,7 +89,7 @@ def runRossler(finaltime=1200.0,remote=1,varchange=0,driven=1,rotated=0):
         print('------------------------------------')
         compinds = [c1,compind2[k]]
         fname = basefname + names[c1] + names[compind2[k]] + '.pickle'
-        continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,[lags[k]],fname=basedir+fname)
+        continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags[k],fname=basedir+fname)
 
 if __name__ == '__main__':
     runRossler()
