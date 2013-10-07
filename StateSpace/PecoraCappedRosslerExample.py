@@ -53,8 +53,8 @@ def runCappedRossler(finaltime=1200.0,remote=1,rotated=1):
     numlags = 6
     if rotated:
         eqns,names,ts = cappedRotatedRosslerTS(finaltime)
-        basefname = 'CappedRotatedRossler_1200time_mixedlags_'
-        lags= [[100,50],[100,60],[100,60],[100,200],[100,50],[100,60],[100,60],[100,200],[50,60],[50,60],[50,200],[60,60],[60,200],[60,200]]
+        basefname = 'CappedRotatedRossler_1200time_mixedlags_p100_s60_'
+        lags= [[100,60],[100,60],[100,60],[100,100],[100,60],[100,60],[100,60],[100,100],[60,60],[60,60],[60,100],[60,60],[60,100],[60,100]]
     else:
         eqns,names,ts = cappedRosslerTS(finaltime)
         basefname = 'CappedRossler_1200time_mixedlags_'
@@ -69,11 +69,11 @@ def runCappedRossler(finaltime=1200.0,remote=1,rotated=1):
 
 if __name__ == '__main__':
     runCappedRossler()
-    runCappedRossler(rotated=0)
+    # runCappedRossler(rotated=0)
     # chooseLagsForSims(1200.0,rotated=0)
     # #below, choose lags from autocorrelation
     # import StateSpaceReconstructionPlots as SSRPlots
-    # eqns,names,ts = diamondVarChangeTS(1200.0)
-    # T = 400
-    # autocorr = SSR.getAutocorrelation(ts[:,7],T)
-    # SSRPlots.plotAutocorrelation(autocorr,'s')
+    # eqns,names,ts = cappedRotatedRosslerTS(1200.0)
+    # T = 250
+    # autocorr = SSR.getAutocorrelation(ts[:,5],T)
+    # SSRPlots.plotAutocorrelation(autocorr,'p')
