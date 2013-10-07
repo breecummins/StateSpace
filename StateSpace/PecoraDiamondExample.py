@@ -4,11 +4,13 @@ import PecoraMethodModified as PM
 import StateSpaceReconstruction as SSR
 import fileops
 
-def chooseLagsForSims(finaltime,tsprops=None,Tp=400,varchange=1):
+def chooseLagsForSims(finaltime,tsprops=None,Tp=400,varchange=0,rotated=1):
     if tsprops == None:
         tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200  
     if varchange:      
         eqns,names,ts = diamondVarChangeTS(finaltime)
+    elif rotated:
+        eqns,names,ts = diamondRotatedTS(finaltime)
     else:
         eqns,names,ts = diamondTS(finaltime)
     Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
@@ -39,7 +41,14 @@ def diamondVarChangeTS(finaltime=1200.0,dt=0.025):
     names = ['x','y','z','w','s','u','v','p']
     return eqns,names,timeseries
 
-def runDiamond(finaltime=1200.0,remote=1,varchange=1):
+def diamondRotatedTS(finaltime=1200.0,dt=0.025):
+    from Rossler import solveDiamondRotated
+    timeseries = solveDiamondRotated([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],finaltime,dt)
+    eqns = 'Diamond with rotated Rossler'
+    names = ['x','y','z','w','s','u','v','p']
+    return eqns,names,timeseries
+
+def runDiamond(finaltime=1200.0,remote=1,varchange=0,rotated=1):
     print('Beginning batch run for diamond equations....')
     if remote:
         basedir = '/home/bcummins/'
@@ -55,6 +64,10 @@ def runDiamond(finaltime=1200.0,remote=1,varchange=1):
         eqns,names,ts = diamondVarChangeTS(finaltime)
         basefname = 'DiamondVarChange_1200time_mixedlags_'
         lags= [[100,60],[100,60],[100,60],[100,140],[100,60],[100,60],[100,60],[100,140],[60,60],[60,60],[60,140],[60,60],[60,140],[140,60],[140,100],[140,115]]
+    elif rotated:
+        eqns,names,ts = diamondRotatedTS(finaltime)
+        basefname = 'DiamondRotated_1200time_mixedlags_'
+        lags= [[100,60],[100,60],[100,60],[100,140],[100,60],[100,60],[100,60],[100,140],[60,60],[60,60],[60,140],[60,60],[60,140],[140,60],[140,100],[140,115]]        
     else:
         eqns,names,ts = diamondTS(finaltime)
         basefname = 'Diamond_1200time_mixedlags_'
@@ -72,7 +85,7 @@ if __name__ == '__main__':
     # chooseLagsForSims(1200.0)
     # #below, choose lags from autocorrelation
     # import StateSpaceReconstructionPlots as SSRPlots
-    # eqns,names,ts = diamondVarChangeTS(1200.0)
+    # eqns,names,ts = diamondRotatedTS(600.0)
     # T = 400
     # autocorr = SSR.getAutocorrelation(ts[:,7],T)
-    # SSRPlots.plotAutocorrelation(autocorr,'s')
+    # SSRPlots.plotAutocorrelation(autocorr,'p')

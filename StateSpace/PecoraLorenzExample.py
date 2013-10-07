@@ -67,8 +67,8 @@ def runLorenz(finaltime=1200.0,remote=1,rotated=1):
         continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags[k],numlags,fname=basedir+fname)
 
 if __name__ == '__main__':
-    runLorenz()
-    # chooseLagsForSims(1200.0)
+    # runLorenz()
+    chooseLagsForSims(1200.0,rotated=0)
     # ################################
     # import StateSpaceReconstructionPlots as SSRPlots
     # eqs,ns,ts = rotatedLorenzTS(400.)
