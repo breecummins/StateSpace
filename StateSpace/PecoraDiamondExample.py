@@ -4,13 +4,15 @@ import PecoraMethodModified as PM
 import StateSpaceReconstruction as SSR
 import fileops
 
-def chooseLagsForSims(finaltime,tsprops=None,Tp=400,varchange=0,rotated=1):
+def chooseLagsForSims(finaltime,tsprops=None,Tp=400,varchange=0,rotated=0,moredrive=1):
     if tsprops == None:
         tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200  
     if varchange:      
         eqns,names,ts = diamondVarChangeTS(finaltime)
     elif rotated:
         eqns,names,ts = diamondRotatedTS(finaltime)
+    elif moredrive:
+        eqns,names,ts = diamondRotatedMoreDriveTS(finaltime)        
     else:
         eqns,names,ts = diamondTS(finaltime)
     Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
@@ -48,7 +50,14 @@ def diamondRotatedTS(finaltime=1200.0,dt=0.025):
     names = ['x','y','z','w','s','u','v','p']
     return eqns,names,timeseries
 
-def runDiamond(finaltime=1200.0,remote=1,varchange=0,rotated=1):
+def diamondRotatedMoreDriveTS(finaltime=1200.0,dt=0.025):
+    from Rossler import solveDiamondRotatedMoreDrive
+    timeseries = solveDiamondRotatedMoreDrive([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],finaltime,dt)
+    eqns = 'Diamond, rotated Rossler, more drive'
+    names = ['x','y','z','w','s','u','v','p']
+    return eqns,names,timeseries
+
+def runDiamond(finaltime=1200.0,remote=1,varchange=0,rotated=0,moredrive=1):
     print('Beginning batch run for diamond equations....')
     if remote:
         basedir = '/home/bcummins/'
@@ -68,6 +77,10 @@ def runDiamond(finaltime=1200.0,remote=1,varchange=0,rotated=1):
         eqns,names,ts = diamondRotatedTS(finaltime)
         basefname = 'DiamondRotated_1200time_mixedlags_'
         lags= [[100,60],[100,60],[100,60],[100,140],[100,60],[100,60],[100,60],[100,140],[60,60],[60,60],[60,140],[60,60],[60,140],[140,60],[140,100],[140,115]]        
+    elif moredrive:
+        eqns,names,ts = diamondRotatedMoreDriveTS(finaltime)
+        basefname = 'DiamondRotatedMoreDrive_1200time_mixedlags_'
+        lags= [[100,45],[100,60],[100,60],[100,125],[100,45],[100,60],[100,60],[100,125],[45,60],[45,60],[45,125],[60,60],[60,125],[125,60],[125,100],[125,115]]        
     else:
         eqns,names,ts = diamondTS(finaltime)
         basefname = 'Diamond_1200time_mixedlags_'
