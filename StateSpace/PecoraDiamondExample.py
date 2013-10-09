@@ -4,7 +4,7 @@ import PecoraMethodModified as PM
 import StateSpaceReconstruction as SSR
 import fileops
 
-def chooseLagsForSims(finaltime,tsprops=None,Tp=400,varchange=0,rotated=0,moredrive=1):
+def chooseLagsForSims(finaltime,tsprops=None,Tp=400,varchange=0,rotated=0,moredrive=0,xymult=1):
     if tsprops == None:
         tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200  
     if varchange:      
@@ -12,7 +12,9 @@ def chooseLagsForSims(finaltime,tsprops=None,Tp=400,varchange=0,rotated=0,moredr
     elif rotated:
         eqns,names,ts = diamondRotatedTS(finaltime)
     elif moredrive:
-        eqns,names,ts = diamondRotatedMoreDriveTS(finaltime)        
+        eqns,names,ts = diamondRotatedMoreDriveTS(finaltime)  
+    elif xymult:
+        eqns,names,ts = diamondRotatedDrivenXYMultTS(finaltime)  
     else:
         eqns,names,ts = diamondTS(finaltime)
     Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
@@ -57,7 +59,14 @@ def diamondRotatedMoreDriveTS(finaltime=1200.0,dt=0.025):
     names = ['x','y','z','w','s','u','v','p']
     return eqns,names,timeseries
 
-def runDiamond(finaltime=1200.0,remote=1,varchange=0,rotated=0,moredrive=1):
+def diamondRotatedDrivenXYMultTS(finaltime=1200.0,dt=0.025):
+    from Rossler import solveDiamondRotatedDrivenXYMult
+    timeseries = solveDiamondRotatedDrivenXYMult([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],finaltime,dt)
+    eqns = 'Diamond, rotated Rossler, xy mult'
+    names = ['x','y','z','w','s','u','v','p']
+    return eqns,names,timeseries
+
+def runDiamond(finaltime=1200.0,remote=1,varchange=0,rotated=0,moredrive=0,xymult=1):
     print('Beginning batch run for diamond equations....')
     if remote:
         basedir = '/home/bcummins/'
@@ -80,7 +89,11 @@ def runDiamond(finaltime=1200.0,remote=1,varchange=0,rotated=0,moredrive=1):
     elif moredrive:
         eqns,names,ts = diamondRotatedMoreDriveTS(finaltime)
         basefname = 'DiamondRotatedMoreDrive_1200time_mixedlags_'
-        lags= [[100,45],[100,60],[100,60],[100,125],[100,45],[100,60],[100,60],[100,125],[45,60],[45,60],[45,125],[60,60],[60,125],[125,60],[125,100],[125,115]]        
+        lags= [[100,45],[100,60],[100,60],[100,125],[100,45],[100,60],[100,60],[100,125],[45,60],[45,60],[45,125],[60,60],[60,125],[125,60],[125,100],[125,115]]  
+    elif xymult:
+        eqns,names,ts = diamondRotatedDrivenXYMultTS(finaltime)
+        basefname = 'DiamondRotatedXYMult_1200time_mixedlags_'
+        lags= [[100,50],[100,60],[100,60],[100,250],[100,50],[100,60],[100,60],[100,250],[50,60],[50,60],[50,250],[60,60],[60,250],[250,60],[250,100],[250,115]]                
     else:
         eqns,names,ts = diamondTS(finaltime)
         basefname = 'Diamond_1200time_mixedlags_'
@@ -98,7 +111,7 @@ if __name__ == '__main__':
     # chooseLagsForSims(1200.0)
     # #below, choose lags from autocorrelation
     # import StateSpaceReconstructionPlots as SSRPlots
-    # eqns,names,ts = diamondRotatedTS(600.0)
+    # eqns,names,ts = diamondRotatedDrivenXYMultTS(600.0)
     # T = 400
     # autocorr = SSR.getAutocorrelation(ts[:,7],T)
     # SSRPlots.plotAutocorrelation(autocorr,'p')
