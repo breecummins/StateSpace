@@ -10,7 +10,7 @@ import os
 
 basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/Diamondpaperexample/'
 for fname in os.listdir(basedir):
-    if '.png' not in fname and 'MoreDrive' in fname:
+    if '.png' not in fname and 'Mult' in fname:
         PV.plotContinuityConfWrapper_SaveFigs(basedir,fname,[0,0])
 
 # basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DoublePendulumDiamondExample/'
