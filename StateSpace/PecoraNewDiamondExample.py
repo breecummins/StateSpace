@@ -6,7 +6,7 @@ import fileops
 
 def chooseLagsForSims(finaltime,tsprops=None,Tp=400):
     if tsprops == None:
-        tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200  
+        tsprops = np.arange(0.3,1.05,0.1) # for finaltime = 1200  
     eqns,names,ts = newDiamondTS(finaltime)
     Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
     lags = SSR.chooseLags(ts,Mlens,Tp)
@@ -36,10 +36,9 @@ def runDiamond(finaltime=1200.0,remote=1):
     else:
         basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/Diamondpaperexample/'
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) 
-    names = ['x','y','z','w','s','u','v','p']
     compind1 = [0,0,0,0,1,1,1,1,4,4,4,5,5,7,7,7]
     compind2 = [4,5,6,7,4,5,6,7,5,6,7,6,7,6,3,2]
-    tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200
+    tsprops = np.arange(0.3,1.05,0.1) # for finaltime = 1200
     numlags = 8
     eqns,names,ts = newDiamondTS(finaltime)
     basefname = 'DiamondInternalMult_1200time_mixedlags_'
