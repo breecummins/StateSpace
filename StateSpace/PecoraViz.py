@@ -6,54 +6,55 @@ import fileops
 
 def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,inversetitle,logs = [1,1],forwardfname='',inversefname=''):
     # Mlens = (tsprops*tslength).astype(int)
+    colormap = plt.cm.jet
+    plt.figure()
+    plt.gca().set_color_cycle([colormap(i) for i in np.linspace(0, 1.0, forwardconf.shape[1])])
     if logs[0]:
         if np.any(forwardconf):
-            plt.figure()
             plt.semilogy(epsprops,forwardconf.transpose())
             plt.ylim([0,1])
             # plt.legend([str(m) for m in Mlens],loc=0)
             plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
             plt.ylabel(r'$\Theta$',rotation='horizontal')
             plt.xlabel(r'$\epsilon$')
-            plt.title(forwardtitle,fontsize=14)
+            plt.title(forwardtitle[-12:])
             if forwardfname:
                 plt.savefig(forwardfname)
         else:
             print("Data has no positive values in the forward direction.")
     else:   
-        plt.figure()
         plt.plot(epsprops,forwardconf.transpose())
         plt.ylim([0,1])
         # plt.legend([str(m) for m in Mlens],loc=0)
         plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
         plt.ylabel(r'$\Theta$',rotation='horizontal')
         plt.xlabel(r'$\epsilon$')
-        plt.title(forwardtitle,fontsize=14)
+        plt.title(forwardtitle[-12:])
         if forwardfname:
             plt.savefig(forwardfname)
+    plt.figure()
+    plt.gca().set_color_cycle([colormap(i) for i in np.linspace(0, 1.0, forwardconf.shape[1])])
     if logs[1]:
         if np.any(inverseconf):
-            plt.figure()
             plt.semilogy(epsprops,inverseconf.transpose())
             plt.ylim([0,1])
             # plt.legend([str(m) for m in Mlens],loc=0)
             plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
             plt.ylabel(r'$\Theta$',rotation='horizontal')
             plt.xlabel(r'$\epsilon$')
-            plt.title(inversetitle,fontsize=14)
+            plt.title(inversetitle[-12:])
             if inversefname:
                 plt.savefig(inversefname)
         else:
             print("Data has no positive values in the inverse direction.")
     else:   
-        plt.figure()
         plt.plot(epsprops,inverseconf.transpose())
         plt.ylim([0,1])
         # plt.legend([str(m) for m in Mlens],loc=0)
         plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
         plt.ylabel(r'$\Theta$',rotation='horizontal')
         plt.xlabel(r'$\epsilon$')
-        plt.title(inversetitle,fontsize=14)
+        plt.title(inversetitle[-12:])
         if inversefname:
             plt.savefig(inversefname)
 
@@ -66,26 +67,28 @@ def plotContinuityConfWrapper_SaveFigs(basedir,fname,logs=[0,0]):
     inversefname = base + '_M' + var2 + 'toM' + var1 + '.png'    
     plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['epsprops'],outdict['tsprops'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'],logs,forwardfname,inversefname)
 
-def plotContinuityConfWrapper(basedir,fname,logs=[1,1]):
+def plotContinuityConfWrapper(basedir,fname,logs=[0,0]):
     outdict = fileops.loadPickle(basedir+fname)
     np.set_printoptions(linewidth=125)
-    print("Epsilon as proportions of (changing) standard deviations: {0}.".format(outdict['epsprops']))
-    print("Forward continuity confidence: ")
-    print(outdict['forwardconf'])
-    print("Inverse continuity confidence: ")
-    print(outdict['inverseconf'])
-    print("Real epsilon values for M1: ")
-    for e in outdict['epsM1']: 
-        print(e)
-    print("Real epsilon values for M2: ")
-    for e in outdict['epsM2']: 
-        print(e)
-    print("Forward probability of one point mapping into M2 epsilon: ")
-    print(outdict['forwardprobs'])
-    print("Inverse probability of one point mapping into M1 epsilon: ")
-    print(outdict['inverseprobs'])    
-    plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['epsprops'],outdict['tsprops'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'],logs)
-    plt.show()
+    # print("Epsilon as proportions of (changing) standard deviations: {0}.".format(outdict['epsprops']))
+    print(outdict['forwardtitle'])
+    print("Forward continuity confidence at biggest epsilon and N: ")
+    print(outdict['forwardconf'][-1][-1])
+    print(outdict['inversetitle'])
+    print("Inverse continuity confidence at biggest epsilon and N: ")
+    print(outdict['inverseconf'][-1][-1])
+    # print("Real epsilon values for M1: ")
+    # for e in outdict['epsM1']: 
+    #     print(e)
+    # print("Real epsilon values for M2: ")
+    # for e in outdict['epsM2']: 
+    #     print(e)
+    # print("Forward probability of one point mapping into M2 epsilon: ")
+    # print(outdict['forwardprobs'])
+    # print("Inverse probability of one point mapping into M1 epsilon: ")
+    # print(outdict['inverseprobs'])    
+    # plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['epsprops'],outdict['tsprops'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'],logs)
+    # plt.show()
 
 def plotAutoCorrWrapper(finaltime=1200.0):
     import PecoraScriptsModified as PS

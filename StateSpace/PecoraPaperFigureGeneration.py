@@ -3,15 +3,21 @@
 import PecoraViz as PV
 import os
 
+basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/FinalPaperExamples/'
+for fname in os.listdir(basedir):
+    if '.png' not in fname:
+        # PV.plotContinuityConfWrapper(basedir,fname,[0,0])
+        PV.plotContinuityConfWrapper_SaveFigs(basedir,fname,[0,0])
+
 # basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPpaperexample/'
 # for fname in os.listdir(basedir):
 #     if '.png' not in fname:
 #         PV.plotContinuityConfWrapper_SaveFigs(basedir,fname,[0,0])
 
-basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/Diamondpaperexample/'
-for fname in os.listdir(basedir):
-    if '.png' not in fname and 'Mult' in fname:
-        PV.plotContinuityConfWrapper_SaveFigs(basedir,fname,[0,0])
+# basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/Diamondpaperexample/'
+# for fname in os.listdir(basedir):
+#     if '.png' not in fname and 'Mult' in fname:
+#         PV.plotContinuityConfWrapper_SaveFigs(basedir,fname,[0,0])
 
 # basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DoublePendulumDiamondExample/'
 # for fname in os.listdir(basedir):
