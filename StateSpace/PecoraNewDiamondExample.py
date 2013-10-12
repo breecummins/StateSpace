@@ -30,6 +30,7 @@ def newDiamondTS(finaltime=1200.0,dt=0.025):
     return eqns,names,timeseries
 
 def runDiamond(finaltime=1200.0,remote=1):
+    #FIXME: Rewrite like PecoraDoublePendulumDiamondExample.py with a double for loop
     print('Beginning batch run for diamond equations....')
     if remote:
         basedir = '/home/bcummins/'
@@ -39,11 +40,13 @@ def runDiamond(finaltime=1200.0,remote=1):
     # compind1 = [0,0,0,0,1,1,1,1,4,4,4,5,5,7,7,7]
     # compind2 = [4,5,6,7,4,5,6,7,5,6,7,6,7,6,3,2]
     # lags= [[100,60],[100,60],[100,60],[100,185],[100,60],[100,60],[100,60],[100,185],[60,60],[60,60],[60,185],[60,60],[60,185],[185,60],[185,100],[185,115]]
-    # basefname = 'DiamondInternalMult_1200time_mixedlags_'
-    compind1 = [2,2,2,3,3,3]
-    compind2 = [4,5,6,4,5,6]
-    lags = [[115,60],[115,60],[115,60],[100,60],[100,60]]
-    basefname = 'DiamondInternalMult_1200time_mixedlags_morecomps_' 
+    # compind1 = [2,2,2,3,3,3]
+    # compind2 = [4,5,6,4,5,6]
+    # lags = [[115,60],[115,60],[115,60],[100,60],[100,60],[100,60]]
+    compind1 = [3]
+    compind2 = [6]
+    lags = [[100,60]]
+    basefname = 'DiamondInternalMult_1200time_mixedlags_' 
     tsprops = np.arange(0.3,1.05,0.1) 
     numlags = 8
     eqns,names,ts = newDiamondTS(finaltime)
