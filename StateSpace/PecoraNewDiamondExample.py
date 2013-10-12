@@ -1,5 +1,5 @@
 import numpy as np
-import random
+import random, os
 import PecoraMethodModified as PM
 import StateSpaceReconstruction as SSR
 import fileops
@@ -34,15 +34,19 @@ def runDiamond(finaltime=1200.0,remote=1):
     if remote:
         basedir = '/home/bcummins/'
     else:
-        basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/Diamondpaperexample/'
+        basedir=os.path.join(os.path.expanduser("~"),'SimulationResults/TimeSeries/PecoraMethod/FinalPaperExamples/')
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) 
-    compind1 = [0,0,0,0,1,1,1,1,4,4,4,5,5,7,7,7]
-    compind2 = [4,5,6,7,4,5,6,7,5,6,7,6,7,6,3,2]
-    tsprops = np.arange(0.3,1.05,0.1) # for finaltime = 1200
+    # compind1 = [0,0,0,0,1,1,1,1,4,4,4,5,5,7,7,7]
+    # compind2 = [4,5,6,7,4,5,6,7,5,6,7,6,7,6,3,2]
+    # lags= [[100,60],[100,60],[100,60],[100,185],[100,60],[100,60],[100,60],[100,185],[60,60],[60,60],[60,185],[60,60],[60,185],[185,60],[185,100],[185,115]]
+    # basefname = 'DiamondInternalMult_1200time_mixedlags_'
+    compind1 = [2,2,2,3,3,3]
+    compind2 = [4,5,6,4,5,6]
+    lags = [[115,60],[115,60],[115,60],[100,60],[100,60]]
+    basefname = 'DiamondInternalMult_1200time_mixedlags_morecomps_' 
+    tsprops = np.arange(0.3,1.05,0.1) 
     numlags = 8
     eqns,names,ts = newDiamondTS(finaltime)
-    basefname = 'DiamondInternalMult_1200time_mixedlags_'
-    lags= [[100,60],[100,60],[100,60],[100,185],[100,60],[100,60],[100,60],[100,185],[60,60],[60,60],[60,185],[60,60],[60,185],[185,60],[185,100],[185,115]]
     for k,c1 in enumerate(compind1):
         print('------------------------------------')
         print(names[c1] + ' and ' + names[compind2[k]])
@@ -52,7 +56,7 @@ def runDiamond(finaltime=1200.0,remote=1):
         continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags[k],numlags,fname=basedir+fname) 
 
 if __name__ == '__main__':
-    runDiamond()
+    runDiamond(remote=0)
     # chooseLagsForSims(1200.0)
     # #below, choose lags from autocorrelation
     # import StateSpaceReconstructionPlots as SSRPlots
