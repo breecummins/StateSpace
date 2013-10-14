@@ -6,7 +6,7 @@ import fileops
 
 def chooseLagsForSims(finaltime,tsprops=None,Tp=1000,rotated=1):
     if tsprops == None:
-        tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200  
+        tsprops = np.arange(0.3,1.05,0.1) # for finaltime = 1200  
     if rotated:      
         eqns,names,ts = rotatedLorenzTS(finaltime)
     else:
@@ -44,19 +44,19 @@ def runLorenz(finaltime=1200.0,remote=1,rotated=1):
     if remote:
         basedir = '/home/bcummins/'
     else:
-        basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/LorenzExample/'
+        basedir=os.path.join(os.path.expanduser("~"),'SimulationResults/TimeSeries/PecoraMethod/LorenzExample/')
     numlags = 3
-    tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200
-    epsprops=np.arange(0.1,1.0,0.1) 
+    tsprops = np.arange(0.3,1.05,0.1) # for finaltime = 1200
+    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) 
     compind1 = [0,0,1]
     compind2 = [1,2,2]
     if rotated:
         eqns,names,ts = rotatedLorenzTS(finaltime)
-        basefname = 'RotatedLorenz_1200time_samelags_biggereps_'
+        basefname = 'RotatedLorenz_1200time_samelags_'
         lags= [[10,10],[10,10],[10,10]]
     else:
         eqns,names,ts = lorenzTS(finaltime)
-        basefname = 'Lorenz_1200time_mixedlags_125_100_biggereps_'
+        basefname = 'Lorenz_1200time_mixedlags_125_100_'
         lags= [[125,125],[125,100],[125,100]]
     for k,c1 in enumerate(compind1):
         print('------------------------------------')

@@ -19,7 +19,7 @@ def chooseLagsForSims(finaltime,tsprops=None,Tp=200,varchange=0,driven=0,rotated
     lags = SSR.chooseLags(ts,Mlens,Tp)
     return lags
 
-def continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,numlags=3,fname=''):
+def continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,numlags,fname=''):
     forwardconf, inverseconf, epsM1, epsM2, forwardprobs, inverseprobs = PM.convergenceWithContinuityTestFixedLagsFixedEps(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags[0],lags[1],tsprops=tsprops,epsprops=epsprops)
     forwardtitle = eqns + r', M{0} $\to$ M{1}'.format(names[compinds[0]],names[compinds[1]])
     inversetitle = eqns + r', M{1} $\to$ M{0}'.format(names[compinds[0]],names[compinds[1]])
@@ -57,14 +57,15 @@ def rosslerVarChangeTS(finaltime=1200.0,dt=0.025):
     names = ['s','u','v']
     return eqns,names,timeseries
 
-def runRossler(finaltime=1200.0,remote=1,varchange=0,driven=1,rotated=0):
+def runRossler(finaltime=1200.0,remote=1,varchange=0,driven=0,rotated=1):
     print('Beginning batch run for Rossler equations....')
     if remote:
         basedir = '/home/bcummins/'
     else:
-        basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/RosslerExample/'
-    tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200
+        basedir=os.path.join(os.path.expanduser("~"),'SimulationResults/TimeSeries/PecoraMethod/RosslerExample/')
+    tsprops = np.arange(0.3,1.05,0.1) # for finaltime = 1200
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) 
+    numlags=3
     compind1 = [0,0,1]
     compind2 = [1,2,2]
     if varchange:
@@ -89,7 +90,7 @@ def runRossler(finaltime=1200.0,remote=1,varchange=0,driven=1,rotated=0):
         print('------------------------------------')
         compinds = [c1,compind2[k]]
         fname = basefname + names[c1] + names[compind2[k]] + '.pickle'
-        continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags[k],fname=basedir+fname)
+        continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags[k],numlags,fname=basedir+fname)
 
 if __name__ == '__main__':
     runRossler()
