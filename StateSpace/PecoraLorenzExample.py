@@ -29,14 +29,14 @@ def lorenzTS(finaltime=1200.0,dt=0.025):
     from LorenzEqns import solveLorenzVarChange
     timeseries = solveLorenzVarChange([1.0,0.5,-0.5],finaltime,dt)
     eqns = 'Lorenz with variable change'
-    names = ['s','u','v']
+    names = ['x','y','z']
     return eqns,names,timeseries
 
 def rotatedLorenzTS(finaltime=1200.0,dt=0.025):
     from LorenzEqns import solveRotatedLorenz
     timeseries = solveRotatedLorenz([1.0,0.5,0.5],finaltime,dt)
     eqns = 'Rotated Lorenz'
-    names = ['s','u','v']
+    names = ['x','y','z']
     return eqns,names,timeseries
 
 def runLorenz(finaltime=1200.0,remote=1,rotated=1):
@@ -67,8 +67,8 @@ def runLorenz(finaltime=1200.0,remote=1,rotated=1):
         continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags[k],numlags,fname=basedir+fname)
 
 if __name__ == '__main__':
-    # runLorenz()
-    chooseLagsForSims(1200.0,rotated=0)
+    runLorenz()
+    # chooseLagsForSims(1200.0,rotated=0)
     # ################################
     # import StateSpaceReconstructionPlots as SSRPlots
     # eqs,ns,ts = rotatedLorenzTS(400.)
