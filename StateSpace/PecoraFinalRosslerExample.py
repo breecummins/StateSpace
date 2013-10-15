@@ -4,9 +4,9 @@ import PecoraMethodModified as PM
 import StateSpaceReconstruction as SSR
 import fileops
 
-def chooseLagsForSims(finaltime,tsprops=None,Tp=200,unrotated=0,rotated=0,drivenrotated=1):
+def chooseLagsForSims(finaltime,tsprops=None,Tp=200,unrotated=0,rotated=0,drivenrotated=0):
     if tsprops == None:
-        tsprops = np.arange(0.3,0.95,0.1) # for finaltime = 1200 
+        tsprops = np.arange(0.3,1.05,0.1) # for finaltime = 1200 
     if drivenrotated:
         eqns,names,ts = drivenRosslerTS(finaltime)
     elif rotated:
@@ -72,7 +72,7 @@ def runRossler(finaltime=1200.0,remote=1,unrotated=0,rotated=0,drivenrotated=0):
         numlags=3
     elif unrotated:
         eqns,names,ts = rosslerTS(finaltime)
-        basefname = 'Rossler_1200time_mixedlags_'
+        basefname = 'Rossler_1200time_mixedlags_rerun_'
         lags= [[60,60],[60,35],[60,35]]
         compind1 = [0,0,1]
         compind2 = [1,2,2]
@@ -86,7 +86,7 @@ def runRossler(finaltime=1200.0,remote=1,unrotated=0,rotated=0,drivenrotated=0):
         continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags[k],numlags,fname=basedir+fname)
 
 if __name__ == '__main__':
-    # runRossler(remote=0,unrotated=1)
-    runRossler(remote=0,rotated=1)
-    runRossler(remote=0,drivenrotated=1)
-     # chooseLagsForSims(1200.0)
+    runRossler(remote=0,unrotated=1)
+    # runRossler(remote=0,rotated=1)
+    # runRossler(remote=0,drivenrotated=1)
+    # chooseLagsForSims(1200.0,unrotated=1)
