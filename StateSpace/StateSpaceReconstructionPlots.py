@@ -10,11 +10,13 @@ import CCM, CCMAlternatives,Weights
 
 mpl.rcParams.update({'font.size': 22})
 
-def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False):
+def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False,color=None):
     '''
     timeseries is a sequence of observations containing at most three columns
 
     '''
+    if style and not color:
+        color = style[0]
     if scatter and style[1] == '-':
         style = style[0] + '.'
     s = timeseries.shape
@@ -27,23 +29,23 @@ def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False
         ax = plt.gca()
     if len(s) == 1:
         if not scatter:
-            plt.plot(timeseries,style)
+            plt.plot(timeseries,style,color=color)
         else:
-            plt.scatter(timeseries,style)
+            plt.scatter(timeseries,style,color=color)
         # plt.ylabel(r'$x_0$')
     elif len(s) == 2 and s[1] == 2:
         if not scatter:
-            plt.plot(timeseries[:,0],timeseries[:,1],style)
+            plt.plot(timeseries[:,0],timeseries[:,1],style,color=color)
         else:
-            plt.scatter(timeseries[:,0],timeseries[:,1],style)
+            plt.scatter(timeseries[:,0],timeseries[:,1],style,color=color)
         # plt.xlabel(r'$x_0$')
         # plt.ylabel(r'$x_1$')
     elif len(s) == 2 and s[1] == 3:
         if not scatter:
-            ax.plot(timeseries[:,0],timeseries[:,1],timeseries[:,2],style)
+            ax.plot(timeseries[:,0],timeseries[:,1],timeseries[:,2],style,color=color)
             # ax.set_zlim3d(0,2)
         else:
-            ax.scatter(timeseries[:,0],timeseries[:,1],timeseries[:,2],style)
+            ax.scatter(timeseries[:,0],timeseries[:,1],timeseries[:,2],style,color=color)
         # plt.xlabel(r'$x_0$')
         # plt.ylabel(r'$x_1$')
         # ax.set_zlabel(r'$x_2$')
@@ -57,7 +59,7 @@ def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False
 
 
 
-def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-',titlestr=None,scatter=False, smooth=1):
+def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-',titlestr=None,scatter=False, color=None,smooth=1):
     '''
     timeseries is a sequence of observations.
     numlags is a integer indicating the dimension of the shadow manifold
@@ -66,7 +68,7 @@ def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-',ti
 
     '''
     pts = SSR.makeShadowManifold(timeseries,numlags,lagsize,smooth)
-    plotManifold(pts,show=show,hold=hold,style=style,titlestr=titlestr,scatter=scatter)
+    plotManifold(pts,show=show,hold=hold,style=style,titlestr=titlestr,scatter=scatter,color=color)
 
 def plotEstShadowManifoldSugihara(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeights):
     est1,est2 = CCM.crossMap(ts1,ts2,numlags,lagsize,wgtfunc)
