@@ -20,6 +20,7 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
             plt.title(forwardtitle[-12:])
             if forwardfname:
                 plt.savefig(forwardfname)
+                plt.close()
         else:
             print("Data has no positive values in the forward direction.")
     else:   
@@ -32,6 +33,7 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
         plt.title(forwardtitle[-12:])
         if forwardfname:
             plt.savefig(forwardfname)
+            plt.close()
     plt.figure()
     plt.gca().set_color_cycle([colormap(i) for i in np.linspace(0, 1.0, forwardconf.shape[1])])
     if logs[1]:
@@ -45,6 +47,7 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
             plt.title(inversetitle[-12:])
             if inversefname:
                 plt.savefig(inversefname)
+                plt.close()
         else:
             print("Data has no positive values in the inverse direction.")
     else:   
@@ -57,6 +60,7 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
         plt.title(inversetitle[-12:])
         if inversefname:
             plt.savefig(inversefname)
+            plt.close()
 
 def plotContinuityConfWrapper_SaveFigs(basedir,fname,logs=[0,0]):
     outdict = fileops.loadPickle(basedir+fname)

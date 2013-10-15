@@ -4,10 +4,13 @@ import PecoraMethodModified as PM
 import StateSpaceReconstruction as SSR
 import fileops
 
-def chooseLagsForSims(finaltime,tsprops=None,Tp=400):
+def chooseLagsForSims(finaltime,tsprops=None,Tp=400,unrotated=1):
     if tsprops == None:
         tsprops = np.arange(0.3,1.05,0.1) # for finaltime = 1200  
-    eqns,names,ts = newDiamondTS(finaltime)
+    if unrotated:
+        eqns,names,ts = unrotatedDiamondTS(finaltime)
+    else:
+        eqns,names,ts = newDiamondTS(finaltime)
     Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
     lags = SSR.chooseLags(ts,Mlens,Tp)
     return lags
@@ -29,7 +32,14 @@ def newDiamondTS(finaltime=1200.0,dt=0.025):
     names = ['x','y','z','w','s','u','v','p']
     return eqns,names,timeseries
 
-def runDiamond(finaltime=1200.0,remote=1):
+def unrotatedDiamondTS(finaltime=1200.0,dt=0.025):
+    from Rossler import solveDiamond
+    timeseries = solveDiamond([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],finaltime,dt)
+    eqns = 'Diamond, unrotated Rossler'
+    names = ['x','y','z','w','s','u','v','p']
+    return eqns,names,timeseries
+
+def runDiamond(finaltime=1200.0,remote=1,unrotated=1):
     #FIXME: Rewrite like PecoraDoublePendulumDiamondExample.py with a double for loop
     print('Beginning batch run for diamond equations....')
     if remote:
@@ -37,19 +47,18 @@ def runDiamond(finaltime=1200.0,remote=1):
     else:
         basedir=os.path.join(os.path.expanduser("~"),'SimulationResults/TimeSeries/PecoraMethod/FinalPaperExamples/')
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) 
-    # compind1 = [0,0,0,0,1,1,1,1,4,4,4,5,5,7,7,7]
-    # compind2 = [4,5,6,7,4,5,6,7,5,6,7,6,7,6,3,2]
-    # lags= [[100,60],[100,60],[100,60],[100,185],[100,60],[100,60],[100,60],[100,185],[60,60],[60,60],[60,185],[60,60],[60,185],[185,60],[185,100],[185,115]]
-    # compind1 = [2,2,2,3,3,3]
-    # compind2 = [4,5,6,4,5,6]
-    # lags = [[115,60],[115,60],[115,60],[100,60],[100,60],[100,60]]
-    compind1 = [3]
-    compind2 = [6]
-    lags = [[100,60]]
-    basefname = 'DiamondInternalMult_1200time_mixedlags_' 
+    compind1 = [0,0,0,0,1,1,1,1,2,2,2,3,3,3,4,4,4,5,5,7,7,7]
+    compind2 = [4,5,6,7,4,5,6,7,4,5,6,4,5,6,5,6,7,6,7,6,3,2]
     tsprops = np.arange(0.3,1.05,0.1) 
     numlags = 8
-    eqns,names,ts = newDiamondTS(finaltime)
+    if unrotated:
+        eqns,names,ts = unrotatedDiamondTS(finaltime)
+        basefname = 'DiamondUnrotated_1200time_mixedlags_' 
+        lags= [[100,60],[100,75],[100,30],[100,100],[100,60],[100,75],[100,30],[100,100],[115,60],[115,75],[115,30],[100,60],[100,75],[100,30],[60,75],[60,30],[60,100],[75,30],[75,100],[100,30],[100,100],[100,115]]
+    else:
+        eqns,names,ts = newDiamondTS(finaltime)
+        basefname = 'DiamondInternalMult_1200time_mixedlags_' 
+        lags= [[100,60],[100,60],[100,60],[100,185],[100,60],[100,60],[100,60],[100,185],[115,60],[115,60],[115,60],[100,60],[100,60],[100,60],[60,60],[60,60],[60,185],[60,60],[60,185],[185,60],[185,100],[185,115]]
     for k,c1 in enumerate(compind1):
         print('------------------------------------')
         print(names[c1] + ' and ' + names[compind2[k]])
@@ -59,7 +68,7 @@ def runDiamond(finaltime=1200.0,remote=1):
         continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags[k],numlags,fname=basedir+fname) 
 
 if __name__ == '__main__':
-    runDiamond(remote=0)
+    runDiamond()
     # chooseLagsForSims(1200.0)
     # #below, choose lags from autocorrelation
     # import StateSpaceReconstructionPlots as SSRPlots
