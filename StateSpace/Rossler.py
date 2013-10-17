@@ -307,13 +307,13 @@ if __name__ == '__main__':
     # SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=0, titlestr='var change, u, lag 60')
     # SSRPlots.plotShadowManifold(x[:,0], 3, 60, show=0, titlestr='var change, s, lag 60')
     # SSRPlots.plotManifold(x,show=1,titlestr='phase space')
-    #########################
-    x = solveDiamond([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],600.0,d=2.0)
-    SSRPlots.plotShadowManifold(x[:,6], 3, 60, show=0, titlestr='var change, v, lag 60')
-    SSRPlots.plotShadowManifold(x[:,5], 3, 60, show=0, titlestr='var change, u, lag 60')
-    SSRPlots.plotShadowManifold(x[:,4], 3, 60, show=0, titlestr='var change, s, lag 60')
-    SSRPlots.plotManifold(x[:,[0,1,7]],show=0,titlestr='x,y,p')
-    SSRPlots.plotManifold(x[:,4:7],show=1,titlestr='phase space')
+    # #########################
+    # x = solveDiamond([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],600.0,d=2.0)
+    # SSRPlots.plotShadowManifold(x[:,6], 3, 60, show=0, titlestr='var change, v, lag 60')
+    # SSRPlots.plotShadowManifold(x[:,5], 3, 60, show=0, titlestr='var change, u, lag 60')
+    # SSRPlots.plotShadowManifold(x[:,4], 3, 60, show=0, titlestr='var change, s, lag 60')
+    # SSRPlots.plotManifold(x[:,[0,1,7]],show=0,titlestr='x,y,p')
+    # SSRPlots.plotManifold(x[:,4:7],show=1,titlestr='phase space')
     # #########################
     # x = solveDiamondVarChange([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],600.0)
     # SSRPlots.plotShadowManifold(x[:,6], 3, 60, show=0, titlestr='var change, v, lag 60')
@@ -349,11 +349,11 @@ if __name__ == '__main__':
     # SSRPlots.plotShadowManifold(x[:,0], 3, 60, show=0, titlestr='var change, s, lag 60')
     # SSRPlots.plotManifold(x,show=1,titlestr='Rossler phase space')
     # #########################
-    # x = solveRotatedRossler([5,4,3],600.0)
+    x = solveRotatedRossler([5,4,3],600.0)
     # SSRPlots.plotShadowManifold(x[:,2], 3, 60, show=0, titlestr=r'$M_v$',style='k-')
     # SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=0, titlestr=r'$M_u$',style='r-')
     # SSRPlots.plotShadowManifold(x[:,0], 3, 50, show=1, titlestr=r'$M_s$',style='g-')
-    # SSRPlots.plotManifold(x,show=1,titlestr='s,u,v')
+    SSRPlots.plotManifold(x,show=1,color=(2./255,39./255,129./255))
     # #########################
     # x = solveCappedPendulumRotatedRossler([1.0,2.0,5.0,4.0,3.0,0.75],600.0)
     # SSRPlots.plotShadowManifold(x[:,5], 3, 100, show=1, titlestr='var change, p, lag 100')
