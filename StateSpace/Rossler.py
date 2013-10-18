@@ -18,7 +18,7 @@ def Rossler(t,x,a=0.0,b=0.0,c=0.0):
     dx[2] = b+ x[2]*(x[0]-c)
     return dx
 
-def solveDiamond(init,T,dt=0.01,mu=4.0,beta=1.2,A=2.0,a=0.2,b=0.2,c=5.7,d=0.05,B=1.25):
+def solveDiamond(init,T,dt=0.01,mu=4.0,beta=1.2,A=2.0,a=0.2,b=0.2,c=5.7,d=0.15,B=1.25):
     times = np.arange(0,T,dt)
     x = np.zeros((len(times),len(init)))
     x[0,:] = init
@@ -34,7 +34,7 @@ def diamond(t,x,mu=0.0,beta=0.0,A=0.0,a=0.0,b=0.0,c=0.0,d=0.0,B=0.0):
     dx[3] = -x[3] - beta*np.sin(x[2]) + A*np.sin(x[0])
     dx[4] = -(x[5] + x[6]) 
     dx[5] = x[4] + a*x[5] 
-    dx[6] = b - c*x[6] - (d*x[0] - 3*d)*(x[4]**2 + x[6]**2)/4.0 + (2 + d*x[0] - 3*d)*(x[4]*x[6])/2.0
+    dx[6] = b - c*x[6] - d*(x[0] - 3)*(x[4]**2 + x[6]**2)/4.0 + (2 + d*(x[0] - 3))*(x[4]*x[6])/2.0
     dx[7] = -x[7] + B*np.sin(x[6])*np.sin(x[2])
     return dx
 
@@ -308,7 +308,7 @@ if __name__ == '__main__':
     # SSRPlots.plotShadowManifold(x[:,0], 3, 60, show=0, titlestr='var change, s, lag 60')
     # SSRPlots.plotManifold(x,show=1,titlestr='phase space')
     #########################
-    x = solveDiamond([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],600.0)
+    x = solveDiamond([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],600.0,d=0.1)
     SSRPlots.plotShadowManifold(x[:,6], 3, 60, show=0, titlestr='var change, v, lag 60')
     SSRPlots.plotShadowManifold(x[:,5], 3, 60, show=0, titlestr='var change, u, lag 60')
     SSRPlots.plotShadowManifold(x[:,4], 3, 60, show=0, titlestr='var change, s, lag 60')

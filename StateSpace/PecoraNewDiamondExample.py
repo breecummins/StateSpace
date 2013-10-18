@@ -32,47 +32,44 @@ def newDiamondTS(finaltime=1200.0,dt=0.025):
     names = ['x','y','z','w','s','u','v','p']
     return eqns,names,timeseries
 
-def unrotatedDiamondTS(finaltime=1200.0,dt=0.025):
+def unrotatedDiamondTS(finaltime=1200.0,dt=0.025,d=0.15):
     from Rossler import solveDiamond
-    timeseries = solveDiamond([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],finaltime,dt)
+    timeseries = solveDiamond([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],finaltime,dt,d=d)
     eqns = 'Diamond, unrotated Rossler'
     names = ['x','y','z','w','s','u','v','p']
     return eqns,names,timeseries
 
 def runDiamond(finaltime=1200.0,remote=1,unrotated=1):
-    #FIXME: Rewrite like PecoraDoublePendulumDiamondExample.py with a double for loop
     print('Beginning batch run for diamond equations....')
     if remote:
         basedir = '/home/bcummins/'
     else:
         basedir=os.path.join(os.path.expanduser("~"),'SimulationResults/TimeSeries/PecoraMethod/FinalPaperExamples/')
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) 
-    compind1 = [0,0,0,0,1,1,1,1,2,2,2,3,3,3,4,4,4,5,5,7,7,7]
-    compind2 = [4,5,6,7,4,5,6,7,4,5,6,4,5,6,5,6,7,6,7,6,3,2]
     tsprops = np.arange(0.3,1.05,0.1) 
     numlags = 8
     if unrotated:
         eqns,names,ts = unrotatedDiamondTS(finaltime)
-        basefname = 'DiamondUnrotated_1200time_mixedlags_' 
-        lags= [[100,60],[100,60],[100,45],[100,100],[100,60],[100,60],[100,45],[100,100],[115,60],[115,60],[115,45],[100,60],[100,60],[100,45],[60,60],[60,45],[60,100],[60,45],[60,100],[100,45],[100,100],[100,115]]
+        basefname = 'DiamondUnrotated_1200time_mixedlags_d015_' 
+        lags = [100,100,115,100,60,60,45,100]
     else:
         eqns,names,ts = newDiamondTS(finaltime)
         basefname = 'DiamondInternalMult_1200time_mixedlags_' 
-        lags= [[100,60],[100,60],[100,60],[100,185],[100,60],[100,60],[100,60],[100,185],[115,60],[115,60],[115,60],[100,60],[100,60],[100,60],[60,60],[60,60],[60,185],[60,60],[60,185],[185,60],[185,100],[185,115]]
-    for k,c1 in enumerate(compind1):
-        print('------------------------------------')
-        print(names[c1] + ' and ' + names[compind2[k]])
-        print('------------------------------------')
-        compinds = [c1,compind2[k]]
-        fname = basefname + names[c1] + names[compind2[k]] + '.pickle'
-        continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags[k],numlags,fname=basedir+fname) 
+        lags = [100,100,115,100,60,60,60,185]
+    for c1 in range(7):
+        for c2 in range(max(4,c1+1),8):
+            print('------------------------------------')
+            print(names[c1] + ' and ' + names[c2])
+            print('------------------------------------')
+            fname = basefname + names[c1] + names[c2] + '.pickle'
+            continuityTestingFixedEps(eqns,names,ts,[c1,c2],tsprops,epsprops,[lags[c1],lags[c2]],numlags,fname=basedir+fname) 
 
 if __name__ == '__main__':
     runDiamond()
-    # chooseLagsForSims(1200.0)
+    # chooseLagsForSims(1200.0,unrotated=0)
     # #below, choose lags from autocorrelation
     # import StateSpaceReconstructionPlots as SSRPlots
-    # eqns,names,ts = newDiamondTS(1200.0)
+    # eqns,names,ts = unrotatedDiamondTS(1200.0)
     # T = 400
-    # autocorr = SSR.getAutocorrelation(ts[:,7],T)
+    # autocorr = SSR.getAutocorrelation(ts[:,6],T)
     # SSRPlots.plotAutocorrelation(autocorr,'p')
