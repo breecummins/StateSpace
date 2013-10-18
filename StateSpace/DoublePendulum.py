@@ -36,6 +36,7 @@ if __name__ == '__main__':
     finaltime = 2400.0
     finaltime = 600.0
     x = solvePendulum([1.0,2.0,3.0,2.0],finaltime,dt=dt)
+    SSRPlots.plots(np.arange(0,x.shape[0]*0.25,0.25),0.01*x[:,0]-2*0.01,show=1)
     # ac = SSR.getAutocorrelation(x[:,2],int(x.shape[0] / 3.))
     # SSRPlots.plots(np.arange(1,len(ac)+1),np.array(ac),show=1,titlestr='z autocorr')
     # numlags = 3
@@ -61,10 +62,10 @@ if __name__ == '__main__':
     # SSRPlots.plotManifold(x[:,:3],show=0,titlestr='x, y, z',color=(2./255,39./255,129./255))
     # SSRPlots.plotManifold(x[:,(0,1,3)],show=1,titlestr='x, y, w',color=(129./255,0./255,23./255))
     # SSRPlots.plotManifold(x[:,(0,1,2)],show=1,titlestr='x, y, z',style='r-')
-    SSRPlots.plotShadowManifold(x[:,0],3,100,show=0,hold=0,style='k-',titlestr=r'$M_x$')
-    SSRPlots.plotShadowManifold(x[:,1],3,100,show=0,hold=0,titlestr=r'$M_y$',color=(0,129./255,20./255))
-    SSRPlots.plotShadowManifold(x[:,2],3,115,show=0,hold=0,titlestr=r'$M_z$',color=(2./255,39./255,129./255))
-    SSRPlots.plotShadowManifold(x[:,3],3,100,show=1,hold=0,titlestr=r'$M_w$',color=(129./255,0./255,23./255))
+    # SSRPlots.plotShadowManifold(x[:,0],3,100,show=0,hold=0,style='k-',titlestr=r'$M_x$')
+    # SSRPlots.plotShadowManifold(x[:,1],3,100,show=0,hold=0,titlestr=r'$M_y$',color=(0,129./255,20./255))
+    # SSRPlots.plotShadowManifold(x[:,2],3,115,show=0,hold=0,titlestr=r'$M_z$',color=(2./255,39./255,129./255))
+    # SSRPlots.plotShadowManifold(x[:,3],3,100,show=1,hold=0,titlestr=r'$M_w$',color=(129./255,0./255,23./255))
     # SSRPlots.plotShadowManifold(x[:,2],numlags,int(float(lagsize2)/lagsize3)*lagsize3,show=1,hold=0,style='r-',titlestr='Mz, lagsize {0} = {1}*{2}'.format((int(float(lagsize2)/lagsize3)*lagsize3),lagsize3,int(float(lagsize2)/lagsize3)))
 
     # SSRPlots.plotShadowManifold(x[:,3],numlags,lagsize,show=0,hold=0,style='g-',titlestr='lagsize {0}'.format(lagsize))

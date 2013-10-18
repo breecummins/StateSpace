@@ -54,7 +54,7 @@ def runDiamond(finaltime=1200.0,remote=1,unrotated=1):
     if unrotated:
         eqns,names,ts = unrotatedDiamondTS(finaltime)
         basefname = 'DiamondUnrotated_1200time_mixedlags_' 
-        lags= [[100,60],[100,75],[100,30],[100,100],[100,60],[100,75],[100,30],[100,100],[115,60],[115,75],[115,30],[100,60],[100,75],[100,30],[60,75],[60,30],[60,100],[75,30],[75,100],[100,30],[100,100],[100,115]]
+        lags= [[100,60],[100,60],[100,45],[100,100],[100,60],[100,60],[100,45],[100,100],[115,60],[115,60],[115,45],[100,60],[100,60],[100,45],[60,60],[60,45],[60,100],[60,45],[60,100],[100,45],[100,100],[100,115]]
     else:
         eqns,names,ts = newDiamondTS(finaltime)
         basefname = 'DiamondInternalMult_1200time_mixedlags_' 

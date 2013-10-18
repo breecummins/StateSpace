@@ -18,7 +18,7 @@ def Rossler(t,x,a=0.0,b=0.0,c=0.0):
     dx[2] = b+ x[2]*(x[0]-c)
     return dx
 
-def solveDiamond(init,T,dt=0.01,mu=4.0,beta=1.2,A=2.0,a=0.2,b=0.2,c=5.7,d=2.0,B=1.25):
+def solveDiamond(init,T,dt=0.01,mu=4.0,beta=1.2,A=2.0,a=0.2,b=0.2,c=5.7,d=0.05,B=1.25):
     times = np.arange(0,T,dt)
     x = np.zeros((len(times),len(init)))
     x[0,:] = init
@@ -32,9 +32,9 @@ def diamond(t,x,mu=0.0,beta=0.0,A=0.0,a=0.0,b=0.0,c=0.0,d=0.0,B=0.0):
     dx[1] = mu*(1.0 - x[0]**2)*x[1] - x[0] #Van der Pol oscillator
     dx[2] = x[3]
     dx[3] = -x[3] - beta*np.sin(x[2]) + A*np.sin(x[0])
-    dx[4] = -(x[5] + x[6]) + d*np.sin(x[1]) 
-    dx[5] = x[4] + a*x[5] + d*np.sin(x[1])
-    dx[6] = b + x[6]*(x[4] - c) 
+    dx[4] = -(x[5] + x[6]) 
+    dx[5] = x[4] + a*x[5] 
+    dx[6] = b - c*x[6] - (d*x[0] - 3*d)*(x[4]**2 + x[6]**2)/4.0 + (2 + d*x[0] - 3*d)*(x[4]*x[6])/2.0
     dx[7] = -x[7] + B*np.sin(x[6])*np.sin(x[2])
     return dx
 
@@ -307,13 +307,13 @@ if __name__ == '__main__':
     # SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=0, titlestr='var change, u, lag 60')
     # SSRPlots.plotShadowManifold(x[:,0], 3, 60, show=0, titlestr='var change, s, lag 60')
     # SSRPlots.plotManifold(x,show=1,titlestr='phase space')
-    # #########################
-    # x = solveDiamond([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],600.0,d=2.0)
-    # SSRPlots.plotShadowManifold(x[:,6], 3, 60, show=0, titlestr='var change, v, lag 60')
-    # SSRPlots.plotShadowManifold(x[:,5], 3, 60, show=0, titlestr='var change, u, lag 60')
-    # SSRPlots.plotShadowManifold(x[:,4], 3, 60, show=0, titlestr='var change, s, lag 60')
-    # SSRPlots.plotManifold(x[:,[0,1,7]],show=0,titlestr='x,y,p')
-    # SSRPlots.plotManifold(x[:,4:7],show=1,titlestr='phase space')
+    #########################
+    x = solveDiamond([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],600.0)
+    SSRPlots.plotShadowManifold(x[:,6], 3, 60, show=0, titlestr='var change, v, lag 60')
+    SSRPlots.plotShadowManifold(x[:,5], 3, 60, show=0, titlestr='var change, u, lag 60')
+    SSRPlots.plotShadowManifold(x[:,4], 3, 60, show=0, titlestr='var change, s, lag 60')
+    SSRPlots.plotManifold(x[:,[0,1,7]],show=0,titlestr='x,y,p')
+    SSRPlots.plotManifold(x[:,4:7],show=1,titlestr='phase space')
     # #########################
     # x = solveDiamondVarChange([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],600.0)
     # SSRPlots.plotShadowManifold(x[:,6], 3, 60, show=0, titlestr='var change, v, lag 60')
@@ -348,12 +348,12 @@ if __name__ == '__main__':
     # SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=0, titlestr='var change, u, lag 60')
     # SSRPlots.plotShadowManifold(x[:,0], 3, 60, show=0, titlestr='var change, s, lag 60')
     # SSRPlots.plotManifold(x,show=1,titlestr='Rossler phase space')
-    # #########################
-    x = solveRotatedRossler([5,4,3],600.0)
-    # SSRPlots.plotShadowManifold(x[:,2], 3, 60, show=0, titlestr=r'$M_v$',style='k-')
-    # SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=0, titlestr=r'$M_u$',style='r-')
-    # SSRPlots.plotShadowManifold(x[:,0], 3, 50, show=1, titlestr=r'$M_s$',style='g-')
-    SSRPlots.plotManifold(x,show=1,color=(2./255,39./255,129./255))
+    # # #########################
+    # x = solveRotatedRossler([5,4,3],600.0)
+    # # SSRPlots.plotShadowManifold(x[:,2], 3, 60, show=0, titlestr=r'$M_v$',style='k-')
+    # # SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=0, titlestr=r'$M_u$',style='r-')
+    # # SSRPlots.plotShadowManifold(x[:,0], 3, 50, show=1, titlestr=r'$M_s$',style='g-')
+    # SSRPlots.plotManifold(x,show=1,color=(2./255,39./255,129./255))
     # #########################
     # x = solveCappedPendulumRotatedRossler([1.0,2.0,5.0,4.0,3.0,0.75],600.0)
     # SSRPlots.plotShadowManifold(x[:,5], 3, 100, show=1, titlestr='var change, p, lag 100')
