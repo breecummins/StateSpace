@@ -32,9 +32,9 @@ def newDiamondTS(finaltime=1200.0,dt=0.025):
     names = ['x','y','z','w','s','u','v','p']
     return eqns,names,timeseries
 
-def unrotatedDiamondTS(finaltime=1200.0,dt=0.025,d=0.15):
+def unrotatedDiamondTS(finaltime=1200.0,dt=0.025,d=0.25):
     from Rossler import solveDiamond
-    timeseries = solveDiamond([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],finaltime,dt,d=d)
+    timeseries = solveDiamond([1.0,2.0,3.0,2.0,1.0,1.0,1.0,0.75],finaltime,dt,d=d)
     eqns = 'Diamond, unrotated Rossler'
     names = ['x','y','z','w','s','u','v','p']
     return eqns,names,timeseries
@@ -50,8 +50,8 @@ def runDiamond(finaltime=1200.0,remote=1,unrotated=1):
     numlags = 8
     if unrotated:
         eqns,names,ts = unrotatedDiamondTS(finaltime)
-        basefname = 'DiamondUnrotated_1200time_mixedlags_d015_' 
-        lags = [100,100,115,100,60,60,45,100]
+        basefname = 'DiamondUnrotated_1200time_mixedlags_d025_all1inits_' 
+        lags = [100,100,115,95,60,65,50,100]
     else:
         eqns,names,ts = newDiamondTS(finaltime)
         basefname = 'DiamondInternalMult_1200time_mixedlags_' 
@@ -66,7 +66,7 @@ def runDiamond(finaltime=1200.0,remote=1,unrotated=1):
 
 if __name__ == '__main__':
     runDiamond()
-    # chooseLagsForSims(1200.0,unrotated=0)
+    # chooseLagsForSims(1200.0,unrotated=1)
     # #below, choose lags from autocorrelation
     # import StateSpaceReconstructionPlots as SSRPlots
     # eqns,names,ts = unrotatedDiamondTS(1200.0)

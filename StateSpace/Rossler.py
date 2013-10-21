@@ -308,7 +308,7 @@ if __name__ == '__main__':
     # SSRPlots.plotShadowManifold(x[:,0], 3, 60, show=0, titlestr='var change, s, lag 60')
     # SSRPlots.plotManifold(x,show=1,titlestr='phase space')
     #########################
-    x = solveDiamond([1.0,2.0,3.0,2.0,5.0,4.0,3.0,0.75],600.0,d=0.1)
+    x = solveDiamond([1.0,2.0,3.0,2.0,1.0,1.0,1.0,0.75],600.0,d=0.25)
     SSRPlots.plotShadowManifold(x[:,6], 3, 60, show=0, titlestr='var change, v, lag 60')
     SSRPlots.plotShadowManifold(x[:,5], 3, 60, show=0, titlestr='var change, u, lag 60')
     SSRPlots.plotShadowManifold(x[:,4], 3, 60, show=0, titlestr='var change, s, lag 60')
