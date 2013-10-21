@@ -32,7 +32,7 @@ def newDiamondTS(finaltime=1200.0,dt=0.025):
     names = ['x','y','z','w','s','u','v','p']
     return eqns,names,timeseries
 
-def unrotatedDiamondTS(finaltime=1200.0,dt=0.025,d=0.265):
+def unrotatedDiamondTS(finaltime=1200.0,dt=0.025,d=0.2):
     from Rossler import solveDiamond
     timeseries = solveDiamond([1.0,2.0,3.0,2.0,0.5,0.5,0.1,0.75],finaltime,dt,d=d)
     eqns = 'Diamond, unrotated Rossler'
@@ -50,7 +50,7 @@ def runDiamond(finaltime=1200.0,remote=1,unrotated=1):
     numlags = 8
     if unrotated:
         eqns,names,ts = unrotatedDiamondTS(finaltime)
-        basefname = 'DiamondUnrotated_1200time_mixedlags_d0265_lowinits_' 
+        basefname = 'DiamondUnrotated_1200time_mixedlags_d020_lowinits_' 
         lags = [100,100,115,95,60,65,50,100]
     else:
         eqns,names,ts = newDiamondTS(finaltime)
