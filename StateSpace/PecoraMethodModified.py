@@ -87,7 +87,7 @@ def continuityTest(dists1,dists2,ptinds,eps,startdelta):
             while out is False:
                 delta = delta*0.5
                 out = countDeltaPtsMappedToEps(dists1[k],dists2[k],delta,eps) 
-            if out: #out can be 0, in which case we want to report 0 confidence
+            if out: #out can be 0, in which case we leave 0 confidence in place
                 contstat[k] = getContinuityConfidence(neps,out,len(dists1[k]))
             # print("Confidence: {0}".format(contstat[k]))
     return np.mean(contstat), np.mean(probs)
@@ -332,11 +332,13 @@ def convergenceWithContinuityTestFixedLagsFixedEps(ts1,ts2,numlags,lag1,lag2,tsp
         print('-----------------------')
         if j in badL:
             continue
+        # shave off the portion of the reconstructions that we're testing this iterate
         M1L = M1[:L-reflag*(numlags-1),:]
         M2L = M2[:L-reflag*(numlags-1),:]
-        # choose 10% of points randomly in the reconstructions to test
+        # choose 10% of points randomly in the reconstructions for testing
         N = int(np.round(0.1*M1L.shape[0]))
         ptinds = random.sample(range(M1L.shape[0]),N) 
+        # cache distances to the random points
         dists1 = cacheDistances(M1L,ptinds)
         dists2 = cacheDistances(M2L,ptinds)
         for k,eps1 in enumerate(epslist1):
