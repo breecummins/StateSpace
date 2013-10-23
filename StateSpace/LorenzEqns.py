@@ -77,9 +77,9 @@ if __name__ == '__main__':
     # # SSRPlots.plotShadowManifold(timeseries[:,1],3,8,show=0,hold=0,style='g-',smooth=0)
     # # SSRPlots.plotShadowManifold(timeseries[:,2],3,8,show=1,hold=0,style='k-',smooth=0)
     ##############################
-    timeseries = solveRotatedLorenz([1.0,0.5,0.5],finaltime,dt)
+    timeseries = solveLorenz([1.0,0.5,0.5],finaltime,dt)
     numlags = 3
     SSRPlots.plotManifold(timeseries,show=0)
-    SSRPlots.plotShadowManifold(timeseries[:,0],3,10,show=0,hold=0,style='r-')
-    SSRPlots.plotShadowManifold(timeseries[:,1],3,10,show=0,hold=0,style='g-')
-    SSRPlots.plotShadowManifold(timeseries[:,2],3,10,show=1,hold=0,style='k-')
+    SSRPlots.plotShadowManifold(timeseries[:,0],3,40,show=0,hold=0,style='r-')
+    SSRPlots.plotShadowManifold(timeseries[:,1],3,40,show=0,hold=0,style='g-')
+    SSRPlots.plotShadowManifold(timeseries[:,2],3,7,show=1,hold=0,style='k-')

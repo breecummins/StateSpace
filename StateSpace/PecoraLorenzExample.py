@@ -26,9 +26,9 @@ def continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,numla
         return outdict
 
 def lorenzTS(finaltime=1200.0,dt=0.025):
-    from LorenzEqns import solveLorenzVarChange
-    timeseries = solveLorenzVarChange([1.0,0.5,-0.5],finaltime,dt)
-    eqns = 'Lorenz with variable change'
+    from LorenzEqns import solveLorenz
+    timeseries = solveLorenz([1.0,0.5,0.5],finaltime,dt)
+    eqns = 'Lorenz eqns'
     names = ['x','y','z']
     return eqns,names,timeseries
 
@@ -48,30 +48,37 @@ def runLorenz(finaltime=1200.0,remote=1,rotated=1):
     numlags = 3
     tsprops = np.arange(0.3,1.05,0.1) # for finaltime = 1200
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) 
-    compind1 = [0,0,1]
-    compind2 = [1,2,2]
+    def runme(eqns,names,ts,basefname,lags):
+        for c1 in range(2):
+            for c2 in range(c1+1,3):
+                print('------------------------------------')
+                print(names[c1] + ' and ' + names[c2])
+                print('------------------------------------')
+                fname = basefname + names[c1] + names[c2] + '.pickle'
+                continuityTestingFixedEps(eqns,names,ts,[c1,c2],tsprops,epsprops,[lags[c1],lags[c2]],numlags,fname=basedir+fname)
     if rotated:
         eqns,names,ts = rotatedLorenzTS(finaltime)
         basefname = 'RotatedLorenz_1200time_samelags_'
-        lags= [[10,10],[10,10],[10,10]]
+        lags= [10,10,10]
+        runme(eqns,names,ts,basefname,lags)
     else:
         eqns,names,ts = lorenzTS(finaltime)
-        basefname = 'Lorenz_1200time_mixedlags_125_100_'
-        lags= [[125,125],[125,100],[125,100]]
-    for k,c1 in enumerate(compind1):
-        print('------------------------------------')
-        print(names[c1] + ' and ' + names[compind2[k]])
-        print('------------------------------------')
-        compinds = [c1,compind2[k]]
-        fname = basefname + names[c1] + names[compind2[k]] + '.pickle'
-        continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags[k],numlags,fname=basedir+fname)
+        lags= [20,20,7]
+        basefname = 'Lorenz_1200time_mixedlags_xylag020_'
+        runme(eqns,names,ts,basefname,lags)
+        lags= [40,40,7]
+        basefname = 'Lorenz_1200time_mixedlags_xylag040_'
+        runme(eqns,names,ts,basefname,lags)
+        lags= [160,160,7]
+        basefname = 'Lorenz_1200time_mixedlags_xylag160_'
+        runme(eqns,names,ts,basefname,lags)
 
 if __name__ == '__main__':
-    runLorenz()
+    runLorenz(rotated=0)
     # chooseLagsForSims(1200.0,rotated=0)
     # ################################
     # import StateSpaceReconstructionPlots as SSRPlots
-    # eqs,ns,ts = rotatedLorenzTS(400.)
+    # eqs,ns,ts = lorenzTS(1200.)
     # autocorr = SSR.getAutocorrelation(ts[:,0],200)
     # SSRPlots.plotAutocorrelation(autocorr,'x')
     # autocorr = SSR.getAutocorrelation(ts[:,1],200)
