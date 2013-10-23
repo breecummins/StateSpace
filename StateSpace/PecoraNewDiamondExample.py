@@ -41,7 +41,7 @@ def unrotatedDiamondTS(finaltime=1200.0,dt=0.025,d=0.2):
     names = ['x','y','z','w','s','u','v','p']
     return eqns,names,timeseries
 
-def nononlinearDiamondTS(finaltime=1200.0,dt=0.025,d=0.02):
+def nononlinearDiamondTS(finaltime=1200.0,dt=0.025,d=0.15):
     from Rossler import solveDiamondNoNonlinearTerm
     timeseries = solveDiamondNoNonlinearTerm([1.0,2.0,3.0,2.0,0.5,0.5,0.1,0.75],finaltime,dt,d=d)
     eqns = 'Diamond, no nonlinear term'
@@ -63,8 +63,8 @@ def runDiamond(finaltime=1200.0,remote=1,unrotated=0,nononlinear=1):
         lags = [100,100,115,95,60,65,50,100]
     elif nononlinear:
         eqns,names,ts = nononlinearDiamondTS(finaltime)
-        basefname = 'DiamondNoNonlinear_1200time_mixedlags_d002_lowinits_' 
-        lags = [100,100,115,100,57,61,35,117]
+        basefname = 'DiamondNoNonlinear_1200time_mixedlags_d015_lowinits_' 
+        lags = [100,100,115,100,57,64,34,120]
     else:
         eqns,names,ts = newDiamondTS(finaltime)
         basefname = 'DiamondInternalMult_1200time_mixedlags_' 
