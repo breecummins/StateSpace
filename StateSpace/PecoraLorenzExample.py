@@ -63,15 +63,15 @@ def runLorenz(finaltime=1200.0,remote=1,rotated=1):
         runme(eqns,names,ts,basefname,lags)
     else:
         eqns,names,ts = lorenzTS(finaltime)
-        lags= [20,20,7]
-        basefname = 'Lorenz_1200time_mixedlags_xylag020_'
+        lags= [10,10,7]
+        basefname = 'Lorenz_1200time_mixedlags_xylag010_'
         runme(eqns,names,ts,basefname,lags)
-        lags= [40,40,7]
-        basefname = 'Lorenz_1200time_mixedlags_xylag040_'
-        runme(eqns,names,ts,basefname,lags)
-        lags= [160,160,7]
-        basefname = 'Lorenz_1200time_mixedlags_xylag160_'
-        runme(eqns,names,ts,basefname,lags)
+        # lags= [40,40,7]
+        # basefname = 'Lorenz_1200time_mixedlags_xylag040_'
+        # runme(eqns,names,ts,basefname,lags)
+        # lags= [160,160,7]
+        # basefname = 'Lorenz_1200time_mixedlags_xylag160_'
+        # runme(eqns,names,ts,basefname,lags)
 
 if __name__ == '__main__':
     runLorenz(rotated=0)

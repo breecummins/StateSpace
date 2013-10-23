@@ -34,16 +34,16 @@ def runDP(finaltime=1200.0,remote=1):
     if remote:
         basedir = '/home/bcummins/'
     else:
-        basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/DPpaperexample/'
+        basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) 
     eqns,names,ts = doublependulumTS(finaltime)
     numlags = 4
     tsprops = np.arange(0.3,1.05,0.1) 
     compind1 = [0,0,0,1,1,2]
     compind2 = [1,2,3,2,3,3]
-    basefname = 'DP_1200time_numlags4_fixedlags_fixedeps_'
+    basefname = 'DP_1200time_numlags4__fixedlags_fixedeps_'
     lags= [[100,100],[100,115],[100,100],[100,115],[100,100],[115,100]]
-    for k,c1 in enumerate(compind1):
+    for k,c1 in enumerate(compind1[:1]):
         print('------------------------------------')
         print(names[c1] + ' and ' + names[compind2[k]])
         print('------------------------------------')

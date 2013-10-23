@@ -12,24 +12,24 @@ def getBinomialMax(n,p):
 
     '''
     maxloc = np.floor( (n+1)*p )
-    return comb(n,maxloc)*(p**maxloc)*((1-p)**(n-maxloc)) 
+    return comb(n,maxloc)*(p**maxloc)*((1-p)**(n-maxloc))
 
-def getContinuityConfidence(neps,ndelta,numpts):
+def getContinuityConfidence(neps,ndel,numpts):
     '''
     Calculate a confidence that points are _not_ randomly distributed
     over the manifolds M1 and M2. 
 
-    We observed that the ndelta nearest points to x mapped to within 
+    We observed that the ndel nearest points to x mapped to within 
     epsilon of the image point f(x). We also observed that a total of 
     neps points were within epsilon of f(x). Under the null hypothesis 
     that the points in M1 and M2 are randomly distributed, the 
-    probability of our observation of ndelta successes is given by
-    (neps / numpts)**ndelta, where numpts is the number of points in M1
+    probability of our observation of ndel successes is given by
+    (neps / numpts)**ndel, where numpts is the number of points in M1
     (and likewise in M2). If this probability is small compared to 1, and 
     also small compared to the maximum probability (p_max) in the binomial 
-    distribution B(ndelta, neps/numpts), then we are confident that the 
+    distribution B(ndel, neps/numpts), then we are confident that the 
     points are not randomly distributed. We define the confidence level
-    to be 1 - (neps / numpts)**ndelta / p_max.
+    to be 1 - (neps / numpts)**ndel / p_max.
 
     Since we made our observations to be consistent with the definition
     of continuity, we say we are relatively confident (output near 1) or 
@@ -38,8 +38,8 @@ def getContinuityConfidence(neps,ndelta,numpts):
 
     '''
     p = float(neps) / numpts
-    pmax = getBinomialMax(ndelta,p)
-    return 1 - (p**ndelta)/pmax
+    pmax = getBinomialMax(ndel,p)
+    return 1 - (p**ndel)/pmax
 
 def countPtsWithinEps(dists,eps):
     '''
@@ -83,12 +83,17 @@ def continuityTest(dists1,dists2,ptinds,eps,startdelta):
         # print("Probability of 1 correct mapping: {0}".format(np.round(float(neps) / len(dists1[k]),3)))
         if neps > 0: # if eps big enough, continue; else leave 0 in place
             delta = 2.0*startdelta
-            out = False
-            while out is False:
+            ndel = False
+            while ndel is False:
                 delta = delta*0.5
-                out = countDeltaPtsMappedToEps(dists1[k],dists2[k],delta,eps) 
-            if out: #out can be 0, in which case we leave 0 confidence in place
-                contstat[k] = getContinuityConfidence(neps,out,len(dists1[k]))
+                ndel = countDeltaPtsMappedToEps(dists1[k],dists2[k],delta,eps) 
+            if ndel: #ndel can be 0, in which case we leave 0 confidence in place
+                contstat[k] = getContinuityConfidence(neps,ndel,len(dists1[k]))
+                while np.isnan(contstat[k]):
+                    # Need handling of overflow for success under very improbable conditions. 
+                    # Check lower numbers. Confidence may be underestimated. 
+                    ndel = ndel/2
+                    contstat[k] = getContinuityConfidence(neps,ndel,len(dists1[k]))
             # print("Confidence: {0}".format(contstat[k]))
     return np.mean(contstat), np.mean(probs)
 
