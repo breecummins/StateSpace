@@ -54,7 +54,7 @@ def diamondNonlinearTerm(t,x,mu=0.0,beta=0.0,A=0.0,a=0.0,b=0.0,c=0.0,d=0.0,B=0.0
     dx[3] = -x[3] - beta*np.sin(x[2]) + A*np.sin(x[0])
     dx[4] = -(x[5] + x[6])
     dx[5] = x[4] + a*x[5] 
-    dx[6] = b + x[6]*(x[4] - c) - d*(x[0] - 2)*(x[4]**2 + x[6]**2)/4.0
+    dx[6] = b + x[6]*(x[4] - c) + d*x[0]**2
     dx[7] = -x[7] + B*np.sin(x[6])*np.sin(x[2])
     return dx
 
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     # SSRPlots.plotManifold(x[:,[0,1,7]],show=0,titlestr='x,y,p')
     # SSRPlots.plotManifold(x[:,4:7],show=1,titlestr='phase space')
     #########################
-    x = solveDiamondNonlinearTerm([1.0,2.0,3.0,2.0,0.5,0.5,0.1,0.75],600.0,d=0.1)
+    x = solveDiamondNonlinearTerm([1.0,2.0,3.0,2.0,4.0,4.0,4.0,0.75],600.0,d=0.4)
     SSRPlots.plotShadowManifold(x[:,6], 3, 50, show=0, titlestr=r'$M_v$, lag 50')
     SSRPlots.plotShadowManifold(x[:,5], 3, 65, show=0, titlestr=r'$M_u$, lag 65')
     SSRPlots.plotShadowManifold(x[:,4], 3, 60, show=0, titlestr=r'$M_s$, lag 60')
