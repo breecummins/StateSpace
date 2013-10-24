@@ -1,5 +1,4 @@
 import numpy as np
-import random
 import PecoraMethodModified as PM
 import StateSpaceReconstruction as SSR
 import fileops
@@ -51,6 +50,35 @@ def runDP(finaltime=1200.0,remote=1):
         fname = basefname + names[c1] + names[compind2[k]] + '.pickle'
         continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags[k],numlags,fname=basedir+fname)
 
+def runDPWithNoise(finaltime=1200.0,remote=1):
+    print('Beginning batch run for double pendulum equations with noise....')
+    if remote:
+        basedir = '/home/bcummins/'
+    else:
+        basedir='/Users/bree/SimulationResults/TimeSeries/PecoraMethod/'
+    epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) 
+    eqns,names,ts = doublependulumTS(finaltime)
+    numlags = 4
+    tsprops = np.array([1.00]) 
+    compind1 = [0,0,0,1,1,2]
+    compind2 = [1,2,3,2,3,3]
+    basefname = 'DPNoise_1200time_numlags4_fixedlags_fixedeps_'
+    lags= [[100,100],[100,115],[100,100],[100,115],[100,100],[115,100]]
+    noiselevels = np.arange(0.1,1.1,0.1)
+    stds = [np.std(ts[:,k]) for k in range(ts.shape[1])]
+    for n in noiselevels:
+        basefname1 = basefname + 'noise{:02d}_'.format(int(n*10))
+        ts1 = ts.copy()
+        for k in range(ts.shape[1]):
+            ts1[:,k] = ts1[:,k] + np.random.normal(0,n*stds[k],ts1[:,k].shape)
+        for k,c1 in enumerate(compind1[:1]):
+            print('------------------------------------')
+            print(names[c1] + ' and ' + names[compind2[k]])
+            print('------------------------------------')
+            compinds = [c1,compind2[k]]
+            fname = basefname1 + names[c1] + names[compind2[k]] + '.pickle'
+            continuityTestingFixedEps(eqns,names,ts1,compinds,tsprops,epsprops,lags[k],numlags,fname=basedir+fname)
+
 if __name__ == '__main__':
-    runDP()
+    runDPWithNoise()
     # chooseLagsForSims(1200.0)
