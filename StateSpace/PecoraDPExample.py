@@ -67,7 +67,7 @@ def runDPWithNoise(finaltime=1200.0,remote=1):
     noiselevels = np.arange(0.1,1.1,0.1)
     stds = [np.std(ts[:,k]) for k in range(ts.shape[1])]
     for n in noiselevels:
-        basefname1 = basefname + 'noise{:02d}_'.format(int(n*10))
+        basefname1 = basefname + 'noise%02d_' % int(n*10)
         ts1 = ts.copy()
         for k in range(ts.shape[1]):
             ts1[:,k] = ts1[:,k] + np.random.normal(0,n*stds[k],ts1[:,k].shape)
