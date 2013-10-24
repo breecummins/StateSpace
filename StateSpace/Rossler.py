@@ -38,23 +38,23 @@ def diamond(t,x,mu=0.0,beta=0.0,A=0.0,a=0.0,b=0.0,c=0.0,d=0.0,B=0.0):
     dx[7] = -x[7] + B*np.sin(x[6])*np.sin(x[2])
     return dx
 
-def solveDiamondNoNonlinearTerm(init,T,dt=0.01,mu=4.0,beta=1.2,A=2.0,a=0.2,b=0.2,c=5.7,d=0.1,B=1.25):
+def solveDiamondNonlinearTerm(init,T,dt=0.01,mu=4.0,beta=1.2,A=2.0,a=0.2,b=0.2,c=5.7,d=0.1,B=1.25):
     times = np.arange(0,T,dt)
     x = np.zeros((len(times),len(init)))
     x[0,:] = init
     for k,t in enumerate(times[:-1]):
-        x[k+1,:] = rk4.solverp(t,x[k,:],dt,diamondNoNonlinearTerm,mu=mu,beta=beta,A=A,a=a,b=b,c=c,d=d,B=B)
+        x[k+1,:] = rk4.solverp(t,x[k,:],dt,diamondNonlinearTerm,mu=mu,beta=beta,A=A,a=a,b=b,c=c,d=d,B=B)
     return x
 
-def diamondNoNonlinearTerm(t,x,mu=0.0,beta=0.0,A=0.0,a=0.0,b=0.0,c=0.0,d=0.0,B=0.0):
+def diamondNonlinearTerm(t,x,mu=0.0,beta=0.0,A=0.0,a=0.0,b=0.0,c=0.0,d=0.0,B=0.0):
     dx = np.zeros(x.shape)
     dx[0] = x[1]
     dx[1] = mu*(1.0 - x[0]**2)*x[1] - x[0] #Van der Pol oscillator
     dx[2] = x[3]
     dx[3] = -x[3] - beta*np.sin(x[2]) + A*np.sin(x[0])
-    dx[4] = -(x[5] + x[6])*(1+d*x[0]) 
+    dx[4] = -(x[5] + x[6])
     dx[5] = x[4] + a*x[5] 
-    dx[6] = b + x[6]*(x[4] - c)
+    dx[6] = b + x[6]*(x[4] - c) - d*(x[0] - 3)*(x[4]**2 + x[6]**2)/4.0
     dx[7] = -x[7] + B*np.sin(x[6])*np.sin(x[2])
     return dx
 
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     # SSRPlots.plotManifold(x[:,[0,1,7]],show=0,titlestr='x,y,p')
     # SSRPlots.plotManifold(x[:,4:7],show=1,titlestr='phase space')
     #########################
-    x = solveDiamondNoNonlinearTerm([1.0,2.0,3.0,2.0,0.5,0.5,0.1,0.75],600.0,d=0.2)
+    x = solveDiamondNonlinearTerm([1.0,2.0,3.0,2.0,0.5,0.5,0.1,0.75],600.0,d=0.2)
     SSRPlots.plotShadowManifold(x[:,6], 3, 50, show=0, titlestr=r'$M_v$, lag 50')
     SSRPlots.plotShadowManifold(x[:,5], 3, 65, show=0, titlestr=r'$M_u$, lag 65')
     SSRPlots.plotShadowManifold(x[:,4], 3, 60, show=0, titlestr=r'$M_s$, lag 60')

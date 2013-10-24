@@ -4,13 +4,13 @@ import PecoraMethodModified as PM
 import StateSpaceReconstruction as SSR
 import fileops
 
-def chooseLagsForSims(finaltime,tsprops=None,Tp=400,unrotated=0,nononlinear=1):
+def chooseLagsForSims(finaltime,tsprops=None,Tp=400,unrotated=0,nonlinear=1):
     if tsprops == None:
         tsprops = np.arange(0.3,1.05,0.1) # for finaltime = 1200  
     if unrotated:
         eqns,names,ts = unrotatedDiamondTS(finaltime)
-    elif nononlinear:
-        eqns,names,ts = nononlinearDiamondTS(finaltime)
+    elif nonlinear:
+        eqns,names,ts = nonlinearDiamondTS(finaltime)
     else:
         eqns,names,ts = newDiamondTS(finaltime)
     Mlens = ( np.round( ts.shape[0]*tsprops ) ).astype(int)
@@ -41,14 +41,14 @@ def unrotatedDiamondTS(finaltime=1200.0,dt=0.025,d=0.2):
     names = ['x','y','z','w','s','u','v','p']
     return eqns,names,timeseries
 
-def nononlinearDiamondTS(finaltime=1200.0,dt=0.025,d=0.2):
-    from Rossler import solveDiamondNoNonlinearTerm
-    timeseries = solveDiamondNoNonlinearTerm([1.0,2.0,3.0,2.0,0.5,0.5,0.1,0.75],finaltime,dt,d=d)
-    eqns = 'Diamond, no nonlinear term'
+def nonlinearDiamondTS(finaltime=1200.0,dt=0.025,d=0.2):
+    from Rossler import solveDiamondNonlinearTerm
+    timeseries = solveDiamondNonlinearTerm([1.0,2.0,3.0,2.0,0.5,0.5,0.1,0.75],finaltime,dt,d=d)
+    eqns = 'Diamond + nonlinear Rossler'
     names = ['x','y','z','w','s','u','v','p']
     return eqns,names,timeseries
 
-def runDiamond(finaltime=1200.0,remote=1,unrotated=1,nononlinear=0):
+def runDiamond(finaltime=1200.0,remote=1,unrotated=1,nonlinear=0):
     print('Beginning batch run for diamond equations....')
     if remote:
         basedir = '/home/bcummins/'
@@ -59,13 +59,13 @@ def runDiamond(finaltime=1200.0,remote=1,unrotated=1,nononlinear=0):
     numlags = 8
     if unrotated:
         eqns,names,ts = unrotatedDiamondTS(finaltime)
-        basefname = 'DiamondUnrotated_1200time_mixedlags_d020_lowinits_zsupchangedlags_' 
-        # lags = [100,100,115,95,60,65,50,100]
-        lags = [100,100,115,100,50,50,50,90]
-    elif nononlinear:
-        eqns,names,ts = nononlinearDiamondTS(finaltime)
-        basefname = 'DiamondNoNonlinear_1200time_mixedlags_d020_lowinits_' 
-        lags = [100,100,115,100,56,66,32,120]
+        basefname = 'DiamondUnrotated_1200time_mixedlags_d020_lowinits_' 
+        lags = [100,100,115,95,60,65,50,100]
+        # lags = [100,100,115,100,50,50,50,90]
+    elif nonlinear:
+        eqns,names,ts = nonlinearDiamondTS(finaltime)
+        basefname = 'DiamondNonlinear_1200time_mixedlags_d020_lowinits_' 
+        lags = [100,100,115,100,60,70,45,95]
     else:
         eqns,names,ts = newDiamondTS(finaltime)
         basefname = 'DiamondInternalMult_1200time_mixedlags_' 
@@ -79,8 +79,8 @@ def runDiamond(finaltime=1200.0,remote=1,unrotated=1,nononlinear=0):
             continuityTestingFixedEps(eqns,names,ts,[c1,c2],tsprops,epsprops,[lags[c1],lags[c2]],numlags,fname=basedir+fname) 
 
 if __name__ == '__main__':
-    runDiamond()
-    # chooseLagsForSims(1200.0,unrotated=1,nononlinear=0)
+    runDiamond(unrotated=0,nonlinear=1)
+    # chooseLagsForSims(1200.0,unrotated=0,nonlinear=1)
     # #below, choose lags from autocorrelation
     # import StateSpaceReconstructionPlots as SSRPlots
     # eqns,names,ts = unrotatedDiamondTS(1200.0)
