@@ -5,7 +5,7 @@ import os
 
 basedir=os.path.join(os.path.expanduser("~"),'SimulationResults/TimeSeries/PecoraMethod/FinalPaperExamples/')
 for fname in os.listdir(basedir):
-    if '.png' not in fname and 'd015' in fname:
+    if '.png' not in fname and '010' in fname:
         # PV.plotContinuityConfWrapper(basedir,fname,[0,0])
         PV.plotContinuityConfWrapper_SaveFigs(basedir,fname,[0,0])
 

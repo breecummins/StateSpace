@@ -48,7 +48,7 @@ def nononlinearDiamondTS(finaltime=1200.0,dt=0.025,d=0.2):
     names = ['x','y','z','w','s','u','v','p']
     return eqns,names,timeseries
 
-def runDiamond(finaltime=1200.0,remote=1,unrotated=0,nononlinear=1):
+def runDiamond(finaltime=1200.0,remote=1,unrotated=1,nononlinear=0):
     print('Beginning batch run for diamond equations....')
     if remote:
         basedir = '/home/bcummins/'
@@ -59,8 +59,9 @@ def runDiamond(finaltime=1200.0,remote=1,unrotated=0,nononlinear=1):
     numlags = 8
     if unrotated:
         eqns,names,ts = unrotatedDiamondTS(finaltime)
-        basefname = 'DiamondUnrotated_1200time_mixedlags_d020_lowinits_' 
-        lags = [100,100,115,95,60,65,50,100]
+        basefname = 'DiamondUnrotated_1200time_mixedlags_d020_lowinits_zsupchangedlags_' 
+        # lags = [100,100,115,95,60,65,50,100]
+        lags = [100,100,115,100,50,50,50,90]
     elif nononlinear:
         eqns,names,ts = nononlinearDiamondTS(finaltime)
         basefname = 'DiamondNoNonlinear_1200time_mixedlags_d020_lowinits_' 
@@ -79,10 +80,10 @@ def runDiamond(finaltime=1200.0,remote=1,unrotated=0,nononlinear=1):
 
 if __name__ == '__main__':
     runDiamond()
-    # chooseLagsForSims(1200.0,unrotated=0,nononlinear=1)
+    # chooseLagsForSims(1200.0,unrotated=1,nononlinear=0)
     # #below, choose lags from autocorrelation
     # import StateSpaceReconstructionPlots as SSRPlots
     # eqns,names,ts = unrotatedDiamondTS(1200.0)
     # T = 400
     # autocorr = SSR.getAutocorrelation(ts[:,6],T)
-    # SSRPlots.plotAutocorrelation(autocorr,'p')
+    # SSRPlots.plotAutocorrelation(autocorr,'v')
