@@ -59,12 +59,12 @@ def runDPWithNoise(finaltime=1200.0,remote=1):
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) 
     eqns,names,ts = doublependulumTS(finaltime)
     numlags = 4
-    tsprops = np.array([1.00]) 
+    tsprops = np.arange(0.3,1.05,0.1) 
     compind1 = [0,0,0,1,1,2]
     compind2 = [1,2,3,2,3,3]
     basefname = 'DPNoise_1200time_numlags4_fixedlags_fixedeps_'
     lags= [[100,100],[100,115],[100,100],[100,115],[100,100],[115,100]]
-    noiselevels = np.arange(0.07,0.11,0.01)
+    noiselevels = np.arange(0.01,0.11,0.01)
     stds = [np.std(ts[:,k]) for k in range(ts.shape[1])]
     for n in noiselevels:
         basefname1 = basefname + 'noise%02d_' % round(n*100)

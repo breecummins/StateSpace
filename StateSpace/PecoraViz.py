@@ -75,8 +75,8 @@ def plotContinuityConfWrapper_SaveFigs_Noise(basedir,fnames,noises,logs=[0,0]):
     invconf = []
     for f in fnames:
         outdict = fileops.loadPickle(basedir+f)
-        forconf.append(outdict['forwardconf'].squeeze())
-        invconf.append(outdict['inverseconf'].squeeze())
+        forconf.append(outdict['forwardconf'][-1].squeeze())
+        invconf.append(outdict['inverseconf'][-1].squeeze())
     base = basedir+f[:-7] #get rid of .pickle at end of fname
     var1 = base[-2]
     var2 = base[-1]
