@@ -71,7 +71,7 @@ def runDPWithNoise(finaltime=1200.0,remote=1):
         ts1 = ts.copy()
         for k in range(ts.shape[1]):
             ts1[:,k] = ts1[:,k] + np.random.normal(0,n*stds[k],ts1[:,k].shape)
-        for k,c1 in enumerate(compind1[:1]):
+        for k,c1 in enumerate(compind1[1:]):
             print('------------------------------------')
             print(names[c1] + ' and ' + names[compind2[k]])
             print('------------------------------------')
