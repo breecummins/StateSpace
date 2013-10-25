@@ -4,17 +4,16 @@ import matplotlib as mpl
 mpl.rcParams.update({'font.size': 18})
 import fileops
 
-def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,inversetitle,logs = [1,1],forwardfname='',inversefname=''):
-    # Mlens = (tsprops*tslength).astype(int)
+def plotOutput(forwardconf,inverseconf,epsprops,legendarray,forwardtitle,inversetitle,logs = [1,1],forwardfname='',inversefname=''):
     colormap = plt.cm.jet
     plt.figure()
-    plt.gca().set_color_cycle([colormap(i) for i in np.linspace(0, 1.0, forwardconf.shape[1])])
+    plt.gca().set_color_cycle([colormap(i) for i in np.linspace(0, 1.0, len(legendarray))])
     if logs[0]:
         if np.any(forwardconf):
             plt.semilogy(epsprops,forwardconf.transpose())
             plt.ylim([0,1])
             # plt.legend([str(m) for m in Mlens],loc=0)
-            plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
+            plt.legend([str(int(m*100))+'%' for m in legendarray],loc=0,prop={'size':16})
             plt.ylabel(r'$\Theta$',rotation='horizontal')
             plt.xlabel(r'$\epsilon$')
             plt.title(forwardtitle[-12:])
@@ -27,7 +26,7 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
         plt.plot(epsprops,forwardconf.transpose())
         plt.ylim([0,1])
         # plt.legend([str(m) for m in Mlens],loc=0)
-        plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
+        plt.legend([str(int(m*100))+'%' for m in legendarray],loc=0,prop={'size':16})
         plt.ylabel(r'$\Theta$',rotation='horizontal')
         plt.xlabel(r'$\epsilon$')
         plt.title(forwardtitle[-12:])
@@ -35,13 +34,13 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
             plt.savefig(forwardfname)
             plt.close()
     plt.figure()
-    plt.gca().set_color_cycle([colormap(i) for i in np.linspace(0, 1.0, forwardconf.shape[1])])
+    plt.gca().set_color_cycle([colormap(i) for i in np.linspace(0, 1.0, len(legendarray))])
     if logs[1]:
         if np.any(inverseconf):
             plt.semilogy(epsprops,inverseconf.transpose())
             plt.ylim([0,1])
             # plt.legend([str(m) for m in Mlens],loc=0)
-            plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
+            plt.legend([str(int(m*100))+'%' for m in legendarray],loc=0,prop={'size':16})
             plt.ylabel(r'$\Theta$',rotation='horizontal')
             plt.xlabel(r'$\epsilon$')
             plt.title(inversetitle[-12:])
@@ -54,7 +53,7 @@ def plotOutput(forwardconf,inverseconf,epsprops,tsprops,tslength,forwardtitle,in
         plt.plot(epsprops,inverseconf.transpose())
         plt.ylim([0,1])
         # plt.legend([str(m) for m in Mlens],loc=0)
-        plt.legend([str(int(m*100))+'%' for m in tsprops],loc=0,prop={'size':16})
+        plt.legend([str(int(m*100))+'%' for m in legendarray],loc=0,prop={'size':16})
         plt.ylabel(r'$\Theta$',rotation='horizontal')
         plt.xlabel(r'$\epsilon$')
         plt.title(inversetitle[-12:])
@@ -69,7 +68,22 @@ def plotContinuityConfWrapper_SaveFigs(basedir,fname,logs=[0,0]):
     var2 = base[-1]
     forwardfname = base + '_M' + var1 + 'toM' + var2 + '.png'
     inversefname = base + '_M' + var2 + 'toM' + var1 + '.png'    
-    plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['epsprops'],outdict['tsprops'],len(outdict['ts']),outdict['forwardtitle'],outdict['inversetitle'],logs,forwardfname,inversefname)
+    plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['epsprops'],outdict['tsprops'],outdict['forwardtitle'],outdict['inversetitle'],logs,forwardfname,inversefname)
+
+def plotContinuityConfWrapper_SaveFigs_Noise(basedir,fnames,noises,logs=[0,0]):
+    forconf = []
+    invconf = []
+    for f in fnames:
+        outdict = fileops.loadPickle(basedir+f)
+        forconf.append(outdict['forwardconf'].squeeze())
+        invconf.append(outdict['inverseconf'].squeeze())
+    base = basedir+f[:-7] #get rid of .pickle at end of fname
+    var1 = base[-2]
+    var2 = base[-1]
+    chunk = 'noise{:02d}_'.format(int(noises[-1]*100))
+    forwardfname = base.replace(chunk,'') + '_M' + var1 + 'toM' + var2 + '.png'
+    inversefname = base.replace(chunk,'') + '_M' + var2 + 'toM' + var1 + '.png' 
+    plotOutput(np.array(forconf),np.array(invconf),outdict['epsprops'],noises,outdict['forwardtitle'],outdict['inversetitle'],logs,forwardfname,inversefname)
 
 def plotContinuityConfWrapper(basedir,fname,logs=[0,0]):
     outdict = fileops.loadPickle(basedir+fname)

@@ -64,10 +64,10 @@ def runDPWithNoise(finaltime=1200.0,remote=1):
     compind2 = [1,2,3,2,3,3]
     basefname = 'DPNoise_1200time_numlags4_fixedlags_fixedeps_'
     lags= [[100,100],[100,115],[100,100],[100,115],[100,100],[115,100]]
-    noiselevels = np.arange(0.01,0.11,0.01)
+    noiselevels = np.arange(0.07,0.11,0.01)
     stds = [np.std(ts[:,k]) for k in range(ts.shape[1])]
     for n in noiselevels:
-        basefname1 = basefname + 'noise%02d_' % int(n*100)
+        basefname1 = basefname + 'noise%02d_' % round(n*100)
         ts1 = ts.copy()
         for k in range(ts.shape[1]):
             ts1[:,k] = ts1[:,k] + np.random.normal(0,n*stds[k],ts1[:,k].shape)
