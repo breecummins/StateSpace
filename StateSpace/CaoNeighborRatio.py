@@ -3,41 +3,6 @@ from functools import partial
 from scipy.special import gamma
 import StateSpaceReconstruction as SSR
 
-def lagFromFirstZeroAutocorrelation(ts,M=None):
-    '''
-    Calculate autocorrelation of a 1D timeseries and 
-    return the first zero crossing. Check all lags from
-    1 to M+1. Default is M = len(ts)/10. 
-
-    '''
-    mu = np.mean(ts)
-    s2 = np.var(ts,ddof=1) #unbiased estimator of variance
-    N = len(ts)
-    if M == None:
-        M = int(N/10.)
-    autocc = []
-    for k in range(1,M+1):
-        autocc.append( ((ts[:N-k] - mu)*(ts[k:] - mu)).sum() / ( s2 *(N-k) ) )
-    return findFirstZero(autocc)
-
-def findFirstZero(arr):
-    '''
-    arr must be a list or 1D numpy array
-
-    '''
-    signs = np.sign(arr[1:]) + np.sign(arr[:-1])
-    ind = np.argmax(np.abs(signs) < 2)
-    if ind == 0 and np.abs(signs[0]) == 2: 
-        # False positive: if there is no zero crossing, argmax will return 
-        # the first index, so I have to manually return None.
-        return None 
-    elif np.abs(arr[ind]) < np.abs(arr[ind+1]):
-        # return whichever of the two indices flanking zero has the smallest value
-        return ind
-    else:
-        return ind+1
-
-
 def Ln(poi,pts,n=None):
     '''
     Norm of order n>0 between poi and pts, where poi is a 1D array
@@ -87,7 +52,7 @@ def CaoNeighborRatio(ts,lagsize,randinds,dims=4,norm=Linf):
     randinds = set(randinds).intersection(range(len(ts)-shifts[-1]))
     if len(randinds) != L:
         print('Number of random indices changed from {0} to {1}'.format(L,len(randinds)))
-    for d in range(1,dims):
+    for d in range(2,dims):
         m = SSR.makeShadowManifold(ts,d,lagsize)
         manifolds.append(m[corrections[d-1]:,:])
     # now find nearest neighbors and calculate Cao ratio
@@ -101,6 +66,9 @@ def CaoNeighborRatio(ts,lagsize,randinds,dims=4,norm=Linf):
             dist1 = norm(m1[k,:],m1[nk,:])
             rats.append(dist1/distknk)
         E.append(np.mean(rats))
+        if d > 0:
+            print('dim: {0}'.format(d))
+            print('Neighbor ratio: {0}'.format(E[-1]/E[-2]))
     return [E[k+1] / E[k] for k in range(len(E)-1)]
 
 def CaoNeighborRatio2(ts,lagsize,randinds,thresh=0.97,norm=Linf):
@@ -138,9 +106,12 @@ def CaoNeighborRatio2(ts,lagsize,randinds,thresh=0.97,norm=Linf):
                 dist1 = norm(m1[k,:],m1[nk,:])
                 rats.append(dist1/distknk)
             e.append(np.mean(rats))
-        E = e[1]/e[0]
+        if e[0] > 0:
+            E = e[1]/e[0]
+        else:
+            E = np.nan
         print('Neighbor ratio: {0}'.format(E))
-        if E > thresh:
+        if E > thresh and E < 2 - thresh:
             abovethresh += 1
         elif abovethresh == 1:
             abovethresh = 0
@@ -155,7 +126,7 @@ def getLagDim(timeseries,cols=None,dims=10,randinds=None):
     timeseries.
 
     '''
-    thresh = 0.97
+    thresh = 0.90
     if cols == None:
         cols = range(timeseries.shape[1])
     if randinds == None:
@@ -165,26 +136,26 @@ def getLagDim(timeseries,cols=None,dims=10,randinds=None):
     for c in cols:
         print('Variable {0}'.format(c))
         ts = np.squeeze(timeseries[:,c])
-        lg.append(lagFromFirstZeroAutocorrelation(ts))
+        lg.append(SSR.lagsizeFromFirstZeroOfAutocorrelation(ts))
         print('Lagsize: {0}'.format(lg[-1]))
         rats.append(CaoNeighborRatio(ts,lg[-1],randinds,dims=dims))
     if len(lg)> 1:
         diffs = [abs(lg[k] - lg[j]) for k in range(len(lg)) for j in range(k+1,len(lg))]
         if max(diffs) > 2:
             print('Discrepancy in lagsizes: {0}'.format(lg))
-            print('Embedding dimensions: {0}'.format(nl))
+            print('Embedding dimensions: {0}'.format(rats))
         else:
             print('Lagsizes: {0}'.format(lg))
-            print('Embedding dimensions: {0}'.format(nl))
+            print('Embedding dimensions: {0}'.format(rats))
     else:
         print('Lagsize: {0}'.format(lg))
-        print('Embedding dimension: {0}'.format(nl))
+        print('Embedding dimension: {0}'.format(rats))
     inds = [min([i+1 for i in range(len(rat)) if rat[i] > thresh]) for rat in rats]
     numlags = max(inds)
     lagsize = lg[inds.index(numlags)]
     return lagsize, numlags
 
-def getLagDim2(timeseries,cols=None,thresh=0.97,randinds=None):
+def getLagDim2(timeseries,cols=None,thresh=0.90,randinds=None,lags=None):
     '''
     Employs an arbitrary threshold to choose the embedding dim.
 
@@ -195,13 +166,17 @@ def getLagDim2(timeseries,cols=None,thresh=0.97,randinds=None):
         randinds = range(timeseries.shape[0]) 
     lg = []
     nl = []
-    for c in cols:
+    for k,c in enumerate(cols):
         print('Variable {0}'.format(c))
         ts = np.squeeze(timeseries[:,c])
-        lg.append(lagFromFirstZeroAutocorrelation(ts))
-        print('Lagsize: {0}'.format(lg[-1]))
-        nl.append(CaoNeighborRatio2(ts,lg[-1],randinds,thresh=thresh))
-    if len(lg)> 1:
+        if lags:
+            print('Lagsize: {0}'.format(lags[k]))
+            nl.append(CaoNeighborRatio2(ts,lags[k],randinds,thresh=thresh))
+        else:
+            lg.append(SSR.lagsizeFromFirstZeroOfAutocorrelation(ts))
+            print('Lagsize: {0}'.format(lg[-1]))
+            nl.append(CaoNeighborRatio2(ts,lg[-1],randinds,thresh=thresh))
+    if not lags and len(lg)> 1:
         diffs = [abs(lg[k] - lg[j]) for k in range(len(lg)) for j in range(k+1,len(lg))]
         if max(diffs) > 2:
             print('Discrepancy in lagsizes: {0}'.format(lg))
@@ -209,9 +184,12 @@ def getLagDim2(timeseries,cols=None,thresh=0.97,randinds=None):
         else:
             print('Lagsizes: {0}'.format(lg))
             print('Embedding dimensions: {0}'.format(nl))
-    else:
+    elif not lags and len(lg) == 1:
         print('Lagsize: {0}'.format(lg))
         print('Embedding dimension: {0}'.format(nl))
+    else:
+        print('Lagsizes: {0}'.format(lags))
+        print('Embedding dimensions: {0}'.format(nl))
     numlags = max(nl)
     lagsize = lg[nl.index(numlags)]
     return lagsize, numlags
@@ -289,6 +267,6 @@ if __name__ == '__main__':
     timeseries = timeseries[startind:,:]
     N = len(timeseries)
     randinds = random.sample(range(N-int(N/10.)),int(N/5.))
-    lagsize,numlags=getLagDim2(timeseries,cols=[0,3],randinds=randinds)
+    lagsize,numlags=getLagDim2(timeseries,cols=None,thresh=0.9,randinds=randinds)
     print('Lagsize: {0}'.format(lagsize))
     print('Embedding dimension: {0}'.format(numlags))
