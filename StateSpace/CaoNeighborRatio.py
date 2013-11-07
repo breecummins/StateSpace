@@ -191,7 +191,10 @@ def getLagDim2(timeseries,cols=None,thresh=0.90,randinds=None,lags=None):
         print('Lagsizes: {0}'.format(lags))
         print('Embedding dimensions: {0}'.format(nl))
     numlags = max(nl)
-    lagsize = lg[nl.index(numlags)]
+    if lags:
+        lagsize = lags
+    else:
+        lagsize = lg[nl.index(numlags)]
     return lagsize, numlags
 
 if __name__ == '__main__':
