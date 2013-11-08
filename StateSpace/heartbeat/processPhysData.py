@@ -2,7 +2,7 @@ import numpy as np
 import random
 import StateSpace.PecoraMethodModified as PM
 import StateSpace.CaoNeighborRatio as CNR
-import StateSpace.fileops
+import StateSpace.fileops as fileops
 
 def extractRates(fname='physdata_13081200_NewSummary.csv'):
     f = open(fname,'r')
