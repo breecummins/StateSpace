@@ -88,13 +88,13 @@ def plotContinuityConfWrapper_SaveFigs_Noise(basedir,fnames,noises,logs=[0,0]):
 def plotContinuityConfWrapper(basedir,fname,logs=[0,0]):
     outdict = fileops.loadPickle(basedir+fname)
     np.set_printoptions(linewidth=125)
-    # print("Epsilon as proportions of (changing) standard deviations: {0}.".format(outdict['epsprops']))
+    print("Epsilon as proportions of (changing) standard deviations: {0}.".format(outdict['epsprops']))
     print(outdict['forwardtitle'])
-    print("Forward continuity confidence at biggest epsilon and N: ")
-    print(outdict['forwardconf'][-1][-1])
+    print("Forward continuity confidence: ")
+    print(outdict['forwardconf'])
     print(outdict['inversetitle'])
-    print("Inverse continuity confidence at biggest epsilon and N: ")
-    print(outdict['inverseconf'][-1][-1])
+    print("Inverse continuity confidence: ")
+    print(outdict['inverseconf'])
     # print("Real epsilon values for M1: ")
     # for e in outdict['epsM1']: 
     #     print(e)
