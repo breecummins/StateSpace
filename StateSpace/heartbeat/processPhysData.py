@@ -74,6 +74,6 @@ def runHeartRate(lags,dims,remote=1):
 
 
 if __name__ == "__main__":
-    runHeartRate([10,20,50],[3,4])
+    runHeartRate([1,5],[3,4])
 
 
