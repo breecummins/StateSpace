@@ -50,7 +50,7 @@ def runHeartRate(lags,dims,remote=1):
     names = ['h','b']
     print('Beginning batch run for heart rate equations....')
     ts = extractRates()
-    ts = [90:720,:]
+    ts = ts[90:720,:]
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) 
     tsprops = np.arange(0.3,1.05,0.1) 
     for l in lags:
