@@ -10,7 +10,7 @@ import StateSpace.PecoraViz as PV
 def plotContConf():
     basedir=os.path.join(os.path.expanduser("~"),'SimulationResults/TimeSeries/HeartRateData/')
     for fname in os.listdir(basedir):
-        if '.pickle' in fname and 'Truncated' in fname:
+        if '.pickle' in fname and 'lag100' in fname:
             print(fname)
             PV.plotContinuityConfWrapper(basedir,fname,[0,0])
             PV.plotContinuityConfWrapper_SaveFigs(basedir,fname,[0,0])
@@ -33,10 +33,12 @@ def autocorrViz(ts):
     SSRPlots.plotAutocorrelation(autocorr1,"breathing rate autocorr")
 
 if __name__ == "__main__":
+    plotContConf()
     ts = PD.extractRates()
-    # plotRates(ts,90,720)
-    # plotContConf()
-    # SSRPlots.plotShadowManifold(ts[:,0], 3, 20, show=0,hold=0,style='b-',titlestr='Heart rate',scatter=False, color=None,smooth=1)
-    # SSRPlots.plotShadowManifold(ts[:,1], 3, 20, show=1,hold=0,style='b-',titlestr='Breathing rate',scatter=False, color=None,smooth=1)
-    autocorrViz(ts[90:720,:])
+    plotRates(ts)
+    plotRates(ts,90,720)
+    for l in [5,50,100]:
+        SSRPlots.plotShadowManifold(ts[90:720,0], 3, l, show=0,hold=0,style='b-',titlestr='Heart rate, lag {0}'.format(l),scatter=False, color=None,smooth=1)
+        SSRPlots.plotShadowManifold(ts[90:720,1], 3, l, show=1,hold=0,style='b-',titlestr='Breathing rate, lag {0}'.format(l),scatter=False, color=None,smooth=1)
+     # autocorrViz(ts[90:720,:])
 

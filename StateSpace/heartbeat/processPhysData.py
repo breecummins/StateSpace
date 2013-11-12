@@ -1,5 +1,5 @@
 import numpy as np
-import random
+import random, os
 import StateSpace.PecoraMethodModified as PM
 import StateSpace.CaoNeighborRatio as CNR
 import StateSpace.fileops as fileops
@@ -67,7 +67,7 @@ def runHeartRate(lags,dims,remote=1):
 
 
 if __name__ == "__main__":
-    runHeartRate([1,5,10,20,50],range(3,9))
+    runHeartRate([100],range(3,9),remote=0)
     # getLagsDimsWrapper([1,5,10,20],90,720)
 
 
