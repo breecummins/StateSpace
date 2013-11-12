@@ -23,8 +23,11 @@ def getLagsDims(ts,lags=None):
     lags, dims = CNR.getLagDim2(ts,randinds=randinds,lags=lags)
     return lags, dims
 
-def getLagsDimsWrapper(listoflags):
+def getLagsDimsWrapper(listoflags,start=0,stop=None):
+    if not stop:
+        stop = ts.shape[0]
     ts = extractRates()
+    ts = ts[start:stop,:]
     for l in listoflags:
         print("--------------------------------------")
         print("Lags = {0}".format(l))
@@ -64,7 +67,7 @@ def runHeartRate(lags,dims,remote=1):
 
 
 if __name__ == "__main__":
-    runHeartRate([1,5,10,20],[3,4])
-    # getLagsDimsWrapper([1,5])
+    runHeartRate([1,5,10,20,50],range(3,9))
+    # getLagsDimsWrapper([1,5,10,20],90,720)
 
 
