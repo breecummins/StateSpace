@@ -11,6 +11,7 @@ def plotContConf():
     basedir=os.path.join(os.path.expanduser("~"),'SimulationResults/TimeSeries/HeartRateData/')
     for fname in os.listdir(basedir):
         if '.pickle' in fname:
+            print(fname)
             PV.plotContinuityConfWrapper(basedir,fname,[0,0])
             PV.plotContinuityConfWrapper_SaveFigs(basedir,fname,[0,0])
 
@@ -32,10 +33,10 @@ def autocorrViz(ts):
     SSRPlots.plotAutocorrelation(autocorr1,"breathing rate autocorr")
 
 if __name__ == "__main__":
-    plotContConf()
-    # ts = PD.extractRates()
+    # plotContConf()
+    ts = PD.extractRates()
+    plotRates(ts,90,720)
     # SSRPlots.plotShadowManifold(ts[:,0], 3, 20, show=0,hold=0,style='b-',titlestr='Heart rate',scatter=False, color=None,smooth=1)
     # SSRPlots.plotShadowManifold(ts[:,1], 3, 20, show=1,hold=0,style='b-',titlestr='Breathing rate',scatter=False, color=None,smooth=1)
     # autocorrViz(ts)
-    # plotRates(ts,90,720)
 

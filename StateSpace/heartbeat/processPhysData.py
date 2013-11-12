@@ -23,24 +23,13 @@ def getLagsDims(ts,lags=None):
     lags, dims = CNR.getLagDim2(ts,randinds=randinds,lags=lags)
     return lags, dims
 
-def getLagsDimsWrapper():
+def getLagsDimsWrapper(listoflags):
     ts = extractRates()
-    print("--------------------------------------")
-    print("Lags = 10")
-    print("--------------------------------------")
-    lags,dims = getLagsDims(ts, lags=[10,10])
-    print("--------------------------------------")
-    print("Lags = 20")
-    print("--------------------------------------")
-    lags,dims = getLagsDims(ts, lags=[20,20])
-    print("--------------------------------------")
-    print("Lags = 50")
-    print("--------------------------------------")
-    lags,dims = getLagsDims(ts, lags=[50,50])
-    print("--------------------------------------")
-    print("Lags = 100")
-    print("--------------------------------------")
-    lags,dims = getLagsDims(ts, lags=[100,100])
+    for l in listoflags:
+        print("--------------------------------------")
+        print("Lags = {0}".format(l))
+        print("--------------------------------------")
+        lags,dims = getLagsDims(ts, lags=[l,l])
 
 def continuityTestingFixedEps(eqns,names,ts,compinds,tsprops,epsprops,lags,numlags,fname=''):
     forwardconf, inverseconf, epsM1, epsM2, forwardprobs, inverseprobs = PM.convergenceWithContinuityTestFixedLagsFixedEps(ts[:,compinds[0]],ts[:,compinds[1]],numlags,lags[0],lags[1],tsprops=tsprops,epsprops=epsprops)
@@ -61,6 +50,7 @@ def runHeartRate(lags,dims,remote=1):
     names = ['h','b']
     print('Beginning batch run for heart rate equations....')
     ts = extractRates()
+    ts = [90:720,:]
     epsprops=np.array([0.02,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4]) 
     tsprops = np.arange(0.3,1.05,0.1) 
     for l in lags:
@@ -68,12 +58,13 @@ def runHeartRate(lags,dims,remote=1):
             print('------------------------------------')
             print("Lag %d, dimension %d" % (l,d))
             print('------------------------------------')
-            fname = 'HeartRate_lag%02d_dim%02d.pickle' % (l,d)
+            fname = 'HeartRateTruncated_lag%02d_dim%02d.pickle' % (l,d)
             continuityTestingFixedEps(eqns,names,ts,[0,1],tsprops,epsprops,[l,l],d,fname=basedir+fname) 
 
 
 
 if __name__ == "__main__":
-    runHeartRate([1,5],[3,4])
+    runHeartRate([1,5,10,20],[3,4])
+    # getLagsDimsWrapper([1,5])
 
 
