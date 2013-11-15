@@ -44,7 +44,7 @@ def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False
     elif len(s) == 2 and s[1] == 3:
         if not scatter:
             ax.plot(timeseries[:,0],timeseries[:,1],timeseries[:,2],style,color=color)
-            ax._axis3don = False
+            # ax._axis3don = False
             # plt.hold('on')
             # ax.plot([0.5],[0.5],[0.1],'r.')
             # ax.set_zlim3d(0,2)
