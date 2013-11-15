@@ -33,7 +33,7 @@ def autocorrViz(ts):
     SSRPlots.plotAutocorrelation(autocorr1,"breathing rate autocorr")
 
 if __name__ == "__main__":
-    plotContConf()
+    # plotContConf()
     ts = PD.extractRates()
     plotRates(ts)
     plotRates(ts,90,720)

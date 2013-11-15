@@ -120,20 +120,23 @@ if __name__ == '__main__':
     # SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=0, titlestr=r'$M_y$',style='r-')
     # SSRPlots.plotShadowManifold(x[:,0], 3, 50, show=0, titlestr=r'$M_x$',style='g-')
     # SSRPlots.plotManifold(x,show=1,titlestr='x,y,z',style='k-')
-    # #########################
-    # x = solveDiamond([1.0,2.0,3.0,2.0,0.5,0.5,0.1,0.75],600.0,d=0.2)
+    #########################
+    x = solveDiamond([1.0,2.0,3.0,2.0,0.5,0.5,0.1,0.75],600.0,d=0.2)
     # SSRPlots.plotShadowManifold(x[:,6], 3, 50, show=0, titlestr=r'$M_v$, lag 50')
     # SSRPlots.plotShadowManifold(x[:,5], 3, 65, show=0, titlestr=r'$M_u$, lag 65')
     # SSRPlots.plotShadowManifold(x[:,4], 3, 60, show=0, titlestr=r'$M_s$, lag 60')
     # SSRPlots.plotManifold(x[:,[0,1,7]],show=0,titlestr='x,y,p')
     # SSRPlots.plotManifold(x[:,4:7],show=1,titlestr='phase space')
-    #########################
-    x = solveDiamondNonlinearTerm([1.0,2.0,3.0,2.0,4.0,4.0,4.0,0.75],600.0,d=0.4)
-    SSRPlots.plotShadowManifold(x[:,6], 3, 50, show=0, titlestr=r'$M_v$, lag 50')
-    SSRPlots.plotShadowManifold(x[:,5], 3, 65, show=0, titlestr=r'$M_u$, lag 65')
-    SSRPlots.plotShadowManifold(x[:,4], 3, 60, show=0, titlestr=r'$M_s$, lag 60')
-    SSRPlots.plotManifold(x[:,[0,1,7]],show=0,titlestr='x,y,p')
-    SSRPlots.plotManifold(x[:,4:7],show=1,titlestr='phase space')
+    # SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=1,color=(0.2,0.5,0.2))
+    SSRPlots.plotShadowManifold(x[:,5], 3, 60, show=1,color=(0.4,0.1,0.05))
+    # SSRPlots.plotManifold(x[:,4:7],show=1,style='k-')
+    # #########################
+    # x = solveDiamondNonlinearTerm([1.0,2.0,3.0,2.0,4.0,4.0,4.0,0.75],600.0,d=0.4)
+    # SSRPlots.plotShadowManifold(x[:,6], 3, 50, show=0, titlestr=r'$M_v$, lag 50')
+    # SSRPlots.plotShadowManifold(x[:,5], 3, 65, show=0, titlestr=r'$M_u$, lag 65')
+    # SSRPlots.plotShadowManifold(x[:,4], 3, 60, show=0, titlestr=r'$M_s$, lag 60')
+    # SSRPlots.plotManifold(x[:,[0,1,7]],show=0,titlestr='x,y,p')
+    # SSRPlots.plotManifold(x[:,4:7],show=1,titlestr='phase space')
     # # #########################
     # x = solveRotatedRossler([5,4,3],600.0)
     # # SSRPlots.plotShadowManifold(x[:,2], 3, 60, show=0, titlestr=r'$M_v$',style='k-')

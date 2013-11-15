@@ -64,6 +64,9 @@ def rotatedLorenz(t,x,sigma=0.,rho=0.,beta=0.):
 if __name__ == '__main__':
     import StateSpaceReconstructionPlots as SSRPlots
     dt = 0.025
+    dt = 0.01
+    lag=10
+    lag=25
     finaltime = 100.0
     # timeseries = solveLorenzVarChange([1.0,0.5,-0.5],finaltime,dt)
     # numlags = 3
@@ -79,7 +82,7 @@ if __name__ == '__main__':
     ##############################
     timeseries = solveLorenz([1.0,0.5,0.5],finaltime,dt)
     numlags = 3
-    SSRPlots.plotManifold(timeseries,show=0)
-    SSRPlots.plotShadowManifold(timeseries[:,0],3,10,show=0,hold=0,style='r-')
-    SSRPlots.plotShadowManifold(timeseries[:,1],3,10,show=0,hold=0,style='g-')
-    SSRPlots.plotShadowManifold(timeseries[:,2],3,7,show=1,hold=0,style='k-')
+    # SSRPlots.plotManifold(timeseries,show=0)
+    SSRPlots.plotShadowManifold(timeseries[:,2],numlags,lag,show=1,hold=0,color=(0.8,0.2,0.1))
+    # SSRPlots.plotShadowManifold(timeseries[:,1],3,10,show=0,hold=0,style='g-')
+    # SSRPlots.plotShadowManifold(timeseries[:,2],3,7,show=1,hold=0,style='r-')

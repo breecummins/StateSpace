@@ -22,6 +22,7 @@ def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False
     s = timeseries.shape
     if not hold:
         fig = plt.figure()
+        fig.patch.set_alpha(0.0)
         if len(s) == 2 and s[1] == 3:
             ax = fig.add_subplot(111, projection='3d')
     else:
@@ -43,6 +44,7 @@ def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False
     elif len(s) == 2 and s[1] == 3:
         if not scatter:
             ax.plot(timeseries[:,0],timeseries[:,1],timeseries[:,2],style,color=color)
+            ax._axis3don = False
             # plt.hold('on')
             # ax.plot([0.5],[0.5],[0.1],'r.')
             # ax.set_zlim3d(0,2)
@@ -54,6 +56,7 @@ def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False
     else:
         print('A timeseries of dimension ' + str(timeseries.shape) + ' cannot be plotted')
         raise(SystemExit)
+    ax.patch.set_alpha(0.0)
     if titlestr != None:  
         plt.title(titlestr)
     if show:
