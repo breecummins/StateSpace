@@ -128,7 +128,7 @@ if __name__ == '__main__':
     # SSRPlots.plotManifold(x[:,[0,1,7]],show=0,titlestr='x,y,p')
     # SSRPlots.plotManifold(x[:,4:7],show=1,titlestr='phase space')
     # SSRPlots.plotShadowManifold(x[:,1], 3, 60, show=1,color=(0.2,0.5,0.2))
-    SSRPlots.plotShadowManifold(x[:,5], 3, 60, show=1,color=(0.4,0.1,0.05))
+    SSRPlots.plotShadowManifold(x[:,5], 3, 60, show=1,color=(0.7,0,0))
     # SSRPlots.plotManifold(x[:,4:7],show=1,style='k-')
     # #########################
     # x = solveDiamondNonlinearTerm([1.0,2.0,3.0,2.0,4.0,4.0,4.0,0.75],600.0,d=0.4)

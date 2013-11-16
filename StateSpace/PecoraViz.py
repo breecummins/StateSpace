@@ -66,8 +66,8 @@ def plotContinuityConfWrapper_SaveFigs(basedir,fname,logs=[0,0]):
     base = basedir+fname[:-7] #get rid of .pickle at end of fname
     var1 = base[-2]
     var2 = base[-1]
-    forwardfname = base + '_M' + var1 + 'toM' + var2 + '.png'
-    inversefname = base + '_M' + var2 + 'toM' + var1 + '.png'    
+    forwardfname = base + '_M' + var1 + 'toM' + var2 + '.eps'
+    inversefname = base + '_M' + var2 + 'toM' + var1 + '.eps'    
     plotOutput(outdict['forwardconf'],outdict['inverseconf'],outdict['epsprops'],outdict['tsprops'],outdict['forwardtitle'],outdict['inversetitle'],logs,forwardfname,inversefname)
 
 def plotContinuityConfWrapper_SaveFigs_Noise(basedir,fnames,noises,logs=[0,0]):
