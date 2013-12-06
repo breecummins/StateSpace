@@ -18,12 +18,14 @@ def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False
     if style and not color:
         color = style[0]
     if scatter and style[1] == '-':
-        style = style[0] + '.'
+        style = style[0] + 'o'
+    if scatter and not style:
+        style = 'o' 
     s = timeseries.shape
     if not hold:
         fig = plt.figure()
         fig.patch.set_alpha(0.0)
-        if len(s) == 2 and s[1] == 3:
+        if len(s) == 2 and s[1] > 2:
             ax = fig.add_subplot(111, projection='3d')
     else:
         plt.hold('on')
@@ -32,13 +34,14 @@ def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False
         if not scatter:
             plt.plot(timeseries,style,color=color)
         else:
-            plt.scatter(timeseries,style,color=color)
+            plt.scatter(timeseries)
         # plt.ylabel(r'$x_0$')
     elif len(s) == 2 and s[1] == 2:
         if not scatter:
             plt.plot(timeseries[:,0],timeseries[:,1],style,color=color)
         else:
-            plt.scatter(timeseries[:,0],timeseries[:,1],style,color=color)
+            plt.scatter(timeseries[:,0],timeseries[:,1])
+            plt.axis('off')
         # plt.xlabel(r'$x_0$')
         # plt.ylabel(r'$x_1$')
     elif len(s) == 2 and s[1] == 3:
@@ -50,13 +53,18 @@ def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False
             # ax.set_zlim3d(0,2)
         else:
             ax.scatter(timeseries[:,0],timeseries[:,1],timeseries[:,2],style,color=color)
+        ax.patch.set_alpha(0.0)
         # plt.xlabel(r'$x_0$')
         # plt.ylabel(r'$x_1$')
         # ax.set_zlabel(r'$x_2$')
+    elif len(s) == 2 and s[1] == 4:
+        norm4 = (timeseries[:,-1] - np.min(timeseries[:,-1])) / (np.max(timeseries[:,-1]) - np.min(timeseries[:,-1]))
+        ax.scatter(timeseries[:,0],timeseries[:,1],timeseries[:,2],'-',c=mpl.cm.jet(norm4))
+        ax._axis3don = False
+        ax.patch.set_alpha(0.0)
     else:
         print('A timeseries of dimension ' + str(timeseries.shape) + ' cannot be plotted')
         raise(SystemExit)
-    ax.patch.set_alpha(0.0)
     if titlestr != None:  
         plt.title(titlestr)
     if show:
