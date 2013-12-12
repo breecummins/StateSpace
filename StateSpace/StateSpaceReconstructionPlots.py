@@ -10,7 +10,7 @@ import CCM, CCMAlternatives,Weights
 
 mpl.rcParams.update({'font.size': 22})
 
-def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False,color=None):
+def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False,color=None,axisequal=True):
     '''
     timeseries is a sequence of observations containing at most three columns
 
@@ -27,6 +27,18 @@ def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False
         fig.patch.set_alpha(0.0)
         if len(s) == 2 and s[1] > 2:
             ax = fig.add_subplot(111, projection='3d')
+            if axisequal:
+                # Create cubic bounding box to simulate equal aspect ratio
+                X = timeseries[:,0]
+                Y = timeseries[:,1]
+                Z = timeseries[:,2]
+                max_range = np.array([X.max()-X.min(), Y.max()-Y.min(), Z.max()-Z.min()]).max()
+                Xb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][0].flatten() + 0.5*(X.max()+X.min())
+                Yb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][1].flatten() + 0.5*(Y.max()+Y.min())
+                Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() + 0.5*(Z.max()+Z.min())
+                # Comment or uncomment following both lines to test the fake bounding box:
+                for xb, yb, zb in zip(Xb, Yb, Zb):
+                   ax.plot([xb], [yb], [zb], 'w')
     else:
         plt.hold('on')
         ax = plt.gca()
@@ -67,12 +79,14 @@ def plotManifold(timeseries,show=1,hold=0,style='b-',titlestr=None,scatter=False
         raise(SystemExit)
     if titlestr != None:  
         plt.title(titlestr)
+    if axisequal:   
+        plt.axis('equal')
     if show:
         plt.show()
 
 
 
-def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-',titlestr=None,scatter=False, color=None,smooth=1):
+def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-',titlestr=None,scatter=False, color=None,smooth=1,axisequal=True):
     '''
     timeseries is a sequence of observations.
     numlags is a integer indicating the dimension of the shadow manifold
@@ -81,7 +95,7 @@ def plotShadowManifold(timeseries, numlags, lagsize, show=1,hold=0,style='b-',ti
 
     '''
     pts = SSR.makeShadowManifold(timeseries,numlags,lagsize,smooth)
-    plotManifold(pts,show=show,hold=hold,style=style,titlestr=titlestr,scatter=scatter,color=color)
+    plotManifold(pts,show=show,hold=hold,style=style,titlestr=titlestr,scatter=scatter,color=color,axisequal=axisequal)
 
 def plotEstShadowManifoldSugihara(ts1,ts2,numlags,lagsize,wgtfunc=Weights.makeExpWeights):
     est1,est2 = CCM.crossMap(ts1,ts2,numlags,lagsize,wgtfunc)

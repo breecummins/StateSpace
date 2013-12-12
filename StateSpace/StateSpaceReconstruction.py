@@ -71,7 +71,7 @@ def getAutocorrelation(ts,T):
 def lagsizeFromFirstZeroOfAutocorrelation(ts,T=None):
     '''
     Calculate autocorrelation of a 1D timeseries and 
-    return the first zero crossing in the first 30%
+    return the first zero crossing in the first 40%
     of the time series. An error is thrown if there
     is no such zero.
 
