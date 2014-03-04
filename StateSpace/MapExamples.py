@@ -27,7 +27,12 @@ def map2(x0,y0,N):
         y.append(y[k-1]*(3.5-3.5*y[k-1]-0.1*(x[k-1])**2))
     return x,y
 
-def figs(x,y):
+def figstogether(x,y):
+    plt.figure()
+    plt.plot(x,y,'b-')
+    plt.show()
+
+def figsapart(x,y):
     plt.figure()
     plt.plot(x,'b-')
     plt.hold('on')
@@ -35,7 +40,7 @@ def figs(x,y):
     plt.show()
 
 # x,y=mapSugi(0.1,0.2,1000)
-# figs(x,y)
+# figsapart(x,y)
 x,y=map2(0.1,0.2,100)
-figs(x,y)
-
+figsapart(x,y)
+figstogether(x,y)
