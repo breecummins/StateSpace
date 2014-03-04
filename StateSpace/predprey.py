@@ -62,8 +62,8 @@ def run4D():
     tsprops=np.arange(0.4,1.1,0.2)
     epspropslo=np.array([0.001, 0.002, 0.005,0.01,0.02,0.05])
     epspropshi=np.array([0.005,0.01,0.02,0.05,0.1,0.2])
-    c1=2
-    c2=3
+    c1=1
+    c2=2
     epsprops=epspropshi
     forwardconf, inverseconf,epslist1,epslist2,forwardprobs,inverseprobs = PM.convergenceWithContinuityTestFixedLagsFixedEps(ts[:,c1],ts[:,c2],dim,lags[c1],lags[c2],tsprops=tsprops,epsprops=epsprops)
     PV.plotOutput(forwardconf,inverseconf,epsprops,tsprops,'Mx'+str(c1+1)+' -> Mx'+str(c2+1),'Mx'+str(c2+1)+' -> Mx'+str(c1+1),logs = [0,0])
