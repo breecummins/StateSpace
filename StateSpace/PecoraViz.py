@@ -20,6 +20,8 @@ def plotOutput(forwardconf,inverseconf,epsprops,legendarray,forwardtitle,inverse
             if forwardfname:
                 plt.savefig(forwardfname)
                 plt.close()
+            else:
+                plt.show()
         else:
             print("Data has no positive values in the forward direction.")
     else:   
@@ -33,6 +35,8 @@ def plotOutput(forwardconf,inverseconf,epsprops,legendarray,forwardtitle,inverse
         if forwardfname:
             plt.savefig(forwardfname)
             plt.close()
+        else:
+            plt.show()
     plt.figure()
     plt.gca().set_color_cycle([colormap(i) for i in np.linspace(0, 1.0, len(legendarray))])
     if logs[1]:
@@ -47,6 +51,8 @@ def plotOutput(forwardconf,inverseconf,epsprops,legendarray,forwardtitle,inverse
             if inversefname:
                 plt.savefig(inversefname)
                 plt.close()
+            else:
+                plt.show()
         else:
             print("Data has no positive values in the inverse direction.")
     else:   
@@ -60,6 +66,8 @@ def plotOutput(forwardconf,inverseconf,epsprops,legendarray,forwardtitle,inverse
         if inversefname:
             plt.savefig(inversefname)
             plt.close()
+        else:
+            plt.show()
 
 def plotContinuityConfWrapper_SaveFigs(basedir,fname,logs=[0,0]):
     outdict = fileops.loadPickle(basedir+fname)
